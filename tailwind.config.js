@@ -8,8 +8,9 @@ export default {
 				statusSalate: "#779F7C",
 				statusRed: "#C73535",
 			},
-			maxWidth: {
-				laptop: "1024px",
+			gridTemplateColumns: {
+				"content-large": "440px 312px 140px 175px 178px",
+				"content-small": "301px 179px 140px 124px 125px",
 			},
 			fontFamily: {
 				baloo: ['"Baloo Bhai"', "cursive"],

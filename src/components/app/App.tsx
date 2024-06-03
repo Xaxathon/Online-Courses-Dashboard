@@ -1,4 +1,5 @@
 import Meetings from "../../pages/meetings/Meetings";
+import Protocol from "../../pages/protocol/Protocol";
 
 import Sidebar from "../sidebar/Sidebar";
 
@@ -6,7 +7,7 @@ function App() {
 	return (
 		<div className="flex">
 			<Sidebar />
-			<Meetings />
+			<Protocol />
 		</div>
 	);
 }
