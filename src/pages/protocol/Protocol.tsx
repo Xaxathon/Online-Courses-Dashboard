@@ -1,25 +1,45 @@
 import React from "react";
-
-import AddProtocolIcon from "@assets/icons/addProtocol.svg";
-import ProtocolList from "../../components/protocolList/ProtocolList";
+import ParticipantList from "../../components/participantList/ParticipantList";
+import VideoProtocol from "../../components/videoProtocol/VideoProtocol";
+import ProtocolAddForm from "../../components/protocolAddForm/ProtocolAddForm";
+import Subtitle from "../../components/subtitle/Subtitle";
+import Backward from "@assets/icons/backward.svg";
 const Protocol = () => {
 	return (
-		<div className=" mr-[15px] mt-[35px] space-y-[15px]">
-			<div className="font-bold text-mainPurple text-[24px] max-w-[1245px h-[51px] rounded-xl bg-gray-100 flex justify-between items-center px-[30px] ">
-				<h1>Протоколы</h1>
-				<div className="flex items-center space-x-4">
-					<h2>Создать новый протокол</h2>
-					<AddProtocolIcon />
+		<div className="mt-[35px]">
+			<div className="font-bold text-mainPurple text-[24px] w-[1245px] h-[51px] rounded-xl bg-gray-100 flex items-center justify-center relative px-[30px]">
+				<div className="absolute left-0 ml-[30px] cursor-pointer">
+					<Backward />
+				</div>
+				<h1 className="text-center w-full">Добавление протокола</h1>
+				<div className="absolute right-0 mr-[100px] flex gap-4">
+					<button className="flex text-[14px] items-center justify-center bg-mainPurple text-white px-4 py-1 rounded-lg">
+						PDF
+					</button>
+					<button className="flex text-[14px]  items-center justify-center bg-mainPurple text-white px-4 py-2 rounded-lg">
+						DOCX
+					</button>
 				</div>
 			</div>
-			<ul className="max-w-[1245px] px-5 grid lg:grid-cols-[minmax(301px,440px)_minmax(179px,312px)_minmax(140px,140px)_minmax(124px,175px)_minmax(125px,178px)] font-bold  justify-center xl:text-[17px] text-[15px] text-center text-mainPurple ">
-				<li className="col-span-5 md:col-span-1">Тема</li>
-				<li className="col-span-5 md:col-span-1">Секретарь</li>
-				<li className="col-span-5 md:col-span-1">Дата</li>
-				<li className="col-span-5 md:col-span-1">№Протокола</li>
-				<li className="col-span-5 md:col-span-1">Статус</li>
-			</ul>
-			<ProtocolList />
+			<div className="grid grid-cols-2 grid-rows-1 mt-6 gap-4">
+				<div className="w-full h-[653px] bg-gray-100 py-5 px-3  rounded-xl">
+					<h2 className="font-bold text-[20px] text-mainPurple text-center">
+						Участники
+					</h2>
+					<ParticipantList />
+					<h2 className="font-bold text-[20px] text-mainPurple text-center mt-[50px]">
+						Видеозапись
+					</h2>
+					<VideoProtocol />
+				</div>
+				<div className="flex justify-center w-full h-[653px] bg-gray-100 py-5 rounded-xl">
+					<ProtocolAddForm />
+				</div>
+				<Subtitle />
+			</div>
+			<div className="mx-auto w-[250px] cursor-pointer text-center my-6 text-white font-bold  text-[24px} bg-mainPurple py-3 px-2 rounded-lg">
+				Исполнить протокол
+			</div>
 		</div>
 	);
 };
