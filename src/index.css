@@ -8,23 +8,27 @@
 
 
 /* Добавьте эти стили в ваш CSS файл */
-.scrollbar-visible {
-    overflow-x: auto;
-  }
-  .scrollbar-visible::-webkit-scrollbar {
-    height: 8px; /* Высота полосы прокрутки */
-  }
-  
-  .scrollbar-visible::-webkit-scrollbar-thumb {
-    background: #c5c5c5; /* Цвет "ползунка" */
-    border-radius: 10px; /* Скругление краёв */
+/* Custom scrollbar styles */
+.scrollbar-custom {
+    scrollbar-width: thin;
+    scrollbar-color: #7130A3 #f1f1f1;
   }
   
-  .no-scrollbar {
-    scrollbar-width: none; /* Для Firefox */
-    -ms-overflow-style: none; /* Для Internet Explorer и Edge */
+  .scrollbar-custom::-webkit-scrollbar {
+    width: 12px; /* Ширина скроллбара */
   }
   
-  .no-scrollbar::-webkit-scrollbar {
-    display: none; /* Для WebKit (e.g. Safari, Chrome) */
+  .scrollbar-custom::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Цвет дорожки скроллбара */
+  }
+  
+  .scrollbar-custom::-webkit-scrollbar-thumb {
+    background-color: #7130A3; /* Цвет скроллбара */
+    border-radius: 10px; /* Радиус скроллбара */
+    border: 3px solid #f1f1f1; /* Пустота вокруг скроллбара */
+  }
+  
+  /* Ensuring scrollbar is always visible */
+  .scrollbar-custom {
+    overflow-y: scroll;
   }
