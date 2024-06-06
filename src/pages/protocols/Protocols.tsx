@@ -5,7 +5,7 @@ import ProtocolList from "../../components/protocolList/ProtocolList";
 const Protocol = () => {
 	return (
 		<div className=" mr-[15px] mt-[35px] space-y-[15px]">
-			<div className="font-bold text-mainPurple text-[24px] max-w-[1245px h-[51px] rounded-xl bg-gray-100 flex justify-between items-center px-[30px] ">
+			<div className="font-bold text-mainPurple text-[24px] max-w-[1245px] h-[51px] rounded-xl bg-gray-100 flex justify-between items-center px-[30px] ">
 				<h1>Протоколы</h1>
 				<div className="flex items-center space-x-4">
 					<h2>Создать новый протокол</h2>
