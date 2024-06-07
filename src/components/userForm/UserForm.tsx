@@ -1,16 +1,16 @@
 import React from "react";
 import Participant from "@assets/img/participant.jpg";
 
-const SettingsForm = () => {
+const UserForm = () => {
 	return (
 		<form action="">
 			<div className="flex space-x-3 font-bold items-center">
-				<label className="text-statusSalate text-[17px]" htmlFor="subject">
+				<label className="text-statusSalate text-[17px]" htmlFor="fio">
 					ФИО:
 				</label>
 				<input
 					className="w-[282px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
-					id="subject"
+					id="fio"
 					type="text"
 				/>
 			</div>
@@ -27,12 +27,42 @@ const SettingsForm = () => {
 				</div>
 				<div className="grid grid-cols-2 grid-rows-2 gap-5 font-bold justify-around">
 					<div className="flex flex-col space-y-[5px]">
-						<label className="text-statusSalate text-[17px]" htmlFor="subject">
+						<label className="text-statusSalate text-[17px]" htmlFor="name">
 							Наименование отдела
 						</label>
 						<input
 							className="w-[398px] h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
-							id="subject"
+							id="name"
+							type="text"
+						/>
+					</div>
+					<div className="flex flex-col space-y-[5px]">
+						<label className="text-statusSalate text-[17px]" htmlFor="login">
+							Логин
+						</label>
+						<input
+							className="w-[398px] h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+							id="login"
+							type="text"
+						/>
+					</div>
+					<div className="flex flex-col space-y-[5px]">
+						<label className="text-statusSalate text-[17px]" htmlFor="email">
+							E-mail
+						</label>
+						<input
+							className="w-[398px] h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+							id="email"
+							type="text"
+						/>
+					</div>
+					<div className="flex flex-col space-y-[5px]">
+						<label className="text-statusSalate text-[17px]" htmlFor="password">
+							Пароль
+						</label>
+						<input
+							className="w-[398px] h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+							id="password"
 							type="text"
 						/>
 					</div>
@@ -47,4 +77,4 @@ const SettingsForm = () => {
 	);
 };
 
-export default SettingsForm;
+export default UserForm;

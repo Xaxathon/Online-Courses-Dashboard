@@ -2,9 +2,9 @@ import React from "react";
 
 const TaskItem = () => {
 	return (
-		<li className="grid grid-cols-5 xl:text-[14px] text-[10px] bg-gray-100 items-center justify-center rounded-lg text-center p-5 w-full min-h-[60px] text-statusRed mb-3">
+		<li className="grid grid-cols-5 xl:text-[14px] relative text-[10px] bg-gray-100 items-center justify-center rounded-lg text-center p-5 w-full min-h-[60px] text-statusRed mb-3">
 			<div className="col-span-5 md:col-span-1">
-				Создание благоприятных условий для детей в образовательном центре Север
+				Создание благоприятных условий для
 			</div>
 			<div className="col-span-5 md:col-span-1">Чантиева Иман Магомедовна</div>
 			<div className="col-span-5 md:col-span-1">02.09.2023</div>

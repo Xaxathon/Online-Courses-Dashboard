@@ -4,10 +4,12 @@ import VideoProtocol from "../../components/videoProtocol/VideoProtocol";
 import ProtocolAddForm from "../../components/protocolAddForm/ProtocolAddForm";
 import Subtitle from "../../components/subtitle/Subtitle";
 import Backward from "@assets/icons/backward.svg";
+import AddProtocolIcon from "@assets/icons/addProtocol.svg";
+
 const Protocol = () => {
 	return (
-		<div className="mt-[35px]">
-			<div className="font-bold text-mainPurple text-[24px] w-[1245px] h-[51px] rounded-xl bg-gray-100 flex items-center justify-center relative px-[30px]">
+		<div className="mt-[35px] mr-5">
+			<div className="font-bold text-mainPurple text-[24px] max-w-[1245px] h-[51px] rounded-xl bg-gray-100 flex items-center justify-center relative px-[30px]">
 				<div className="absolute left-0 ml-[30px] cursor-pointer">
 					<Backward />
 				</div>
@@ -22,10 +24,16 @@ const Protocol = () => {
 				</div>
 			</div>
 			<div className="grid grid-cols-2 grid-rows-1 mt-6 gap-4">
-				<div className="w-full h-[653px] bg-gray-100 py-5 px-3  rounded-xl">
-					<h2 className="font-bold text-[20px] text-mainPurple text-center">
-						Участники
-					</h2>
+				<div className=" h-[653px] bg-gray-100 py-5 px-3  rounded-xl">
+					<div className="relative flex items-center justify-center bg-[#EAE8F1] p-2 rounded-lg mb-3">
+						<h2 className="font-bold text-[20px] text-mainPurple text-center">
+							Участники
+						</h2>
+						<div className="absolute right-0 mr-[25px] flex gap-4 cursor-pointer">
+							<AddProtocolIcon />
+						</div>
+					</div>
+
 					<ParticipantList />
 					<h2 className="font-bold text-[20px] text-mainPurple text-center mt-[50px]">
 						Видеозапись

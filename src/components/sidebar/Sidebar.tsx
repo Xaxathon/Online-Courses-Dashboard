@@ -8,10 +8,10 @@ import Logout from "@assets/icons/logout.svg";
 
 const Sidebar = () => {
 	return (
-		<div className="  h-screen flex mx-[15px] items-center">
-			<aside className="w-[110px]  h-full flex flex-col items-center justify-between py-10  bg-mainPurple rounded-[24px]">
+		<aside className="flex items-center z-10 h-screen mr-4">
+			<nav className="w-[110px] h-[98vh] z-10  flex  flex-col items-center justify-between py-10 bg-mainPurple rounded-[24px]">
 				<div className="flex flex-col space-y-10">
-					<a className=" text-white text-[60px] font-baloo cursor-pointer">P</a>
+					<a className="text-white text-[60px] font-baloo cursor-pointer">P</a>
 					<ul className="flex flex-col items-center justify-center space-y-[50px]">
 						<li>
 							<a href="#">
@@ -36,11 +36,11 @@ const Sidebar = () => {
 					</ul>
 				</div>
 
-				<a href="#">
+				<a href="#" className="">
 					<Logout />
 				</a>
-			</aside>
-		</div>
+			</nav>
+		</aside>
 	);
 };
 

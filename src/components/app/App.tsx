@@ -1,4 +1,3 @@
-import Protocols from "../../pages/protocols/Protocols";
 import KpiChart from "../kpiChart/KpiChart";
 import ProtocolModal from "../protocolModal/ProtocolModal";
 import Sidebar from "../sidebar/Sidebar";
@@ -17,17 +16,23 @@ import Change from "@assets/icons/change.svg";
 import Keywords from "../../pages/keywords/Keywords";
 
 import Participant from "@assets/img/participant.jpg";
-import SettingsForm from "../settingsForm/SettingsForm";
-import SecretariesForm from "../secretariesForm/SecretariesForm";
-import UserSettings from "../../pages/userSettings/userSettings";
-
+import SettingsForm from "../userForm/UserForm";
+import SecretariesForm from "../secretaryForm/SecretaryForm";
+import UserSettings from "../../pages/userSettings/UserSettings";
+import SecretaryAddForm from "../secretaryAddFormModal/SecretaryAddFormModal";
+import Protocol from "../../pages/protocol/Protocol";
+import Protocols from "../../pages/protocols/Protocols";
 function App() {
 	return (
-		<div className=" flex">
-			<Sidebar />
-			<UserSettings />
+		<div className="relative flex ">
+			<div className="sticky top-0 left-2 z-10 h-screen">
+				<Sidebar />
+			</div>
+			<Secretary />
 		</div>
 	);
 }
 
 export default App;
+
+// <Protocol />  <UserSettings /> <Keywords /> <AddProtocol /> <Protocols /> <Meetings /> <Settings /> <Secretaries /> <Secretary />
