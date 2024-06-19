@@ -14,7 +14,7 @@ import Settings from "../../pages/settings/Settings";
 import AddProtocolIcon from "@assets/icons/addProtocol.svg";
 import Change from "@assets/icons/change.svg";
 import Keywords from "../../pages/keywords/Keywords";
-
+import { useState } from "react";
 import Participant from "@assets/img/participant.jpg";
 import SettingsForm from "../userForm/UserForm";
 import SecretariesForm from "../secretaryForm/SecretaryForm";
@@ -22,17 +22,21 @@ import UserSettings from "../../pages/userSettings/UserSettings";
 import SecretaryAddForm from "../secretaryAddFormModal/SecretaryAddFormModal";
 import Protocol from "../../pages/protocol/Protocol";
 import Protocols from "../../pages/protocols/Protocols";
+import CalendarWithNotes from "../calendar/Calendar";
+import Appointment from "../../pages/appointment/Appointment";
+import Left from "@assets/icons/left-arrow.svg";
+import Right from "@assets/icons/right-arrow.svg";
+import SecretaryCarousel from "../secretaryCarousel/SecretaryCarousel";
+
 function App() {
 	return (
 		<div className="relative flex ">
-			<div className="sticky top-0 left-2 z-10 h-screen">
-				<Sidebar />
-			</div>
-			<Secretary />
+			<Sidebar />
+			<Protocol />
 		</div>
 	);
 }
 
 export default App;
 
-// <Protocol />  <UserSettings /> <Keywords /> <AddProtocol /> <Protocols /> <Meetings /> <Settings /> <Secretaries /> <Secretary />
+// <Protocol ideal />  <UserSettings /> <Keywords /> <AddProtocol problems /> <Protocols problems /> <Meetings problems/> <Settings /> <Secretaries /> <Appointment />

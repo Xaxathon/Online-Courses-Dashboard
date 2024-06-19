@@ -3,15 +3,14 @@ import SecretaryItem from "../secretaryItem/SecretaryItem";
 
 const SecretaryList = () => {
 	return (
-		<div className="flex flex-col space-y-3 items-center overflow-y-auto  h-[85vh] rounded-lg">
+		<ul className="w-full space-y-3  overflow-y-auto max-h-[550px] p-5 ">
 			<SecretaryItem />
 			<SecretaryItem />
 			<SecretaryItem />
 			<SecretaryItem />
 			<SecretaryItem />
 			<SecretaryItem />
-			<SecretaryItem />
-		</div>
+		</ul>
 	);
 };
 

@@ -21,12 +21,10 @@ const Keywords = () => {
 				<h2>Фраза</h2>
 			</div>
 			<div className="flex flex-col space-y-4 mt-10">
-				<div className="w-full relative grid grid-cols-2 items-center justify-center gap-3 mx-auto text-statusSalate text-[15px] font-normal  max-w-[1100px] rounded-xl bg-gray-100 py-7  px-[30px] ">
+				<div className="w-full relative grid grid-cols-2 items-center pr-10 justify-center gap-3 mx-auto  text-statusSalate text-[15px] font-normal  max-w-[1100px] rounded-xl bg-gray-100 py-7  px-[30px] ">
 					<span>Приветствие</span>
-					<span>Фраз</span>
-					<div className="absolute top-50% -right-[60px] cursor-pointer">
-						<Change />
-					</div>
+					<span> Фраз</span>
+					<Change className="absolute top-50% right-5 cursor-pointer" />
 				</div>
 			</div>
 		</div>

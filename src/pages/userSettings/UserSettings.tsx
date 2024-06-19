@@ -22,7 +22,7 @@ const UserSettings = () => {
 					Мой профиль
 				</h2>
 
-				<div className="w-[1064px] mx-auto mt-[25px] bg-gray-100 px-[25px] py-[15px]  rounded-lg">
+				<div className="max-w-[1064px] mx-auto mt-[25px] bg-gray-100 px-[25px] py-[15px]  rounded-lg">
 					<UserForm />
 				</div>
 				<h3 className="font-bold text-mainPurple mx-auto text-[24px] text-center mt-[30px]">

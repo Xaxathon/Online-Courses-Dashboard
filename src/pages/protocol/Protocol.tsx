@@ -8,46 +8,44 @@ import AddProtocolIcon from "@assets/icons/addProtocol.svg";
 
 const Protocol = () => {
 	return (
-		<div className="mt-[35px] mr-5">
-			<div className="font-bold text-mainPurple text-[24px] max-w-[1245px] h-[51px] rounded-xl bg-gray-100 flex items-center justify-center relative px-[30px]">
-				<div className="absolute left-0 ml-[30px] cursor-pointer">
-					<Backward />
-				</div>
-				<h1 className="text-center w-full">Добавление протокола</h1>
-				<div className="absolute right-0 mr-[100px] flex gap-4">
-					<button className="flex text-[14px] items-center justify-center bg-mainPurple text-white px-4 py-1 rounded-lg">
+		<div className="flex flex-col items-center mt-8 mr-5 w-full">
+			<div className="relative min-w-full flex items-center justify-between py-2 px-7 font-bold text-mainPurple  rounded-xl bg-gray-100">
+				<Backward className="w-9 h-9 cursor-pointer" />
+				<h1 className="lg:text-2xl text-xl">Добавление протокола</h1>
+				<div className="flex gap-4">
+					<button className="text-base bg-mainPurple text-white px-4 py-1 rounded-lg">
 						PDF
 					</button>
-					<button className="flex text-[14px]  items-center justify-center bg-mainPurple text-white px-4 py-2 rounded-lg">
+					<button className="text-base bg-mainPurple text-white px-4 py-2 rounded-lg">
 						DOCX
 					</button>
 				</div>
 			</div>
 			<div className="grid grid-cols-2 grid-rows-1 mt-6 gap-4">
-				<div className=" h-[653px] bg-gray-100 py-5 px-3  rounded-xl">
-					<div className="relative flex items-center justify-center bg-[#EAE8F1] p-2 rounded-lg mb-3">
-						<h2 className="font-bold text-[20px] text-mainPurple text-center">
+				<div className=" bg-gray-100 py-5 px-3  rounded-xl">
+					<div className="relative flex items-center justify-center p-2 bg-inputPurple rounded-lg">
+						<h2 className="font-bold lg:text-xl text-base text-mainPurple text-center">
 							Участники
 						</h2>
-						<div className="absolute right-0 mr-[25px] flex gap-4 cursor-pointer">
-							<AddProtocolIcon />
-						</div>
+						<AddProtocolIcon className="absolute right-0 mr-6 w-8 h-8 cursor-pointer" />
+					</div>
+					<div className="mt-4">
+						<ParticipantList />
 					</div>
 
-					<ParticipantList />
-					<h2 className="font-bold text-[20px] text-mainPurple text-center mt-[50px]">
+					<h2 className="font-bold text-xl text-mainPurple text-center mt-8">
 						Видеозапись
 					</h2>
 					<VideoProtocol />
 				</div>
-				<div className="flex justify-center w-full h-[653px] bg-gray-100 py-5 rounded-xl">
+				<div className="flex justify-center w-full bg-gray-100 py-5 xl:px-10 px-5 lg:px-7 rounded-xl">
 					<ProtocolAddForm />
 				</div>
 				<Subtitle />
 			</div>
-			<div className="mx-auto w-[250px] cursor-pointer text-center my-6 text-white font-bold  text-[24px} bg-mainPurple py-3 px-2 rounded-lg">
+			<button className="my-6 text-white font-bold text-xl bg-mainPurple py-3 px-2 rounded-lg">
 				Исполнить протокол
-			</div>
+			</button>
 		</div>
 	);
 };

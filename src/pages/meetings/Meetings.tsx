@@ -7,7 +7,7 @@ import Search from "@assets/icons/search.svg";
 
 const Meetings = () => {
 	return (
-		<div className="grid  grid-cols-[minmax(427px,_475px)_minmax(437px,_780px)] gap-[30px] mr-[15px] mt-[25px]">
+		<div className="grid grid-cols-1 xl:grid-cols-[minmax(427px,_475px)_minmax(437px,_780px)] gap-[30px] mr-[15px] mt-[25px]">
 			<div className="flex flex-col space-y-3 ">
 				<Calendar />
 				<KpiChart />

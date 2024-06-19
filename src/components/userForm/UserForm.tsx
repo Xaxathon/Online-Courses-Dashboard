@@ -3,8 +3,8 @@ import Participant from "@assets/img/participant.jpg";
 
 const UserForm = () => {
 	return (
-		<form action="">
-			<div className="flex space-x-3 font-bold items-center">
+		<form action="w-full">
+			<div className="flex space-x-3 font-bold items-center ">
 				<label className="text-statusSalate text-[17px]" htmlFor="fio">
 					ФИО:
 				</label>
@@ -14,8 +14,8 @@ const UserForm = () => {
 					type="text"
 				/>
 			</div>
-			<div className="flex mt-[30px] justify-between">
-				<div className="h-[190px] w-[190px] mr-3 bg-[#EAE8F1] flex flex-col items-center  justify-center rounded-lg">
+			<div className="flex mt-[30px] justify-between w-full">
+				<div className="h-[190px] max-w-[190px] mr-3 bg-[#EAE8F1] flex flex-col items-center  justify-center rounded-lg">
 					<img
 						src={Participant}
 						alt="/"
@@ -25,43 +25,43 @@ const UserForm = () => {
 						Нажмите, чтобы изменить фото
 					</span>
 				</div>
-				<div className="grid grid-cols-2 grid-rows-2 gap-5 font-bold justify-around">
+				<div className="grid grid-cols-2 grid-rows-2 gap-5 gap-x-2 font-bold justify-around w-full">
 					<div className="flex flex-col space-y-[5px]">
 						<label className="text-statusSalate text-[17px]" htmlFor="name">
 							Наименование отдела
 						</label>
 						<input
-							className="w-[398px] h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+							className="max-w-[398px] h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
 							id="name"
 							type="text"
 						/>
 					</div>
-					<div className="flex flex-col space-y-[5px]">
+					<div className="flex flex-col space-y-[5px] w-full">
 						<label className="text-statusSalate text-[17px]" htmlFor="login">
 							Логин
 						</label>
 						<input
-							className="w-[398px] h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+							className="max-w-[398px] h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
 							id="login"
 							type="text"
 						/>
 					</div>
-					<div className="flex flex-col space-y-[5px]">
+					<div className="flex flex-col space-y-[5px] w-full">
 						<label className="text-statusSalate text-[17px]" htmlFor="email">
 							E-mail
 						</label>
 						<input
-							className="w-[398px] h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+							className="max-w-[398px] h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
 							id="email"
 							type="text"
 						/>
 					</div>
-					<div className="flex flex-col space-y-[5px]">
+					<div className="flex flex-col space-y-[5px] w-full">
 						<label className="text-statusSalate text-[17px]" htmlFor="password">
 							Пароль
 						</label>
 						<input
-							className="w-[398px] h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+							className="max-w-[398px] h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
 							id="password"
 							type="text"
 						/>

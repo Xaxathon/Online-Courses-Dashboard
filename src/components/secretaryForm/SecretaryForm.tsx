@@ -9,7 +9,7 @@ const SecretaryForm = () => {
 	return (
 		<form
 			action=""
-			className="w-[1064px] mx-auto mt-[25px] bg-gray-100 px-[25px] py-[15px]  rounded-lg"
+			className="max-w-[1064px] mx-auto mt-[25px] bg-gray-100 px-[25px] py-[15px]  rounded-lg"
 		>
 			<div className="flex space-x-3 font-bold items-center justify-between">
 				<div className=" flex items-center space-x-3 ">
@@ -52,18 +52,18 @@ const SecretaryForm = () => {
 								Нажмите, чтобы изменить фото
 							</span>
 						</div>
-						<div className="grid grid-cols-2 grid-rows-2 gap-5 font-bold justify-around">
+						<div className="grid grid-cols-2 grid-rows-2 gap-5 font-bold justify-around w-full">
 							<div className="flex flex-col space-y-[5px]">
 								<label className="text-statusSalate text-[17px]" htmlFor="name">
 									Наименование отдела
 								</label>
 								<input
-									className="w-[398px] h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+									className="max-w-[398px] h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
 									id="name"
 									type="text"
 								/>
 							</div>
-							<div className="flex flex-col space-y-[5px]">
+							<div className="flex flex-col space-y-[5px] w-full">
 								<label
 									className="text-statusSalate text-[17px]"
 									htmlFor="login"
@@ -71,12 +71,12 @@ const SecretaryForm = () => {
 									Логин
 								</label>
 								<input
-									className="w-[398px] h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+									className="max-w-[398px] h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
 									id="login"
 									type="text"
 								/>
 							</div>
-							<div className="flex flex-col space-y-[5px]">
+							<div className="flex flex-col space-y-[5px] w-full">
 								<label
 									className="text-statusSalate text-[17px]"
 									htmlFor="email"
@@ -84,12 +84,12 @@ const SecretaryForm = () => {
 									E-mail
 								</label>
 								<input
-									className="w-[398px] h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+									className="max-w-[398px] h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
 									id="email"
 									type="text"
 								/>
 							</div>
-							<div className="flex flex-col space-y-[5px]">
+							<div className="flex flex-col space-y-[5px] w-full">
 								<label
 									className="text-statusSalate text-[17px]"
 									htmlFor="password"
@@ -97,7 +97,7 @@ const SecretaryForm = () => {
 									Пароль
 								</label>
 								<input
-									className="w-[398px] h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+									className="max-w-[398px] h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
 									id="password"
 									type="text"
 								/>
