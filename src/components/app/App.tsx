@@ -26,12 +26,13 @@ import Appointment from "../../pages/appointment/Appointment";
 import Left from "@assets/icons/left-arrow.svg";
 import Right from "@assets/icons/right-arrow.svg";
 import SecretaryCarousel from "../secretaryCarousel/SecretaryCarousel";
+import SecretaryAddFormModal from "../secretaryAddFormModal/SecretaryAddFormModal";
 
 function App() {
 	return (
 		<div className="relative flex ">
 			<Sidebar />
-			<Appointment />
+			<ProtocolModal />
 		</div>
 	);
 }

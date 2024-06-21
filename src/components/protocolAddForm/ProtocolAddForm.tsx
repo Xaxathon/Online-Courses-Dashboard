@@ -2,7 +2,7 @@ import React from "react";
 
 const ProtocolAddForm = () => {
 	return (
-		<form className="max-w-[30rem] flex flex-col items-center xl:text-xl lg:text-lg font-bold text-mainPurple gap-8">
+		<form className="max-w-[30rem ТУТ ДВА w-full w-full flex flex-col items-center xl:text-xl lg:text-lg font-bold text-mainPurple gap-8">
 			<div className="flex flex-col items-center w-full">
 				<label className="mb-2" htmlFor="subject">
 					Тема
