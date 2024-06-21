@@ -9,7 +9,7 @@ import AddProtocolIcon from "@assets/icons/addProtocol.svg";
 const Protocol = () => {
 	return (
 		<div className="flex flex-col items-center mt-8 mr-5 w-full">
-			<div className="relative min-w-full flex items-center justify-between py-2 px-7 font-bold text-mainPurple  rounded-xl bg-gray-100">
+			<div className="min-w-full flex items-center justify-between py-2 px-7 font-bold text-mainPurple  rounded-xl bg-gray-100">
 				<Backward className="w-9 h-9 cursor-pointer" />
 				<h1 className="lg:text-2xl text-xl">Добавление протокола</h1>
 				<div className="flex gap-4">

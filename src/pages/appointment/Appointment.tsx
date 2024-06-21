@@ -4,20 +4,20 @@ import AppointmentForm from "../../components/appointmentForm/AppointmentForm";
 
 const Appointment = () => {
 	return (
-		<div className="ml-3 grid grid-cols-[minmax(650px,_772px)_minmax(470px,_470px)] gap-4 justify-between items-start mt-[20px] mr-[25px] w-full">
+		<div className="ml-3 grid grid-cols-[minmax(650px,_772px)_minmax(470px,_470px)] gap-4 justify-between items-start mt-5 mr-6 w-full">
 			<AppointmentCalendar />
-			<div className="min-h-dynamic w-full border-effect border bg-[#FDFDFD] shadow-effect px-3 py-5 rounded-lg">
-				<h1 className="font-bold text-[24px] text-center text-statusSalate ">
+			<div className="min-h-dynamic border-effect border bg-white shadow-effect px-3 py-5 rounded-lg">
+				<h1 className="font-bold text-2xl text-center text-statusSalate ">
 					Тема совещания
 				</h1>
-				<div className="flex w-[28rem] items-center relative mt-3">
-					<div className="flex items-center gap-2 overflow-x-auto  justify-start w-[28rem] max-h-full ">
-						<div className="flex flex-grow items-center border px-2 flex-shrink-0 w-1/4  justify-center border-mainPurple rounded-lg bg-[#EEECFF] h-[44px]">
+				<div className="flex items-center relative mt-3">
+					<ul className="w-full flex items-center gap-2 overflow-x-auto  justify-start max-h-full ">
+						<li className="flex flex-grow items-center border px-2 flex-shrink-0 w-1/4  justify-center border-mainPurple rounded-lg bg-white py-2">
 							1
-						</div>
-					</div>
+						</li>
+					</ul>
 
-					<div className="absolute right-0 flex items-center justify-center font-bold text-[17px] text-white bg-mainPurple h-[44px] w-[30px] rounded-md cursor-pointer">
+					<div className="absolute right-0 flex items-center justify-center font-bold text-lg text-white bg-mainPurple py-2 px-3 rounded-md cursor-pointer">
 						+
 					</div>
 				</div>

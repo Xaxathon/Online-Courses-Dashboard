@@ -3,7 +3,7 @@ import SecretaryForm from "../secretaryForm/SecretaryForm";
 
 const SecretariesListForm = () => {
 	return (
-		<div className="max-w-[1064px] mx-auto">
+		<div>
 			<SecretaryForm />
 			<SecretaryForm />
 			<SecretaryForm />

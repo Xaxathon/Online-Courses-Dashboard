@@ -1,4 +1,4 @@
-<svg width="19" height="23" viewBox="0 0 19 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg  viewBox="0 0 19 23" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path fill-rule="evenodd" clip-rule="evenodd" d="M2.4462 0.574707C1.5448 0.574707 0.813965 1.3507 0.813965 2.3077V20.6968C0.813965 21.6541 1.5448 22.4298 2.4462 22.4298H17.1772C18.0786 22.4298 18.8101 21.6541 18.8101 20.6968V7.51147L12.7269 0.574707H2.4462Z" fill="#9B64B2"/>
 <path fill-rule="evenodd" clip-rule="evenodd" d="M18.814 7.52073V7.86227H14.6951C14.6951 7.86227 12.6638 7.43193 12.7227 5.57153C12.7227 5.57153 12.7896 7.52073 14.6549 7.52073H18.814Z" fill="#824B9E"/>
 <path opacity="0.5" fill-rule="evenodd" clip-rule="evenodd" d="M12.7307 0.570312V5.54354C12.7307 6.10914 13.086 7.52143 14.6951 7.52143H18.814L12.7307 0.570312Z" fill="white"/>

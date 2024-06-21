@@ -3,7 +3,7 @@ import SecretaryItem from "../secretaryItem/SecretaryItem";
 
 const SecretaryList = () => {
 	return (
-		<ul className="w-full space-y-3  overflow-y-auto max-h-[550px] p-5 ">
+		<ul className="flex flex-col gap-3 overflow-y-auto h-[80vh]">
 			<SecretaryItem />
 			<SecretaryItem />
 			<SecretaryItem />

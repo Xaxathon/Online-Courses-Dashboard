@@ -7,30 +7,31 @@ import Search from "@assets/icons/search.svg";
 
 const Meetings = () => {
 	return (
-		<div className="grid grid-cols-1 xl:grid-cols-[minmax(427px,_475px)_minmax(437px,_780px)] gap-[30px] mr-[15px] mt-[25px]">
+		<div className="flex gap-6 px-4 mt-7">
 			<div className="flex flex-col space-y-3 ">
 				<Calendar />
 				<KpiChart />
-				<div className="flex space-x-[36px] items-center justify-center">
+				<div className="flex gap-5 items-center justify-center">
 					<StatWidget />
 					<StatWidget />
 				</div>
 			</div>
-			<div className=" max-lg:w-[780px] mt-[15px] ">
-				<div className="flex bg-gray-100 rounded-lg justify-center items-center px-3 w-full xl:max-w-[787px] h-[46px] mb-[20px]">
+			<div className="">
+				<div className="flex justify-center items-center w-full bg-gray-100 mt-2 rounded-lg px-3 py-1 mb-5">
 					<input
 						className="bg-transparent p-2 w-full focus:outline-none"
 						type="text"
 						placeholder="Введите запрос"
 					/>
-					<Search />
+					<Search className="w-6 h-6" />
 				</div>
-				<ul className="w-full grid grid-cols-5 font-bold items-center justify-center xl:text-[17px] text-[11px]  text-center p-4 text-mainPurple ">
-					<li className="col-span-5 md:col-span-1">Задача</li>
-					<li className="col-span-5 md:col-span-1">Ответственный</li>
-					<li className="col-span-5 md:col-span-1">Дедлайн</li>
-					<li className="col-span-5 md:col-span-1">Статус</li>
-					<li className="col-span-5 md:col-span-1">№Протокола</li>
+
+				<ul className="flex justify-around font-bold  xl:text-lg text-xs  text-center text-mainPurple mb-2">
+					<li>Задача</li>
+					<li>Ответственный</li>
+					<li>Дедлайн</li>
+					<li>Статус</li>
+					<li>№Протокола</li>
 				</ul>
 				<TaskList />
 			</div>

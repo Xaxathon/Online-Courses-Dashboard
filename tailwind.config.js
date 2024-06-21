@@ -26,6 +26,8 @@ export default {
 			gridTemplateColumns: {
 				"content-large": "440px 312px 140px 175px 178px",
 				"content-small": "301px 179px 140px 124px 125px",
+				"5-protocol-cols":
+					"minmax(18.75rem, 27.5rem) minmax(11.125rem, 19.5rem) minmax(8.75rem, 8.75rem) minmax(7.75rem, 10.9375rem) minmax(7.75rem, 11.125rem)",
 			},
 
 			borderColor: {

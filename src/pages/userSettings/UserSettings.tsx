@@ -7,25 +7,21 @@ import SecretariesListForm from "../../components/secretariesListForm/Secretarie
 
 const UserSettings = () => {
 	return (
-		<div className=" mt-[30px] w-full mr-4 mb-20">
-			<div className="font-bold text-mainPurple mx-auto text-[24px] max-w-[1245px] h-[51px] rounded-xl bg-gray-100 flex items-center justify-center relative px-[30px]">
-				<div className="absolute left-0 ml-[30px] cursor-pointer">
-					<Backward />
-				</div>
+		<div className=" mt-7 w-full mr-4 mb-20">
+			<div className="flex items-center justify-between font-bold text-mainPurple xl:text-2xl text-xl rounded-xl bg-gray-100  py-2 px-7 ">
+				<Backward className="w-9 h-9 cursor-pointer" />
 				<h1 className="text-center w-full">Данные о пользователях</h1>
-				<div className="absolute right-0 mr-[50px] flex gap-4 cursor-pointer">
-					<AddProtocolIcon />
-				</div>
+				<AddProtocolIcon className="w-10 h-10 cursor-pointer" />
 			</div>
-			<div className="mt-[25px]">
-				<h2 className="font-bold text-mainPurple mx-auto text-[24px] text-center">
+			<div className="mt-6">
+				<h2 className="font-bold text-mainPurple mx-auto text-2xl text-center">
 					Мой профиль
 				</h2>
 
-				<div className="max-w-[1064px] mx-auto mt-[25px] bg-gray-100 px-[25px] py-[15px]  rounded-lg">
+				<div className="max-w-[66rem] mx-auto mt-6 bg-gray-100 px-6 py-4  rounded-lg">
 					<UserForm />
 				</div>
-				<h3 className="font-bold text-mainPurple mx-auto text-[24px] text-center mt-[30px]">
+				<h3 className="font-bold text-mainPurple mx-auto text-2xl text-center mt-7">
 					Секретари
 				</h3>
 

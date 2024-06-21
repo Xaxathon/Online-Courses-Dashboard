@@ -15,7 +15,6 @@ import AddProtocolIcon from "@assets/icons/addProtocol.svg";
 import Change from "@assets/icons/change.svg";
 import Keywords from "../../pages/keywords/Keywords";
 import { useState } from "react";
-import Participant from "@assets/img/participant.jpg";
 import SettingsForm from "../userForm/UserForm";
 import SecretariesForm from "../secretaryForm/SecretaryForm";
 import UserSettings from "../../pages/userSettings/UserSettings";
@@ -32,11 +31,11 @@ function App() {
 	return (
 		<div className="relative flex ">
 			<Sidebar />
-			<Protocol />
+			<Appointment />
 		</div>
 	);
 }
 
 export default App;
 
-// <Protocol ideal />  <UserSettings /> <Keywords /> <AddProtocol problems /> <Protocols problems /> <Meetings problems/> <Settings /> <Secretaries /> <Appointment />
+// <Protocol ideal />  <UserSettings ideal /> <Keywords ideal/> <Protocols ideal /> <Secretaries ideal/> <Settings  ideal/> <Meetings mini-problems/> <Appointment mini-problems/>
