@@ -1,9 +1,9 @@
 import React from "react";
 import Modal from "../modal/Modal";
 
-const SecretaryAddFormModal = () => {
+const SecretaryAddFormModal = ({ onClose }) => {
 	return (
-		<Modal>
+		<Modal onClose={onClose}>
 			<form className="w-[40rem] flex flex-col gap-4 mt-10 text-xl font-bold text-mainPurple ">
 				<span className="text-center">Добавление секретаря</span>
 				<div className="flex flex-col gap-1">

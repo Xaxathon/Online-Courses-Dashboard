@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Settings = () => {
 	return (
@@ -10,9 +11,12 @@ const Settings = () => {
 				<h2 className="w-full font-bold mx-auto text-mainPurple text-base cursor-pointer  py-4 rounded-xl bg-gray-100 flex items-center justify-start px-7 ">
 					Ключевые слова
 				</h2>
-				<h2 className="w-full font-bold mx-auto text-mainPurple text-base cursor-pointer  py-4 rounded-xl bg-gray-100 flex items-center justify-start px-7 ">
+				<Link
+					to="/main/settings/users"
+					className="w-full font-bold mx-auto text-mainPurple text-base cursor-pointer  py-4 rounded-xl bg-gray-100 flex items-center justify-start px-7 "
+				>
 					Данные о пользователях
-				</h2>
+				</Link>
 			</div>
 		</div>
 	);

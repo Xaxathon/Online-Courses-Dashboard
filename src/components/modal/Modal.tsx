@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import CloseModal from "@assets/icons/сloseModal.svg";
+import Portal from "../portal/Portal";
 
 interface ModalProps {
 	children: React.ReactNode;
@@ -20,24 +21,21 @@ const Modal = ({ children, onClose }: ModalProps) => {
 	}, [onClose]);
 
 	return (
-		<div
-			onClick={onClose}
-			className="absolute flex justify-center items-center top-0 left-0 w-full h-full bg-black bg-opacity-35"
-			role="dialog"
-			aria-labelledby="modal-title"
-		>
+		<Portal>
 			<div
-				onClick={(e) => e.stopPropagation()}
-				className="bg-white shadow-custom py-6 px-7 relative rounded-lg max-w-full mx-4"
+				className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50"
+				role="dialog"
+				aria-labelledby="modal-title"
 			>
-				<CloseModal
-					className="absolute top-3 right-3 cursor-pointer"
-					onClick={onClose}
-				/>
-
-				{children}
+				<div className="bg-white shadow-custom py-6 px-7 relative rounded-lg max-w-full mx-4">
+					<CloseModal
+						className="absolute top-3 right-3 cursor-pointer"
+						onClick={onClose}
+					/>
+					{children}
+				</div>
 			</div>
-		</div>
+		</Portal>
 	);
 };
 

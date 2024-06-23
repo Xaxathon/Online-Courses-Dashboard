@@ -1,42 +1,64 @@
-import KpiChart from "../kpiChart/KpiChart";
-import ProtocolModal from "../protocolModal/ProtocolModal";
+// App.js
+import React, { useEffect } from "react";
+import {
+	BrowserRouter as Router,
+	Route,
+	Routes,
+	Navigate,
+} from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import Login from "../login/Login";
 import Sidebar from "../sidebar/Sidebar";
-import Search from "@assets/icons/search.svg";
-import Rectangle from "@assets/img/Rectangle.jpg";
-import StatWidget from "../statWidget/StatWidget";
-import SecretaryList from "../secretaryList/SecretaryList";
-import Secretaries from "../../pages/secretaries/Secretaries";
-import Backward from "@assets/icons/backward.svg";
-import Secretary from "../../pages/secretary/Secretary";
-import AddProtocol from "../../pages/addProtocol/AddProtocol";
-import Meetings from "../../pages/meetings/Meetings";
-import Settings from "../../pages/settings/Settings";
-import AddProtocolIcon from "@assets/icons/addProtocol.svg";
-import Change from "@assets/icons/change.svg";
-import Keywords from "../../pages/keywords/Keywords";
-import { useState } from "react";
-import SettingsForm from "../userForm/UserForm";
-import SecretariesForm from "../secretaryForm/SecretaryForm";
 import UserSettings from "../../pages/userSettings/UserSettings";
-import SecretaryAddForm from "../secretaryAddFormModal/SecretaryAddFormModal";
-import Protocol from "../../pages/protocol/Protocol";
-import Protocols from "../../pages/protocols/Protocols";
-import CalendarWithNotes from "../calendar/Calendar";
-import Appointment from "../../pages/appointment/Appointment";
-import Left from "@assets/icons/left-arrow.svg";
-import Right from "@assets/icons/right-arrow.svg";
-import SecretaryCarousel from "../secretaryCarousel/SecretaryCarousel";
-import SecretaryAddFormModal from "../secretaryAddFormModal/SecretaryAddFormModal";
+import Settings from "../../pages/settings/Settings";
+import { AppDispatch, RootState } from "../../store/store";
+import { setToken, setRole } from "../../features/authSlice";
 
-function App() {
+const PrivateRoute = ({ children }) => {
+	const token = useSelector((state: RootState) => state.auth.token);
+	console.log("Token in PrivateRoute:", token); // Отладочное сообщение
+	return token ? children : <Navigate to="/login" />;
+};
+
+const AdminDashboard = () => (
+	<div className="flex">
+		<Sidebar />
+		<Routes>
+			<Route path="settings" element={<Settings />} />
+			<Route path="settings/users" element={<UserSettings />} />
+		</Routes>
+	</div>
+);
+
+const App = () => {
+	const dispatch = useDispatch<AppDispatch>();
+
+	useEffect(() => {
+		const token = localStorage.getItem("token");
+		const role = localStorage.getItem("role");
+		if (token) {
+			dispatch(setToken(token));
+		}
+		if (role) {
+			dispatch(setRole(role));
+		}
+	}, [dispatch]);
+
 	return (
-		<div className="relative flex ">
-			<Sidebar />
-			<ProtocolModal />
-		</div>
+		<Router>
+			<Routes>
+				<Route path="/login" element={<Login />} />
+				<Route
+					path="/main/*"
+					element={
+						<PrivateRoute>
+							<AdminDashboard />
+						</PrivateRoute>
+					}
+				/>
+			</Routes>
+		</Router>
 	);
-}
+};
 
 export default App;
-
-// <Protocol ideal />  <UserSettings ideal /> <Keywords ideal/> <Protocols ideal /> <Secretaries ideal/> <Settings  ideal/> <Meetings mini-problems/> <Appointment mini-problems/>
