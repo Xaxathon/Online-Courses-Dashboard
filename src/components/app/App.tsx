@@ -1,5 +1,5 @@
 // App.js
-import React, { useEffect } from "react";
+import React, { ReactNode, useEffect } from "react";
 import {
 	BrowserRouter as Router,
 	Route,
@@ -13,10 +13,15 @@ import UserSettings from "../../pages/userSettings/UserSettings";
 import Settings from "../../pages/settings/Settings";
 import { AppDispatch, RootState } from "../../store/store";
 import { setToken, setRole } from "../../features/authSlice";
+import { UserRole } from "../../shared/interfaces/user";
 
-const PrivateRoute = ({ children }) => {
+interface PrivateRouteProps {
+	children: ReactNode;
+}
+
+const PrivateRoute = ({ children }: PrivateRouteProps) => {
 	const token = useSelector((state: RootState) => state.auth.token);
-	console.log("Token in PrivateRoute:", token); // Отладочное сообщение
+
 	return token ? children : <Navigate to="/login" />;
 };
 
@@ -40,13 +45,14 @@ const App = () => {
 			dispatch(setToken(token));
 		}
 		if (role) {
-			dispatch(setRole(role));
+			dispatch(setRole(role as UserRole));
 		}
 	}, [dispatch]);
 
 	return (
 		<Router>
 			<Routes>
+				<Route path="/" element={<Navigate to="/login" />} />
 				<Route path="/login" element={<Login />} />
 				<Route
 					path="/main/*"

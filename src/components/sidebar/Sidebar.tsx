@@ -1,4 +1,3 @@
-// Sidebar.js
 import React, { useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Calendar from "@assets/icons/calendar.svg";
@@ -10,12 +9,14 @@ import { useLogoutMutation } from "../../api/authApi";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store";
 import { logout } from "../../features/authSlice";
+import { UserRole } from "../../shared/interfaces/user";
 
-const Sidebar = () => {
+const Sidebar: React.FC = () => {
 	const [logoutApi] = useLogoutMutation();
 	const dispatch = useDispatch<AppDispatch>();
 	const navigate = useNavigate();
 	const location = useLocation();
+
 	const role = useSelector((state: RootState) => state.auth.role);
 
 	const handleLogout = async () => {
@@ -29,20 +30,23 @@ const Sidebar = () => {
 	};
 
 	useEffect(() => {
-		// Редирект на первую доступную страницу после регистрации
-		if (location.pathname === "/main") {
-			if (role === "admin") {
-				navigate("/main/settings");
-			} else if (role === "manager") {
-				navigate("/main/meetings");
-			} else if (role === "secretary") {
-				navigate("/main/meetings");
+		if (location.pathname === "/main" && role) {
+			switch (role) {
+				case UserRole.Admin:
+					navigate("/main/settings");
+					break;
+				case UserRole.Manager:
+				case UserRole.Secretary:
+					navigate("/main/meetings");
+					break;
+				default:
+					break;
 			}
 		}
 	}, [role, navigate, location.pathname]);
 
-	const getOpacity = (allowedRole) =>
-		role === allowedRole ? "opacity-100" : "opacity-50 pointer-events-none";
+	const getOpacity = (path: string) =>
+		location.pathname.includes(path) ? "opacity-100" : "opacity-50";
 
 	return (
 		<aside className="sticky top-0 left-2 h-screen z-10 mr-4 py-2">
@@ -51,53 +55,50 @@ const Sidebar = () => {
 					P
 				</a>
 				<ul className="flex flex-col flex-grow justify-start items-center gap-8">
-					{role === "admin" && (
+					{role && [UserRole.Manager, UserRole.Secretary].includes(role) && (
 						<li>
-							<Link to="/main/settings" className={getOpacity("admin")}>
-								<Settings className="w-8 h-8" />
+							<Link
+								to="/main/meetings"
+								className={`w-8 h-8 ${getOpacity("/main/meetings")}`}
+							>
+								<Meetings className="w-8 h-8" />
 							</Link>
 						</li>
 					)}
-					{role === "manager" && (
+					{role === UserRole.Secretary && (
 						<>
 							<li>
-								<Link to="/main/settings" className={getOpacity("manager")}>
-									<Settings className="w-8 h-8" />
-								</Link>
-							</li>
-							<li>
-								<Link to="/main/meetings" className={getOpacity("manager")}>
-									<Meetings className="w-8 h-8" />
-								</Link>
-							</li>
-						</>
-					)}
-					{role === "secretary" && (
-						<>
-							<li>
-								<Link to="/main/meetings" className={getOpacity("secretary")}>
-									<Meetings className="w-8 h-8" />
-								</Link>
-							</li>
-							<li>
-								<Link to="/main/calendar" className={getOpacity("secretary")}>
+								<Link
+									to="/main/calendar"
+									className={`w-8 h-8 ${getOpacity("/main/calendar")}`}
+								>
 									<Calendar className="w-8 h-8" />
 								</Link>
 							</li>
 							<li>
-								<Link to="/main/protocol" className={getOpacity("secretary")}>
+								<Link
+									to="/main/protocol"
+									className={`w-8 h-8 ${getOpacity("/main/protocol")}`}
+								>
 									<Protocol className="w-8 h-8" />
-								</Link>
-							</li>
-							<li>
-								<Link to="/main/settings" className={getOpacity("secretary")}>
-									<Settings className="w-8 h-8" />
 								</Link>
 							</li>
 						</>
 					)}
+					{role &&
+						[UserRole.Admin, UserRole.Manager, UserRole.Secretary].includes(
+							role
+						) && (
+							<li>
+								<Link
+									to="/main/settings"
+									className={`w-8 h-8 ${getOpacity("/main/settings")}`}
+								>
+									<Settings className="w-8 h-8" />
+								</Link>
+							</li>
+						)}
 				</ul>
-
 				<button onClick={handleLogout} className="flex-shrink-0">
 					<Logout className="w-10 h-10" />
 				</button>

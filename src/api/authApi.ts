@@ -1,64 +1,11 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { RootState } from "../store/store";
-import { setToken, setRole, logout } from "../features/authSlice";
-
-interface LoginResponse {
-	token: string;
-	expires_in: number;
-}
-
-interface LoginRequest {
-	email: string;
-	password: string;
-}
-
-interface UserResponse {
-	user: {
-		id: number;
-		full_name: string;
-		email: string;
-		password: string;
-		login: string;
-		department: string;
-		is_active: boolean;
-		created_at: string;
-		updated_at: string;
-		avatar: string;
-		role: string;
-	};
-}
-
-const baseQuery = fetchBaseQuery({
-	baseUrl: "http://85.193.90.243",
-	prepareHeaders: (headers, { getState }) => {
-		const token = (getState() as RootState).auth.token;
-		if (token) {
-			headers.set("Authorization", `Bearer ${token}`);
-		}
-		headers.set("Accept", "application/json");
-		return headers;
-	},
-});
-
-const baseQueryWithReauth = async (args: any, api: any, extraOptions: any) => {
-	let result = await baseQuery(args, api, extraOptions);
-
-	if (result.error && result.error.status === 401) {
-		// попробуем обновить токен
-		const refreshResult = await baseQuery("/api/refresh", api, extraOptions);
-
-		if (refreshResult.data) {
-			api.dispatch(setToken(refreshResult.data.token));
-
-			// попробуем повторить оригинальный запрос с новым токеном
-			result = await baseQuery(args, api, extraOptions);
-		} else {
-			api.dispatch(logout());
-		}
-	}
-
-	return result;
-};
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQueryWithReauth } from "../api/baseQuery";
+import { LoginResponse, LoginRequest } from "../shared/interfaces/auth";
+import {
+	UserResponse,
+	User,
+	CreateUserRequest,
+} from "../shared/interfaces/user";
 
 export const authApi = createApi({
 	reducerPath: "authApi",
@@ -87,8 +34,8 @@ export const authApi = createApi({
 			}),
 		}),
 		updateUser: builder.mutation<
-			UserResponse,
-			{ id: number; data: FormData | any }
+			{ user: UserResponse },
+			{ id: number; data: FormData | Partial<Omit<UserResponse, "password">> }
 		>({
 			query: ({ id, data }) => {
 				if (data instanceof FormData) {
@@ -106,6 +53,19 @@ export const authApi = createApi({
 				};
 			},
 		}),
+		createUser: builder.mutation<{ user: UserResponse }, CreateUserRequest>({
+			query: (data) => ({
+				url: "/api/users",
+				method: "POST",
+				body: data,
+			}),
+		}),
+		fetchUsers: builder.query<{ data: { data: User[] } }, void>({
+			query: () => ({
+				url: "/api/users",
+				method: "GET",
+			}),
+		}),
 	}),
 });
 
@@ -114,4 +74,6 @@ export const {
 	useLogoutMutation,
 	useLazyFetchUserQuery,
 	useUpdateUserMutation,
+	useCreateUserMutation,
+	useFetchUsersQuery,
 } = authApi;

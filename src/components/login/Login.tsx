@@ -7,17 +7,8 @@ import { useLoginMutation, useLazyFetchUserQuery } from "../../api/authApi";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store/store";
 import { setToken, setRole, setUserId } from "../../features/authSlice";
-
-const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]{2,}$/;
-
-interface LoginFormValues {
-	email: string;
-	password: string;
-}
-
-interface LoginFormErrors extends FormikErrors<LoginFormValues> {
-	submit?: string;
-}
+import { UserResponse } from "../../shared/interfaces/user";
+import { LoginFormValues } from "../../shared/interfaces/auth";
 
 const Login = () => {
 	const [login, { isLoading }] = useLoginMutation();
@@ -33,7 +24,7 @@ const Login = () => {
 		},
 		validationSchema: Yup.object({
 			email: Yup.string()
-				.matches(emailRegex, "Неверный формат e-mail")
+				.email("Неверный формат e-mail")
 				.required("Обязательное поле"),
 			password: Yup.string().required("Обязательное поле"),
 		}),
@@ -42,29 +33,22 @@ const Login = () => {
 			{ setSubmitting, setErrors }: FormikHelpers<LoginFormValues>
 		) => {
 			try {
-				console.log("Logging in with values:", values); // Отладочное сообщение
 				const response = await login(values).unwrap();
-				console.log("Login successful, response:", response); // Отладочное сообщение
 
-				// Проверяем, что токен получен
 				const token = response.data?.token;
 				if (token) {
 					dispatch(setToken(token));
-					console.log("Token set in store:", token); // Отладочное сообщение
 
-					// Получаем информацию о пользователе
-					const userResponse = await fetchUser().unwrap();
+					const userResponse: UserResponse = await fetchUser().unwrap();
 					const role = userResponse.data.role;
 					const userId = userResponse.data.id;
 
 					if (role) {
 						dispatch(setRole(role));
-						console.log("Role set in store:", role); // Отладочное сообщение
 					}
 
 					if (userId) {
 						dispatch(setUserId(userId));
-						console.log("UserId set in store:", userId); // Отладочное сообщение
 					}
 
 					navigate("/main");
@@ -72,15 +56,13 @@ const Login = () => {
 					throw new Error("Token not found in response");
 				}
 			} catch (err: any) {
-				console.error("Login failed, error:", err); // Отладочное сообщение
 				setErrors({
 					submit: err.data?.message || "Не удалось авторизоваться",
-				} as LoginFormErrors);
+				});
 			}
 			setSubmitting(false);
 		},
 	});
-	console.log(formik.values);
 	return (
 		<div className="flex items-center justify-center min-h-screen top-0 left-0 w-full text-mainPurple">
 			<form
@@ -156,10 +138,12 @@ const Login = () => {
 					>
 						{isLoading ? "Загрузка..." : "Войти"}
 					</button>
-					{formik.errors.submit && (
-						<div className="text-statusRed mt-4">{formik.errors.submit}</div>
-					)}
 				</div>
+				{formik.errors.submit && (
+					<div className="text-statusRed mt-4 font-bold text-start">
+						{formik.errors.submit}
+					</div>
+				)}
 			</form>
 		</div>
 	);

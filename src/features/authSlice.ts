@@ -1,28 +1,14 @@
-// authSlice.js
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-interface AuthState {
-	token: string | null;
-	role: string | null;
-	user: {
-		id: string | null;
-		full_name?: string;
-		email?: string;
-		login?: string;
-		department?: string;
-		is_active?: boolean;
-		created_at?: string;
-		updated_at?: string;
-		avatar?: string;
-		role?: string;
-	} | null;
-}
+import { AuthState } from "../shared/interfaces/auth";
+import { UserRole } from "../shared/interfaces/user";
 
 const initialState: AuthState = {
 	token: localStorage.getItem("token"),
-	role: localStorage.getItem("role"),
+	role: localStorage.getItem("role") as UserRole | null,
 	user: {
-		id: localStorage.getItem("userId"),
+		id: localStorage.getItem("userId")
+			? parseInt(localStorage.getItem("userId")!, 10)
+			: undefined,
 		full_name: "",
 		email: "",
 		login: "",
@@ -31,7 +17,7 @@ const initialState: AuthState = {
 		created_at: "",
 		updated_at: "",
 		avatar: "",
-		role: "",
+		role: undefined,
 	},
 };
 
@@ -43,13 +29,17 @@ const authSlice = createSlice({
 			state.token = action.payload;
 			localStorage.setItem("token", action.payload);
 		},
-		setRole(state, action: PayloadAction<string>) {
+		setRole(state, action: PayloadAction<UserRole>) {
 			state.role = action.payload;
 			localStorage.setItem("role", action.payload);
 		},
-		setUserId(state, action: PayloadAction<string>) {
-			state.user.id = action.payload;
-			localStorage.setItem("userId", action.payload);
+		setUserId(state, action: PayloadAction<number>) {
+			if (state.user) {
+				state.user.id = action.payload;
+			} else {
+				state.user = { id: action.payload };
+			}
+			localStorage.setItem("userId", action.payload.toString());
 		},
 		setUser(state, action: PayloadAction<AuthState["user"]>) {
 			state.user = action.payload;
@@ -58,7 +48,7 @@ const authSlice = createSlice({
 		logout(state) {
 			state.token = null;
 			state.role = null;
-			state.user = { id: null };
+			state.user = { id: undefined };
 			localStorage.removeItem("token");
 			localStorage.removeItem("role");
 			localStorage.removeItem("userId");
