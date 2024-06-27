@@ -96,7 +96,7 @@ const UserAddFormModal = ({
 					<div className="flex flex-col gap-1">
 						<label htmlFor="full_name">ФИО</label>
 						<Field
-							className="text-mainPurple text-base bg-inputPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
+							className="text-mainPurple text-base bg-lightPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
 							id="full_name"
 							name="full_name"
 							type="text"
@@ -104,13 +104,13 @@ const UserAddFormModal = ({
 						<ErrorMessage
 							name="full_name"
 							component="div"
-							className="text-red-500 text-sm"
+							className="text-crimsonRed text-sm"
 						/>
 					</div>
 					<div className="flex flex-col gap-1">
 						<label htmlFor="department">Информация об отделе</label>
 						<Field
-							className="text-mainPurple text-base bg-inputPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
+							className="text-mainPurple text-base bg-lightPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
 							id="department"
 							name="department"
 							type="text"
@@ -118,13 +118,13 @@ const UserAddFormModal = ({
 						<ErrorMessage
 							name="department"
 							component="div"
-							className="text-red-500 text-sm"
+							className="text-crimsonRed text-sm"
 						/>
 					</div>
 					<div className="flex flex-col gap-1">
 						<label htmlFor="email">E-mail</label>
 						<Field
-							className="text-mainPurple text-base bg-inputPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
+							className="text-mainPurple text-base bg-lightPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
 							id="email"
 							name="email"
 							type="email"
@@ -132,13 +132,13 @@ const UserAddFormModal = ({
 						<ErrorMessage
 							name="email"
 							component="div"
-							className="text-red-500 text-sm"
+							className="text-crimsonRed text-sm"
 						/>
 					</div>
 					<div className="flex flex-col gap-1">
 						<label htmlFor="login">Логин</label>
 						<Field
-							className="text-mainPurple text-base bg-inputPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
+							className="text-mainPurple text-base bg-lightPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
 							id="login"
 							name="login"
 							type="text"
@@ -146,14 +146,14 @@ const UserAddFormModal = ({
 						<ErrorMessage
 							name="login"
 							component="div"
-							className="text-red-500 text-sm"
+							className="text-crimsonRed text-sm"
 						/>
 					</div>
 					<div className="relative flex flex-col gap-1">
 						<label htmlFor="password">Пароль</label>
 						<div className="relative">
 							<Field
-								className="w-full text-mainPurple text-base bg-inputPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent pr-10"
+								className="w-full text-mainPurple text-base bg-lightPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent pr-10"
 								id="password"
 								name="password"
 								type={showPassword ? "text" : "password"}
@@ -169,19 +169,19 @@ const UserAddFormModal = ({
 						<ErrorMessage
 							name="password"
 							component="div"
-							className="text-red-500 text-sm"
+							className="text-crimsonRed text-sm"
 						/>
 					</div>
 
 					{backendErrors && (
-						<div className="text-statusRed text-base mt-3 font-bold">
+						<div className="text-crimsonRed text-base mt-3 font-bold">
 							{backendErrors}
 						</div>
 					)}
 
 					<button
 						type="submit"
-						className="px-5 py-2 mx-auto text-white bg-mainPurple rounded-lg"
+						className="px-5 py-2 mx-auto text-white bg-mainPurple rounded-lg hover:bg-mainPurpleHover active:bg-mainPurpleActive"
 						disabled={isLoading}
 					>
 						{isLoading ? "Загрузка..." : "Добавить"}

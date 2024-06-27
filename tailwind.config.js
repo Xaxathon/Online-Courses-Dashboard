@@ -5,9 +5,14 @@ export default {
 		extend: {
 			colors: {
 				mainPurple: "#7130A3",
-				statusSalate: "#779F7C",
-				statusRed: "#C73535",
-				inputPurple: "#e7e4ef",
+				gardenGreen: "#779F7C",
+				crimsonRed: "#C73535",
+				lightPurple: "#e7e4ef",
+				lightPurpleHover: "#D4C7F5",
+				gardenGreenHover: "#8DB08D",
+				crimsonRedHover: "#D94848",
+				mainPurpleHover: "#592383",
+				mainPurpleActive: "#943CD7",
 			},
 			backgroundImage: {
 				"custom-gradient":

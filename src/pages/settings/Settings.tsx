@@ -14,14 +14,14 @@ const Settings = () => {
 				{role === UserRole.Secretary && (
 					<Link
 						to="/main/settings/keywords"
-						className="w-full font-bold mx-auto text-mainPurple text-base cursor-pointer py-4 rounded-xl bg-gray-100 flex items-center justify-start px-7"
+						className="w-full font-bold mx-auto text-mainPurple text-base cursor-pointer py-4 rounded-xl bg-gray-100 flex items-center justify-start px-7 hover:bg-gray-200 hover:text-mainPurpleHover active:bg-gray-300 active:text-mainPurpleActive"
 					>
 						Ключевые слова
 					</Link>
 				)}
 				<Link
 					to="/main/settings/users"
-					className="w-full font-bold mx-auto text-mainPurple text-base cursor-pointer  py-4 rounded-xl bg-gray-100 flex items-center justify-start px-7 "
+					className="w-full font-bold mx-auto text-mainPurple text-base cursor-pointer  py-4 rounded-xl bg-gray-100 flex items-center justify-start px-7 hover:bg-gray-200 hover:text-mainPurpleHover active:bg-gray-300 active:text-mainPurpleActive"
 				>
 					Данные о пользователях
 				</Link>

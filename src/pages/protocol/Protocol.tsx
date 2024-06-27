@@ -9,21 +9,21 @@ import AddProtocolIcon from "@assets/icons/addProtocol.svg";
 const Protocol = () => {
 	return (
 		<div className="flex flex-col items-center mt-8 mr-5 w-full">
-			<div className="min-w-full flex items-center justify-between py-2 px-7 font-bold text-mainPurple  rounded-xl bg-gray-100">
+			<div className="min-w-full flex items-center justify-between py-2 px-7 font-bold text-mainPurple rounded-xl bg-gray-100">
 				<Backward className="w-9 h-9 cursor-pointer" />
 				<h1 className="lg:text-2xl text-xl">Добавление протокола</h1>
 				<div className="flex gap-4">
-					<button className="text-base bg-mainPurple text-white px-4 py-1 rounded-lg">
+					<button className="text-base bg-mainPurple text-white px-4 py-1 rounded-lg hover:bg-mainPurpleHover active:bg-mainPurpleActive">
 						PDF
 					</button>
-					<button className="text-base bg-mainPurple text-white px-4 py-2 rounded-lg">
+					<button className="text-base bg-mainPurple text-white px-4 py-2 rounded-lg hover:bg-mainPurpleHover active:bg-mainPurpleActive">
 						DOCX
 					</button>
 				</div>
 			</div>
 			<div className="grid grid-cols-2 grid-rows-1 mt-6 gap-4">
-				<div className=" bg-gray-100 py-5 px-3  rounded-xl">
-					<div className="relative flex items-center justify-center p-2 bg-inputPurple rounded-lg">
+				<div className="bg-gray-100 py-5 px-3 rounded-xl">
+					<div className="relative flex items-center justify-center p-2 bg-lightPurple rounded-lg">
 						<h2 className="font-bold lg:text-xl text-base text-mainPurple text-center">
 							Участники
 						</h2>
@@ -43,7 +43,7 @@ const Protocol = () => {
 				</div>
 				<Subtitle />
 			</div>
-			<button className="my-6 text-white font-bold text-xl bg-mainPurple py-3 px-2 rounded-lg">
+			<button className="my-6 text-white font-bold text-xl bg-mainPurple py-3 px-2 rounded-lg hover:bg-mainPurpleHover active:bg-mainPurpleActive">
 				Исполнить протокол
 			</button>
 		</div>

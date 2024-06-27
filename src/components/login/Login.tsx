@@ -77,15 +77,15 @@ const Login = () => {
 					<input
 						className={`text-black text-base bg-white p-3 rounded-lg ring-2 focus:outline-none border-transparent ${
 							formik.touched.email && formik.errors.email
-								? "ring-statusRed"
-								: "ring-mainPurple focus:ring-statusSalate"
+								? "ring-crimsonRed"
+								: "ring-mainPurple focus:ring-gardenGreen"
 						}`}
 						id="email"
 						type="text"
 						{...formik.getFieldProps("email")}
 					/>
 					{formik.touched.email && formik.errors.email ? (
-						<span className="text-statusRed font-bold">
+						<span className="text-crimsonRed font-bold">
 							{formik.errors.email}
 						</span>
 					) : null}
@@ -99,8 +99,8 @@ const Login = () => {
 						<input
 							className={`text-black text-base bg-white p-3 rounded-lg ring-2 focus:outline-none border-transparent w-full ${
 								formik.touched.password && formik.errors.password
-									? "ring-statusRed"
-									: "ring-mainPurple focus:ring-statusSalate"
+									? "ring-crimsonRed"
+									: "ring-mainPurple focus:ring-gardenGreen"
 							}`}
 							id="password"
 							type={showPassword ? "text" : "password"}
@@ -115,13 +115,13 @@ const Login = () => {
 						</button>
 					</div>
 					{formik.touched.password && formik.errors.password ? (
-						<span className="text-statusRed font-bold">
+						<span className="text-crimsonRed font-bold">
 							{formik.errors.password}
 						</span>
 					) : null}
 					<Link
 						to="/reset-password"
-						className="flex justify-end mt-1 hover:text-statusSalate"
+						className="flex justify-end mt-1 hover:text-gardenGreen"
 					>
 						Забыли пароль?
 					</Link>
@@ -132,7 +132,7 @@ const Login = () => {
 						className={`mt-2 rounded-xl px-14 py-2 text-xl font-bold ${
 							isLoading
 								? "bg-gray-500 text-gray-300 cursor-not-allowed"
-								: "bg-mainPurple text-white"
+								: "bg-mainPurple text-white hover:bg-mainPurpleHover active:bg-mainPurpleActive"
 						}`}
 						disabled={isLoading}
 					>
@@ -140,7 +140,7 @@ const Login = () => {
 					</button>
 				</div>
 				{formik.errors.submit && (
-					<div className="text-statusRed mt-4 font-bold text-start">
+					<div className="text-crimsonRed mt-4 font-bold text-start">
 						{formik.errors.submit}
 					</div>
 				)}

@@ -46,7 +46,9 @@ const Sidebar: React.FC = () => {
 	}, [role, navigate, location.pathname]);
 
 	const getOpacity = (path: string) =>
-		location.pathname.includes(path) ? "opacity-100" : "opacity-50";
+		location.pathname.includes(path)
+			? "opacity-100"
+			: "opacity-40 hover:opacity-70 active:opacity-20";
 
 	return (
 		<aside className="sticky top-0 left-2 h-screen z-10 mr-4 py-2">
@@ -54,14 +56,14 @@ const Sidebar: React.FC = () => {
 				<a href="#" className="text-white text-6xl font-baloo cursor-pointer">
 					P
 				</a>
-				<ul className="flex flex-col flex-grow justify-start items-center gap-8">
+				<ul className="flex flex-col flex-grow justify-start items-center gap-8 te">
 					{role && [UserRole.Manager, UserRole.Secretary].includes(role) && (
 						<li>
 							<Link
 								to="/main/meetings"
 								className={`w-8 h-8 ${getOpacity("/main/meetings")}`}
 							>
-								<Meetings className="w-8 h-8" />
+								<Meetings className="w-8 h-8 fill-current text-white" />
 							</Link>
 						</li>
 					)}
@@ -72,7 +74,7 @@ const Sidebar: React.FC = () => {
 									to="/main/calendar"
 									className={`w-8 h-8 ${getOpacity("/main/calendar")}`}
 								>
-									<Calendar className="w-8 h-8" />
+									<Calendar className="w-8 h-8 fill-current text-white" />
 								</Link>
 							</li>
 							<li>
@@ -80,7 +82,7 @@ const Sidebar: React.FC = () => {
 									to="/main/protocol"
 									className={`w-8 h-8 ${getOpacity("/main/protocol")}`}
 								>
-									<Protocol className="w-8 h-8" />
+									<Protocol className="w-8 h-8 fill-current text-white" />
 								</Link>
 							</li>
 						</>
@@ -94,13 +96,13 @@ const Sidebar: React.FC = () => {
 									to="/main/settings"
 									className={`w-8 h-8 ${getOpacity("/main/settings")}`}
 								>
-									<Settings className="w-8 h-8" />
+									<Settings className="w-8 h-8 fill-current text-white" />
 								</Link>
 							</li>
 						)}
 				</ul>
 				<button onClick={handleLogout} className="flex-shrink-0">
-					<Logout className="w-10 h-10" />
+					<Logout className="w-10 h-10 fill-current text-white hover:text-crimsonRed" />
 				</button>
 			</nav>
 		</aside>

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import CloseModal from "@assets/icons/сloseModal.svg";
+import CloseModal from "@assets/icons/сlose-modal.svg";
 import Portal from "../portal/Portal";
 
 interface ModalProps {
@@ -29,7 +29,7 @@ const Modal = ({ children, onClose }: ModalProps) => {
 			>
 				<div className="bg-white shadow-custom py-6 px-7 relative rounded-lg max-w-full mx-4">
 					<CloseModal
-						className="absolute top-3 right-3 cursor-pointer"
+						className="absolute top-5 right-5 cursor-pointer stroke-[0.20rem] stroke-mainPurple hover:stroke-mainPurpleHover active:stroke-mainPurpleActive"
 						onClick={onClose}
 					/>
 					{children}

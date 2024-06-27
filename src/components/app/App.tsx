@@ -1,5 +1,4 @@
-// App.js
-import React, { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 import {
 	BrowserRouter as Router,
 	Route,
@@ -14,6 +13,8 @@ import Settings from "../../pages/settings/Settings";
 import { AppDispatch, RootState } from "../../store/store";
 import { setToken, setRole } from "../../features/authSlice";
 import { UserRole } from "../../shared/interfaces/user";
+import Keywords from "../../pages/keywords/Keywords";
+import ForgotPassword from "../forgotPassword/ForgotPassword";
 
 interface PrivateRouteProps {
 	children: ReactNode;
@@ -24,16 +25,6 @@ const PrivateRoute = ({ children }: PrivateRouteProps) => {
 
 	return token ? children : <Navigate to="/login" />;
 };
-
-const AdminDashboard = () => (
-	<div className="flex">
-		<Sidebar />
-		<Routes>
-			<Route path="settings" element={<Settings />} />
-			<Route path="settings/users" element={<UserSettings />} />
-		</Routes>
-	</div>
-);
 
 const App = () => {
 	const dispatch = useDispatch<AppDispatch>();
@@ -54,11 +45,12 @@ const App = () => {
 			<Routes>
 				<Route path="/" element={<Navigate to="/login" />} />
 				<Route path="/login" element={<Login />} />
+				<Route path="/reset-password" element={<ForgotPassword />} />
 				<Route
 					path="/main/*"
 					element={
 						<PrivateRoute>
-							<AdminDashboard />
+							<Dashboard />
 						</PrivateRoute>
 					}
 				/>
@@ -66,5 +58,16 @@ const App = () => {
 		</Router>
 	);
 };
+
+const Dashboard = () => (
+	<div className="flex">
+		<Sidebar />
+		<Routes>
+			<Route path="settings" element={<Settings />} />
+			<Route path="settings/users" element={<UserSettings />} />
+			<Route path="settings/keywords" element={<Keywords />} />
+		</Routes>
+	</div>
+);
 
 export default App;

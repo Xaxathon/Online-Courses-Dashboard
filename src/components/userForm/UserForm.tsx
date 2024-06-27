@@ -110,11 +110,11 @@ const UserForm = ({ userData }: UserFormProps) => {
 							"opacity-50": !isEditing,
 						})}
 					>
-						<label className="text-statusSalate text-lg" htmlFor="full_name">
+						<label className="text-gardenGreen text-lg" htmlFor="full_name">
 							ФИО:
 						</label>
 						<Field
-							className="max-w-[17rem] flex-grow text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+							className="max-w-[17rem] flex-grow text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gardenGreen focus:border-transparent"
 							id="full_name"
 							name="full_name"
 							type="text"
@@ -123,7 +123,7 @@ const UserForm = ({ userData }: UserFormProps) => {
 						<ErrorMessage
 							name="full_name"
 							component="span"
-							className="text-red-500 text-sm"
+							className="text-crimsonRed text-sm"
 						/>
 					</div>
 					<div
@@ -135,10 +135,11 @@ const UserForm = ({ userData }: UserFormProps) => {
 							<label
 								htmlFor="upload-photo"
 								className={classNames(
-									"flex flex-col items-center justify-center py-2 bg-inputPurple rounded-lg ",
+									"flex flex-col items-center justify-center py-2 bg-lightPurple   rounded-lg ",
 									{
 										"cursor-not-allowed": !isEditing,
-										"cursor-pointer": isEditing,
+										"cursor-pointer hover:bg-lightPurpleHover active:bg-white":
+											isEditing,
 									}
 								)}
 							>
@@ -158,7 +159,7 @@ const UserForm = ({ userData }: UserFormProps) => {
 									alt="/"
 									className="w-36 h-36 rounded-lg object-cover"
 								/>
-								<span className="text-sm font-normal leading-none text-mainPurple mt-1 text-center">
+								<span className="text-sm font-normal leading-none text-mainPurple hover:text-mainPurpleHover active:text-mainPurpleActive mt-1 text-center">
 									Нажмите, чтобы изменить фото
 								</span>
 							</label>
@@ -166,13 +167,13 @@ const UserForm = ({ userData }: UserFormProps) => {
 						<div className="grid grid-cols-2 grid-rows-2 gap-2 font-bold justify-around w-full">
 							<div className="flex flex-col gap-1">
 								<label
-									className="text-statusSalate text-lg"
+									className="text-gardenGreen text-lg"
 									htmlFor="department"
 								>
 									Наименование отдела
 								</label>
 								<Field
-									className="text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+									className="text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gardenGreen focus:border-transparent"
 									id="department"
 									name="department"
 									type="text"
@@ -181,15 +182,15 @@ const UserForm = ({ userData }: UserFormProps) => {
 								<ErrorMessage
 									name="department"
 									component="span"
-									className="text-red-500 text-sm"
+									className="text-crimsonRed text-sm"
 								/>
 							</div>
 							<div className="flex flex-col gap-1">
-								<label className="text-statusSalate text-lg" htmlFor="login">
+								<label className="text-gardenGreen text-lg" htmlFor="login">
 									Логин
 								</label>
 								<Field
-									className="text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+									className="text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gardenGreen focus:border-transparent"
 									id="login"
 									name="login"
 									type="text"
@@ -198,15 +199,15 @@ const UserForm = ({ userData }: UserFormProps) => {
 								<ErrorMessage
 									name="login"
 									component="span"
-									className="text-red-500 text-sm"
+									className="text-crimsonRed text-sm"
 								/>
 							</div>
 							<div className="flex flex-col gap-1">
-								<label className="text-statusSalate text-lg" htmlFor="email">
+								<label className="text-gardenGreen text-lg" htmlFor="email">
 									E-mail
 								</label>
 								<Field
-									className="text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+									className="text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gardenGreen focus:border-transparent"
 									id="email"
 									name="email"
 									type="text"
@@ -215,16 +216,16 @@ const UserForm = ({ userData }: UserFormProps) => {
 								<ErrorMessage
 									name="email"
 									component="span"
-									className="text-red-500 text-sm"
+									className="text-crimsonRed text-sm"
 								/>
 							</div>
 							<div className="flex flex-col gap-1">
-								<label className="text-statusSalate text-lg" htmlFor="password">
+								<label className="text-gardenGreen text-lg" htmlFor="password">
 									Пароль
 								</label>
 								<div className="relative w-full">
 									<Field
-										className="w-full text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+										className="w-full text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gardenGreen focus:border-transparent"
 										id="password"
 										name="password"
 										type={showPassword ? "text" : "password"}
@@ -242,13 +243,13 @@ const UserForm = ({ userData }: UserFormProps) => {
 								<ErrorMessage
 									name="password"
 									component="span"
-									className="text-red-500 text-sm"
+									className="text-crimsonRed text-sm"
 								/>
 							</div>
 						</div>
 					</div>
 					{backendErrors && (
-						<div className="mt-1 font-bold text-statusRed text-sm">
+						<div className="mt-1 font-bold text-crimsonRed text-sm">
 							{backendErrors}
 						</div>
 					)}
@@ -258,7 +259,7 @@ const UserForm = ({ userData }: UserFormProps) => {
 								<button
 									type="button"
 									className={classNames(
-										"mt-4 rounded-xl px-14 py-2 bg-gray-500 text-white text-xl font-bold mr-2",
+										"mt-4 rounded-xl px-14 py-2 bg-gray-500 text-white text-xl font-bold mr-2 hover:bg-gray-600 active:bg-gray-400",
 										{
 											"opacity-50 cursor-not-allowed": isSubmitting,
 										}
@@ -271,7 +272,7 @@ const UserForm = ({ userData }: UserFormProps) => {
 								<button
 									type="submit"
 									className={classNames(
-										"mt-4 rounded-xl px-14 py-2 bg-mainPurple text-white text-xl font-bold",
+										"mt-4 rounded-xl px-14 py-2 bg-mainPurple text-white text-xl font-bold hover:bg-mainPurpleHover active:bg-mainPurpleActive",
 										{
 											"opacity-50 cursor-not-allowed": isSubmitting,
 										}
@@ -285,7 +286,7 @@ const UserForm = ({ userData }: UserFormProps) => {
 							<button
 								type="button"
 								className={classNames(
-									"mt-4 rounded-xl px-14 py-2 bg-mainPurple text-white text-xl font-bold",
+									"mt-4 rounded-xl px-14 py-2 bg-mainPurple text-white text-xl font-bold hover:bg-mainPurpleHover active:bg-mainPurpleActive",
 									{
 										"opacity-50 cursor-not-allowed": isSubmitting,
 									}

@@ -5,13 +5,13 @@ const AppointmentForm = () => {
 		<form action="">
 			<div className="space-y-4 mt-5">
 				<input
-					className="w-full h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg outline-none ring-2 focus:bg-[#EEECFF] focus:ring-mainPurple border-transparent ring-mainPurple"
+					className="w-full h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg outline-none ring-2 focus:bg-lightPurple focus:ring-mainPurple border-transparent ring-mainPurple"
 					id="meetingTitle"
 					type="text"
 					placeholder="Введите тему совещания"
 				/>
 				<input
-					className="w-full h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg outline-none ring-2 focus:bg-[#EEECFF] focus:ring-mainPurple border-transparent ring-mainPurple"
+					className="w-full h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg outline-none ring-2 focus:bg-lightPurple focus:ring-mainPurple border-transparent ring-mainPurple"
 					id="meetingLink"
 					type="text"
 					placeholder="Вставьте ссылку на совещание"
@@ -19,17 +19,17 @@ const AppointmentForm = () => {
 			</div>
 			<div className="mt-4 px-[10px] py-[15px] border-2 border-mainPurple rounded-lg">
 				<div className="justify-between flex items-center">
-					<span className="font-bold text-[20px] text-start text-statusSalate ">
+					<span className="font-bold text-[20px] text-start text-gardenGreen ">
 						Участники
 					</span>
-					<button className=" bg-statusSalate font-bold text-[22px] rounded-md text-white p-2 leading-none">
+					<button className="bg-gardenGreen font-bold text-[22px] rounded-md text-white p-2 leading-none">
 						+
 					</button>
 				</div>
 				<ul className="mt-3 space-y-1 max-h-[180px] overflow-y-auto">
-					<li className="bg-[#EEECFF] rounded-sm px-3 py-1 flex items-center justify-around flex-grow space-x-2">
-						<div className="bg-statusRed w-[22px] h-[22px] rounded-sm"></div>
-						<span className="text-[12px]  font-bold text-mainPurple">
+					<li className="bg-lightPurple rounded-sm px-3 py-1 flex items-center justify-around flex-grow space-x-2">
+						<div className="bg-crimsonRed w-[22px] h-[22px] rounded-sm"></div>
+						<span className="text-[12px] font-bold text-mainPurple">
 							Иванов Иван Иванович
 						</span>
 						<span className="text-[10px] text-gray-400">
@@ -39,12 +39,12 @@ const AppointmentForm = () => {
 							type="checkbox"
 							name="checkbox"
 							id="checkbox"
-							className="   w-7 h-7 border-2 cursor-pointer "
+							className="w-7 h-7 border-2 cursor-pointer"
 						/>
 					</li>
-					<li className="bg-[#EEECFF] rounded-sm px-3 py-1 flex items-center justify-around flex-grow space-x-2">
-						<div className="bg-statusRed w-[22px] h-[22px] rounded-sm"></div>
-						<span className="text-[12px]  font-bold text-mainPurple">
+					<li className="bg-lightPurple rounded-sm px-3 py-1 flex items-center justify-around flex-grow space-x-2">
+						<div className="bg-crimsonRed w-[22px] h-[22px] rounded-sm"></div>
+						<span className="text-[12px] font-bold text-mainPurple">
 							Иванов Иван Иванович
 						</span>
 						<span className="text-[10px] text-gray-400">
@@ -54,12 +54,12 @@ const AppointmentForm = () => {
 							type="checkbox"
 							name="checkbox"
 							id="checkbox"
-							className="   w-7 h-7 border-2 cursor-pointer "
+							className="w-7 h-7 border-2 cursor-pointer"
 						/>
 					</li>
-					<li className="bg-[#EEECFF] rounded-sm px-3 py-1 flex items-center justify-around flex-grow space-x-2">
-						<div className="bg-statusRed w-[22px] h-[22px] rounded-sm"></div>
-						<span className="text-[12px]  font-bold text-mainPurple">
+					<li className="bg-lightPurple rounded-sm px-3 py-1 flex items-center justify-around flex-grow space-x-2">
+						<div className="bg-crimsonRed w-[22px] h-[22px] rounded-sm"></div>
+						<span className="text-[12px] font-bold text-mainPurple">
 							Иванов Иван Иванович
 						</span>
 						<span className="text-[10px] text-gray-400">
@@ -69,12 +69,12 @@ const AppointmentForm = () => {
 							type="checkbox"
 							name="checkbox"
 							id="checkbox"
-							className="   w-7 h-7 border-2 cursor-pointer "
+							className="w-7 h-7 border-2 cursor-pointer"
 						/>
 					</li>
-					<li className="bg-[#EEECFF] rounded-sm px-3 py-1 flex items-center justify-around flex-grow space-x-2">
-						<div className="bg-statusRed w-[22px] h-[22px] rounded-sm"></div>
-						<span className="text-[12px]  font-bold text-mainPurple">
+					<li className="bg-lightPurple rounded-sm px-3 py-1 flex items-center justify-around flex-grow space-x-2">
+						<div className="bg-crimsonRed w-[22px] h-[22px] rounded-sm"></div>
+						<span className="text-[12px] font-bold text-mainPurple">
 							Иванов Иван Иванович
 						</span>
 						<span className="text-[10px] text-gray-400">
@@ -84,12 +84,12 @@ const AppointmentForm = () => {
 							type="checkbox"
 							name="checkbox"
 							id="checkbox"
-							className="   w-7 h-7 border-2 cursor-pointer "
+							className="w-7 h-7 border-2 cursor-pointer"
 						/>
 					</li>
-					<li className="bg-[#EEECFF] rounded-sm px-3 py-1 flex items-center justify-around flex-grow space-x-2">
-						<div className="bg-statusRed w-[22px] h-[22px] rounded-sm"></div>
-						<span className="text-[12px]  font-bold text-mainPurple">
+					<li className="bg-lightPurple rounded-sm px-3 py-1 flex items-center justify-around flex-grow space-x-2">
+						<div className="bg-crimsonRed w-[22px] h-[22px] rounded-sm"></div>
+						<span className="text-[12px] font-bold text-mainPurple">
 							Иванов Иван Иванович
 						</span>
 						<span className="text-[10px] text-gray-400">
@@ -99,12 +99,12 @@ const AppointmentForm = () => {
 							type="checkbox"
 							name="checkbox"
 							id="checkbox"
-							className="   w-7 h-7 border-2 cursor-pointer "
+							className="w-7 h-7 border-2 cursor-pointer"
 						/>
 					</li>
-					<li className="bg-[#EEECFF] rounded-sm px-3 py-1 flex items-center justify-around flex-grow space-x-2">
-						<div className="bg-statusRed w-[22px] h-[22px] rounded-sm"></div>
-						<span className="text-[12px]  font-bold text-mainPurple">
+					<li className="bg-lightPurple rounded-sm px-3 py-1 flex items-center justify-around flex-grow space-x-2">
+						<div className="bg-crimsonRed w-[22px] h-[22px] rounded-sm"></div>
+						<span className="text-[12px] font-bold text-mainPurple">
 							Иванов Иван Иванович
 						</span>
 						<span className="text-[10px] text-gray-400">
@@ -114,13 +114,13 @@ const AppointmentForm = () => {
 							type="checkbox"
 							name="checkbox"
 							id="checkbox"
-							className="   w-7 h-7 border-2 cursor-pointer "
+							className="w-7 h-7 border-2 cursor-pointer"
 						/>
 					</li>
 				</ul>
 			</div>
 			<div className="flex justify-end">
-				<button className="bg-[#FF8F27] text-white font-bold text-[14px] rounded-md p-2 flex justify-center items-center space-x-2 cursor-pointer mt-2 ">
+				<button className="bg-[#FF8F27] text-white font-bold text-[14px] rounded-md p-2 flex justify-center items-center space-x-2 cursor-pointer mt-2">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="22"
@@ -137,11 +137,11 @@ const AppointmentForm = () => {
 				</button>
 			</div>
 			<div className="flex justify-between mt-5">
-				<button className="bg-mainPurple text-white font-bold text-[14px] rounded-md  px-[15px] flex justify-center items-center space-x-2 cursor-pointer mt-2 leading-none ">
+				<button className="bg-mainPurple text-white font-bold text-[14px] rounded-md px-[15px] flex justify-center items-center space-x-2 cursor-pointer mt-2 leading-none hover:bg-mainPurpleHover active:bg-mainPurpleActive">
 					+ Документ
 				</button>
 
-				<button className="bg-mainPurple text-white font-bold text-[20px] rounded-md px-[50px] py-2 flex justify-center items-center space-x-2 cursor-pointer mt-2 ">
+				<button className="bg-mainPurple text-white font-bold text-[20px] rounded-md px-[50px] py-2 flex justify-center items-center space-x-2 cursor-pointer mt-2 hover:bg-mainPurpleHover active:bg-mainPurpleActive">
 					Сохранить
 				</button>
 			</div>

@@ -115,13 +115,13 @@ const UserSettingForm = ({ user }: UserSettingFormProps) => {
 							})}
 						>
 							<label
-								className="text-statusSalate text-lg font-bold "
+								className="text-gardenGreen text-lg font-bold "
 								htmlFor={`full_name_${user.id}`}
 							>
 								ФИО:
 							</label>
 							<Field
-								className="max-w-[17rem] flex-grow text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+								className="max-w-[17rem] flex-grow text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gardenGreen focus:border-transparent"
 								id={`full_name_${user.id}`}
 								name="full_name"
 								type="text"
@@ -130,20 +130,20 @@ const UserSettingForm = ({ user }: UserSettingFormProps) => {
 							<ErrorMessage
 								name="full_name"
 								component="div"
-								className="text-red-500 text-sm"
+								className="text-crimsonRed text-sm"
 							/>
 						</div>
 						<div className="flex gap-4">
 							{user.role === UserRole.Secretary && (
 								<button
 									type="button"
-									className="rounded-xl px-5 py-2 bg-statusRed text-white text-xl "
+									className="rounded-xl px-5 py-2 bg-crimsonRed text-white text-xl "
 								>
 									Заморозить
 								</button>
 							)}
 							<button
-								className="rounded-xl px-5 py-2 bg-mainPurple text-white text-xl"
+								className="rounded-xl px-5 py-2 bg-mainPurple text-white text-xl hover:bg-mainPurpleHover active:bg-mainPurpleActive"
 								onClick={toggleExpand}
 								type="button"
 							>
@@ -162,10 +162,11 @@ const UserSettingForm = ({ user }: UserSettingFormProps) => {
 									<label
 										htmlFor={`upload-photo_${user.id}`}
 										className={classNames(
-											"flex flex-col items-center justify-center py-2 bg-inputPurple rounded-lg",
+											"flex flex-col items-center justify-center py-2 bg-lightPurple rounded-lg",
 											{
 												"cursor-not-allowed": !isEditing,
-												"cursor-pointer": isEditing,
+												"cursor-pointer hover:bg-lightPurpleHover active:bg-white":
+													isEditing,
 											}
 										)}
 									>
@@ -185,7 +186,7 @@ const UserSettingForm = ({ user }: UserSettingFormProps) => {
 											alt="/"
 											className="w-36 h-36 rounded-lg object-cover"
 										/>
-										<span className="text-sm font-normal leading-none text-mainPurple mt-1 text-center">
+										<span className="text-sm font-normal leading-none text-mainPurple hover:text-mainPurpleHover active:text-mainPurpleActive mt-1 text-center">
 											Нажмите, чтобы изменить фото
 										</span>
 									</label>
@@ -193,13 +194,13 @@ const UserSettingForm = ({ user }: UserSettingFormProps) => {
 								<div className="grid grid-cols-2 grid-rows-2 gap-5 font-bold justify-around w-full">
 									<div className="flex flex-col gap-1">
 										<label
-											className="text-statusSalate text-lg"
+											className="text-gardenGreen text-lg"
 											htmlFor={`department_${user.id}`}
 										>
 											Наименование отдела
 										</label>
 										<Field
-											className="text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+											className="text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gardenGreen focus:border-transparent"
 											id={`department_${user.id}`}
 											name="department"
 											type="text"
@@ -208,18 +209,18 @@ const UserSettingForm = ({ user }: UserSettingFormProps) => {
 										<ErrorMessage
 											name="department"
 											component="div"
-											className="text-red-500 text-sm"
+											className="text-crimsonRed text-sm"
 										/>
 									</div>
 									<div className="flex flex-col gap-1">
 										<label
-											className="text-statusSalate text-lg"
+											className="text-gardenGreen text-lg"
 											htmlFor={`login_${user.id}`}
 										>
 											Логин
 										</label>
 										<Field
-											className="text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+											className="text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gardenGreen focus:border-transparent"
 											id={`login_${user.id}`}
 											name="login"
 											type="text"
@@ -228,18 +229,18 @@ const UserSettingForm = ({ user }: UserSettingFormProps) => {
 										<ErrorMessage
 											name="login"
 											component="div"
-											className="text-red-500 text-sm"
+											className="text-crimsonRed text-sm"
 										/>
 									</div>
 									<div className="flex flex-col gap-1">
 										<label
-											className="text-statusSalate text-lg"
+											className="text-gardenGreen text-lg"
 											htmlFor={`email_${user.id}`}
 										>
 											E-mail
 										</label>
 										<Field
-											className="text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+											className="text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gardenGreen focus:border-transparent"
 											id={`email_${user.id}`}
 											name="email"
 											type="text"
@@ -248,19 +249,19 @@ const UserSettingForm = ({ user }: UserSettingFormProps) => {
 										<ErrorMessage
 											name="email"
 											component="div"
-											className="text-red-500 text-sm"
+											className="text-crimsonRed text-sm"
 										/>
 									</div>
 									<div className="flex flex-col gap-1">
 										<label
-											className="text-statusSalate text-lg"
+											className="text-gardenGreen text-lg"
 											htmlFor={`password_${user.id}`}
 										>
 											Пароль
 										</label>
 										<div className="relative w-full">
 											<Field
-												className="w-full text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-statusSalate focus:border-transparent"
+												className="w-full text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gardenGreen focus:border-transparent"
 												id={`password_${user.id}`}
 												name="password"
 												type={showPassword ? "text" : "password"}
@@ -278,13 +279,13 @@ const UserSettingForm = ({ user }: UserSettingFormProps) => {
 										<ErrorMessage
 											name="password"
 											component="div"
-											className="text-red-500 text-sm"
+											className="text-crimsonRed text-sm"
 										/>
 									</div>
 								</div>
 							</div>
 							{backendErrors && (
-								<div className="mt-1 font-bold text-statusRed text-sm">
+								<div className="mt-1 font-bold text-crimsonRed text-sm">
 									{backendErrors}
 								</div>
 							)}
@@ -294,7 +295,7 @@ const UserSettingForm = ({ user }: UserSettingFormProps) => {
 										<button
 											type="button"
 											className={classNames(
-												"mt-4 rounded-xl px-14 py-2 bg-gray-500 text-white text-xl font-bold mr-2",
+												"mt-4 rounded-xl px-14 py-2 bg-gray-500 text-white text-xl font-bold mr-2 hover:bg-gray-600 active:bg-gray-400",
 												{
 													"opacity-50 cursor-not-allowed": isSubmitting,
 												}
@@ -307,7 +308,7 @@ const UserSettingForm = ({ user }: UserSettingFormProps) => {
 										<button
 											type="submit"
 											className={classNames(
-												"mt-4 rounded-xl px-14 py-2 bg-mainPurple text-white text-xl font-bold",
+												"mt-4 rounded-xl px-14 py-2 bg-mainPurple text-white text-xl font-bold hover:bg-mainPurpleHover active:bg-mainPurpleActive",
 												{
 													"opacity-50 cursor-not-allowed": isSubmitting,
 												}
@@ -321,7 +322,7 @@ const UserSettingForm = ({ user }: UserSettingFormProps) => {
 									<button
 										type="button"
 										className={classNames(
-											"mt-4 rounded-xl px-14 py-2 bg-mainPurple text-white text-xl font-bold",
+											"mt-4 rounded-xl px-14 py-2 bg-mainPurple text-white text-xl font-bold hover:bg-mainPurpleHover active:bg-mainPurpleActive",
 											{
 												"opacity-50 cursor-not-allowed": isSubmitting,
 											}
@@ -336,7 +337,7 @@ const UserSettingForm = ({ user }: UserSettingFormProps) => {
 							<ErrorMessage
 								name="submit"
 								component="div"
-								className="text-red-500 text-sm mt-2"
+								className="text-crimsonRed text-sm mt-2"
 							/>
 						</div>
 					)}

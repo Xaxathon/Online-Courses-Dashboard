@@ -2,6 +2,9 @@ import { fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { RootState } from "../store/store";
 import { setToken, logout } from "../features/authSlice";
 
+interface RefreshResponse {
+	token: string;
+}
 const baseQuery = fetchBaseQuery({
 	baseUrl: "http://85.193.90.243",
 	prepareHeaders: (headers, { getState }) => {
@@ -13,10 +16,6 @@ const baseQuery = fetchBaseQuery({
 		return headers;
 	},
 });
-
-interface RefreshResponse {
-	token: string;
-}
 
 const baseQueryWithReauth = async (args: any, api: any, extraOptions: any) => {
 	let result = await baseQuery(args, api, extraOptions);

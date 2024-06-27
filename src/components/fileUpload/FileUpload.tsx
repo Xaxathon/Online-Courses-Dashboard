@@ -21,7 +21,9 @@ const FileUpload: React.FC = () => {
 
 	return (
 		<div className="mt-14 px-16">
-			<h2 className="mb-2">Прикрепить файл совещания</h2>
+			<h2 className="mb-2 text-mainPurple font-bold">
+				Прикрепить файл совещания
+			</h2>
 			<label
 				htmlFor="file-upload"
 				className="flex flex-shrink-0 flex-grow cursor-pointer justify-between gap-1 items-center py-3 px-4 border rounded-lg w-full border-mainPurple"
@@ -30,7 +32,7 @@ const FileUpload: React.FC = () => {
 				<p className="text-xs text-start font-normal text-black">
 					Выберите файл или перетащите сюда
 				</p>
-				<button className="border border-mainPurple bg-custom-gradient text-center px-3 py-1 text-black font-normal uppercase text-[0.5rem] rounded-lg">
+				<button className="border border-mainPurple bg-custom-gradient text-center px-3 py-1 text-black font-normal uppercase text-[0.5rem] rounded-lg hover:bg-mainPurple hover:text-white active:bg-mainPurpleActive">
 					выбрать файл
 				</button>
 			</label>
