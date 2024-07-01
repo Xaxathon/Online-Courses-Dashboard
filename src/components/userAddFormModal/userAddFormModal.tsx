@@ -31,7 +31,6 @@ const UserAddFormModal = ({
 		email: "",
 		password: "",
 		department: "",
-		login: "",
 		role: role === UserRole.Admin ? UserRole.Manager : UserRole.Secretary,
 		is_active: true,
 		external: false,
@@ -46,10 +45,7 @@ const UserAddFormModal = ({
 			.min(5, "Поле должно содержать минимум 5 символов")
 			.max(50, "Поле должно содержать максимум 50 символов")
 			.required("Поле обязательно для заполнения"),
-		login: Yup.string()
-			.min(5, "Поле должно содержать минимум 5 символов")
-			.max(50, "Поле должно содержать максимум 50 символов")
-			.required("Поле обязательно для заполнения"),
+
 		email: Yup.string()
 			.email("Некорректный email")
 			.required("Поле обязательно для заполнения"),
@@ -135,20 +131,7 @@ const UserAddFormModal = ({
 							className="text-crimsonRed text-sm"
 						/>
 					</div>
-					<div className="flex flex-col gap-1">
-						<label htmlFor="login">Логин</label>
-						<Field
-							className="text-mainPurple text-base bg-lightPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
-							id="login"
-							name="login"
-							type="text"
-						/>
-						<ErrorMessage
-							name="login"
-							component="div"
-							className="text-crimsonRed text-sm"
-						/>
-					</div>
+
 					<div className="relative flex flex-col gap-1">
 						<label htmlFor="password">Пароль</label>
 						<div className="relative">

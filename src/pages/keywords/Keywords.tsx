@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Backward from "@assets/icons/backward.svg";
-import AddProtocolIcon from "@assets/icons/addProtocol.svg";
+import { ReactComponent as Backward } from "@assets/icons/backward.svg";
+import { ReactComponent as AddProtocolIcon } from "@assets/icons/addProtocol.svg";
 import KeywordsList from "../../components/keywordsList/KeywordsList";
 import { useNavigate } from "react-router-dom";
 import KeywordAddModal from "../../components/keywordAddModal/KeywordAddModal";

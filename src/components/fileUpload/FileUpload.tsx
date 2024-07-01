@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent } from "react";
-import FileUploadIcon from "@assets/icons/fileUploadIcon.svg";
-import Mp4Icon from "@assets/icons/mp4Icon.svg";
+import { ReactComponent as FileUploadIcon } from "@assets/icons/fileUploadIcon.svg";
+import { ReactComponent as Mp4Icon } from "@assets/icons/mp4Icon.svg";
 
 const FileUpload: React.FC = () => {
 	const [fileName, setFileName] = useState<string | null>(null);

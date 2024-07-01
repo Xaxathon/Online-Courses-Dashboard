@@ -47,10 +47,7 @@ const UserSettingForm = ({ user }: UserSettingFormProps) => {
 			.min(5, "Поле должно содержать минимум 5 символов")
 			.max(50, "Поле должно содержать максимум 50 символов")
 			.required("Поле обязательно для заполнения"),
-		login: Yup.string()
-			.min(5, "Поле должно содержать минимум 5 символов")
-			.max(50, "Поле должно содержать максимум 50 символов")
-			.required("Поле обязательно для заполнения"),
+
 		email: Yup.string()
 			.email("Некорректный email")
 			.required("Поле обязательно для заполнения"),
@@ -99,7 +96,6 @@ const UserSettingForm = ({ user }: UserSettingFormProps) => {
 			initialValues={{
 				full_name: user.full_name || "",
 				department: user.department || "",
-				login: user.login || "",
 				email: user.email || "",
 				password: "",
 			}}
@@ -212,26 +208,7 @@ const UserSettingForm = ({ user }: UserSettingFormProps) => {
 											className="text-crimsonRed text-sm"
 										/>
 									</div>
-									<div className="flex flex-col gap-1">
-										<label
-											className="text-gardenGreen text-lg"
-											htmlFor={`login_${user.id}`}
-										>
-											Логин
-										</label>
-										<Field
-											className="text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gardenGreen focus:border-transparent"
-											id={`login_${user.id}`}
-											name="login"
-											type="text"
-											disabled={!isEditing}
-										/>
-										<ErrorMessage
-											name="login"
-											component="div"
-											className="text-crimsonRed text-sm"
-										/>
-									</div>
+
 									<div className="flex flex-col gap-1">
 										<label
 											className="text-gardenGreen text-lg"

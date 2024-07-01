@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import Calendar from "@assets/icons/calendar.svg";
-import Meetings from "@assets/icons/meetings.svg";
-import Protocol from "@assets/icons/protocol.svg";
-import Settings from "@assets/icons/settings.svg";
-import Logout from "@assets/icons/logout.svg";
+import { ReactComponent as Calendar } from "@assets/icons/calendar.svg";
+import { ReactComponent as Meetings } from "@assets/icons/meetings.svg";
+import { ReactComponent as Protocol } from "@assets/icons/protocol.svg";
+import { ReactComponent as Settings } from "@assets/icons/settings.svg";
+import { ReactComponent as Logout } from "@assets/icons/logout.svg";
+
 import { useLogoutMutation } from "../../api/authApi";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store";
@@ -50,6 +51,15 @@ const Sidebar: React.FC = () => {
 			? "opacity-100"
 			: "opacity-40 hover:opacity-70 active:opacity-20";
 
+	const getRoleLink = () => {
+		if (role === UserRole.Secretary) {
+			return "/main/meetings";
+		} else if (role === UserRole.Manager) {
+			return "/main/secretaries";
+		}
+		return "/main";
+	};
+
 	return (
 		<aside className="sticky top-0 left-2 h-screen z-10 mr-4 py-2">
 			<nav className="min-h-full z-10 flex flex-col items-center py-10 px-9 gap-9 bg-mainPurple rounded-3xl ">
@@ -60,8 +70,8 @@ const Sidebar: React.FC = () => {
 					{role && [UserRole.Manager, UserRole.Secretary].includes(role) && (
 						<li>
 							<Link
-								to="/main/meetings"
-								className={`w-8 h-8 ${getOpacity("/main/meetings")}`}
+								to={getRoleLink()}
+								className={`w-8 h-8 ${getOpacity(getRoleLink())}`}
 							>
 								<Meetings className="w-8 h-8 fill-current text-white" />
 							</Link>
@@ -79,7 +89,7 @@ const Sidebar: React.FC = () => {
 							</li>
 							<li>
 								<Link
-									to="/main/protocol"
+									to="/main/protocols"
 									className={`w-8 h-8 ${getOpacity("/main/protocol")}`}
 								>
 									<Protocol className="w-8 h-8 fill-current text-white" />

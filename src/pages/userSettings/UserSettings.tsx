@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
-import Backward from "@assets/icons/backward.svg";
+import { ReactComponent as Backward } from "@assets/icons/backward.svg";
+import { ReactComponent as AddProtocolIcon } from "@assets/icons/addProtocol.svg";
+
 import UsersSettingListForm from "../../components/usersSettingListForm/UsersSettingListForm";
 import { useNavigate } from "react-router-dom";
 import { useLazyFetchUserQuery, useFetchUsersQuery } from "../../api/authApi";
 import UserForm from "../../components/userForm/UserForm";
-import AddProtocolIcon from "@assets/icons/addProtocol.svg";
 import UserAddFormModal from "../../components/userAddFormModal/userAddFormModal";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { UserRole } from "../../shared/interfaces/user";
-import Skeleton from "../../components/skeleton/Skeleton";
 
 const UserSettings = () => {
 	const navigate = useNavigate();
@@ -56,7 +56,7 @@ const UserSettings = () => {
 					Мой профиль
 				</h2>
 				<div className="max-w-[66rem] mx-auto mt-6 bg-gray-100 px-6 py-4 rounded-lg">
-					{isLoading && <Skeleton />}
+					{isLoading && <div>загрузка</div>}
 					{isError && <p>Error loading user data</p>}
 					{userData && <UserForm userData={userData.data} />}
 				</div>

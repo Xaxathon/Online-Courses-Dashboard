@@ -5,6 +5,7 @@ import {
 	UserResponse,
 	User,
 	CreateUserRequest,
+	FetchUsersResponse,
 } from "../shared/interfaces/user";
 
 export const authApi = createApi({
@@ -40,6 +41,12 @@ export const authApi = createApi({
 		fetchUser: builder.query<UserResponse, void>({
 			query: () => ({
 				url: "/api/me",
+				method: "GET",
+			}),
+		}),
+		fetchUserById: builder.query<FetchUsersResponse, number>({
+			query: (id) => ({
+				url: `/api/users/${id}`,
 				method: "GET",
 			}),
 		}),
@@ -84,6 +91,7 @@ export const {
 	useLogoutMutation,
 	useForgotPasswordMutation,
 	useLazyFetchUserQuery,
+	useFetchUserByIdQuery,
 	useUpdateUserMutation,
 	useCreateUserMutation,
 	useFetchUsersQuery,

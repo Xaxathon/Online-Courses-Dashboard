@@ -7,28 +7,3 @@
 @tailwind utilities;    
 
 
-/* Добавьте эти стили в ваш CSS файл */
-/* Custom scrollbar styles */
-.scrollbar-custom {
-    scrollbar-width: thin;
-    scrollbar-color: #7130A3 #f1f1f1;
-  }
-  
-  .scrollbar-custom::-webkit-scrollbar {
-    width: 12px; /* Ширина скроллбара */
-  }
-  
-  .scrollbar-custom::-webkit-scrollbar-track {
-    background: #f1f1f1; /* Цвет дорожки скроллбара */
-  }
-  
-  .scrollbar-custom::-webkit-scrollbar-thumb {
-    background-color: #7130A3; /* Цвет скроллбара */
-    border-radius: 10px; /* Радиус скроллбара */
-    border: 3px solid #f1f1f1; /* Пустота вокруг скроллбара */
-  }
-  
-  /* Ensuring scrollbar is always visible */
-  .scrollbar-custom {
-    overflow-y: scroll;
-  }

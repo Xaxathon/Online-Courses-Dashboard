@@ -1,151 +1,366 @@
-import React from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
+import {
+	useCreateMeetingMutation,
+	useUpdateMeetingMutation,
+} from "../../api/meetingsApi";
+import {
+	CreateMeeting,
+	Meeting,
+	UpdateMeetingMember,
+} from "../../shared/interfaces/meeting";
+import dayjs from "dayjs";
+import classNames from "classnames";
+import { ReactComponent as Delete } from "@assets/icons/delete.svg";
+import { ReactComponent as Mp4Icon } from "@assets/icons/mp4Icon.svg"; // Предполагается, что у вас есть иконка для mp4 или другого документа
+import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
+import * as Yup from "yup";
 
-const AppointmentForm = () => {
+interface AppointmentFormProps {
+	meeting: Meeting | null;
+	selectedDate: Date | null;
+	startTime: string | null;
+	endTime: string | null;
+	onSave: (meeting: CreateMeeting) => void;
+	onOpenUserModal: () => void;
+}
+
+interface ExtendedUpdateMeetingMember extends UpdateMeetingMember {
+	full_name: string;
+	email: string;
+	email_sent: boolean;
+}
+
+const AppointmentForm: React.FC<AppointmentFormProps> = ({
+	meeting,
+	selectedDate,
+	startTime,
+	endTime,
+	onSave,
+	onOpenUserModal,
+}) => {
+	const [members, setMembers] = useState<ExtendedUpdateMeetingMember[]>([]);
+
+	const [createMeeting] = useCreateMeetingMutation();
+	const [updateMeeting] = useUpdateMeetingMutation();
+
+	const [isSaving, setIsSaving] = useState<boolean>(false);
+	const [saveStatus, setSaveStatus] = useState<string>("");
+	const [fileName, setFileName] = useState<string | null>(null);
+	const [fileURL, setFileURL] = useState<string | null>(null);
+	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (meeting) {
+			console.log("Meeting data:", meeting);
+			setMembers(
+				meeting.members?.map((m) => {
+					const memberId = m.member.id;
+					if (memberId === undefined) {
+						throw new Error("Member ID is undefined");
+					}
+					return {
+						member_id: memberId,
+						should_notify: m.email_sent || m.should_notify,
+						full_name: m.member.full_name,
+						email: m.member.email,
+						email_sent: m.email_sent ?? false,
+					};
+				}) || []
+			);
+			if (meeting.document_url) {
+				console.log("meeting.document_url:", meeting.document_url);
+				setFileURL(meeting.document_url);
+				const fileNameParts = meeting.document_url.split("/");
+				setFileName(fileNameParts[fileNameParts.length - 1]);
+				console.log("fileName:", fileNameParts);
+			} else {
+				setFileURL(null);
+				setFileName(null);
+			}
+		} else {
+			setMembers([]);
+			setFileURL(null);
+			setFileName(null);
+		}
+	}, [meeting]);
+
+	const validationSchema = Yup.object({
+		theme: Yup.string().required("Тема обязательна для заполнения"),
+		link: Yup.string()
+			.url("Некорректная ссылка")
+			.required("Ссылка обязательна для заполнения"),
+	});
+
+	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+		if (event.target.files && event.target.files.length > 0) {
+			const file = event.target.files[0];
+			setFileName(file.name);
+			const fileReader = new FileReader();
+			fileReader.onload = () => {
+				setFileURL(fileReader.result as string);
+			};
+			fileReader.readAsDataURL(file);
+		}
+	};
+
+	const handleSubmit = async (
+		values: any,
+		{ setSubmitting }: FormikHelpers<any>
+	) => {
+		setIsSaving(true);
+		setSaveStatus("");
+		setError(null);
+
+		const data = new FormData();
+		for (const key in values) {
+			if (values[key as keyof typeof values]) {
+				data.append(key, values[key as keyof typeof values] as Blob | string);
+			}
+		}
+
+		data.append("event_date", dayjs(selectedDate).format("YYYY-MM-DD"));
+		data.append("event_start_time", startTime || "");
+		data.append("event_end_time", endTime || "");
+
+		members.forEach((member, index) => {
+			data.append(`members[${index}][member_id]`, member.member_id.toString());
+			data.append(
+				`members[${index}][should_notify]`,
+				member.should_notify ? "1" : "0"
+			);
+		});
+
+		if (fileURL) {
+			const response = await fetch(fileURL);
+			const blob = await response.blob();
+			data.append("document", blob, fileName || "document");
+		}
+
+		const newMeeting: CreateMeeting = {
+			theme: values.theme,
+			link: values.link,
+			event_date: dayjs(selectedDate).format("YYYY-MM-DD"),
+			event_start_time: startTime || "",
+			event_end_time: endTime || "",
+			members: members.map(
+				({ member_id, should_notify, full_name, email, email_sent }) => ({
+					id: member_id,
+					member: {
+						id: member_id,
+						full_name,
+						email,
+					},
+					email_sent,
+					should_notify: should_notify ?? false,
+				})
+			),
+			document: fileURL || undefined,
+		};
+
+		try {
+			if (meeting?.id) {
+				data.append("_method", "PUT");
+				await updateMeeting({ id: meeting.id, data }).unwrap();
+			} else {
+				await createMeeting({ data }).unwrap();
+			}
+			onSave(newMeeting);
+			setSaveStatus("Данные успешно сохранены");
+			setTimeout(() => setSaveStatus(""), 5000); // Скрыть сообщение через 5 секунд
+		} catch (error: any) {
+			console.error("Failed to save meeting: ", error);
+			setError(error.data?.message || "Ошибка при сохранении данных");
+			setTimeout(() => setError(""), 5000); // Скрыть сообщение через 5 секунд
+		} finally {
+			setIsSaving(false);
+			setSubmitting(false);
+		}
+	};
+
+	const handleCheckboxChange = (id: number) => {
+		setMembers((prevMembers) =>
+			prevMembers.map((member) =>
+				member.member_id === id
+					? { ...member, should_notify: !member.should_notify }
+					: member
+			)
+		);
+	};
+
+	const handleDeleteMember = (id: number) => {
+		setMembers(members.filter((member) => member.member_id !== id));
+	};
+
 	return (
-		<form action="">
-			<div className="space-y-4 mt-5">
-				<input
-					className="w-full h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg outline-none ring-2 focus:bg-lightPurple focus:ring-mainPurple border-transparent ring-mainPurple"
-					id="meetingTitle"
-					type="text"
-					placeholder="Введите тему совещания"
-				/>
-				<input
-					className="w-full h-[46px] text-mainPurple text-[15px] bg-white p-3 rounded-lg outline-none ring-2 focus:bg-lightPurple focus:ring-mainPurple border-transparent ring-mainPurple"
-					id="meetingLink"
-					type="text"
-					placeholder="Вставьте ссылку на совещание"
-				/>
-			</div>
-			<div className="mt-4 px-[10px] py-[15px] border-2 border-mainPurple rounded-lg">
-				<div className="justify-between flex items-center">
-					<span className="font-bold text-[20px] text-start text-gardenGreen ">
-						Участники
-					</span>
-					<button className="bg-gardenGreen font-bold text-[22px] rounded-md text-white p-2 leading-none">
-						+
-					</button>
-				</div>
-				<ul className="mt-3 space-y-1 max-h-[180px] overflow-y-auto">
-					<li className="bg-lightPurple rounded-sm px-3 py-1 flex items-center justify-around flex-grow space-x-2">
-						<div className="bg-crimsonRed w-[22px] h-[22px] rounded-sm"></div>
-						<span className="text-[12px] font-bold text-mainPurple">
-							Иванов Иван Иванович
-						</span>
-						<span className="text-[10px] text-gray-400">
-							susuev.95a@gmail.com
-						</span>
-						<input
-							type="checkbox"
-							name="checkbox"
-							id="checkbox"
-							className="w-7 h-7 border-2 cursor-pointer"
-						/>
-					</li>
-					<li className="bg-lightPurple rounded-sm px-3 py-1 flex items-center justify-around flex-grow space-x-2">
-						<div className="bg-crimsonRed w-[22px] h-[22px] rounded-sm"></div>
-						<span className="text-[12px] font-bold text-mainPurple">
-							Иванов Иван Иванович
-						</span>
-						<span className="text-[10px] text-gray-400">
-							susuev.95a@gmail.com
-						</span>
-						<input
-							type="checkbox"
-							name="checkbox"
-							id="checkbox"
-							className="w-7 h-7 border-2 cursor-pointer"
-						/>
-					</li>
-					<li className="bg-lightPurple rounded-sm px-3 py-1 flex items-center justify-around flex-grow space-x-2">
-						<div className="bg-crimsonRed w-[22px] h-[22px] rounded-sm"></div>
-						<span className="text-[12px] font-bold text-mainPurple">
-							Иванов Иван Иванович
-						</span>
-						<span className="text-[10px] text-gray-400">
-							susuev.95a@gmail.com
-						</span>
-						<input
-							type="checkbox"
-							name="checkbox"
-							id="checkbox"
-							className="w-7 h-7 border-2 cursor-pointer"
-						/>
-					</li>
-					<li className="bg-lightPurple rounded-sm px-3 py-1 flex items-center justify-around flex-grow space-x-2">
-						<div className="bg-crimsonRed w-[22px] h-[22px] rounded-sm"></div>
-						<span className="text-[12px] font-bold text-mainPurple">
-							Иванов Иван Иванович
-						</span>
-						<span className="text-[10px] text-gray-400">
-							susuev.95a@gmail.com
-						</span>
-						<input
-							type="checkbox"
-							name="checkbox"
-							id="checkbox"
-							className="w-7 h-7 border-2 cursor-pointer"
-						/>
-					</li>
-					<li className="bg-lightPurple rounded-sm px-3 py-1 flex items-center justify-around flex-grow space-x-2">
-						<div className="bg-crimsonRed w-[22px] h-[22px] rounded-sm"></div>
-						<span className="text-[12px] font-bold text-mainPurple">
-							Иванов Иван Иванович
-						</span>
-						<span className="text-[10px] text-gray-400">
-							susuev.95a@gmail.com
-						</span>
-						<input
-							type="checkbox"
-							name="checkbox"
-							id="checkbox"
-							className="w-7 h-7 border-2 cursor-pointer"
-						/>
-					</li>
-					<li className="bg-lightPurple rounded-sm px-3 py-1 flex items-center justify-around flex-grow space-x-2">
-						<div className="bg-crimsonRed w-[22px] h-[22px] rounded-sm"></div>
-						<span className="text-[12px] font-bold text-mainPurple">
-							Иванов Иван Иванович
-						</span>
-						<span className="text-[10px] text-gray-400">
-							susuev.95a@gmail.com
-						</span>
-						<input
-							type="checkbox"
-							name="checkbox"
-							id="checkbox"
-							className="w-7 h-7 border-2 cursor-pointer"
-						/>
-					</li>
-				</ul>
-			</div>
-			<div className="flex justify-end">
-				<button className="bg-[#FF8F27] text-white font-bold text-[14px] rounded-md p-2 flex justify-center items-center space-x-2 cursor-pointer mt-2">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="22"
-						height="17"
-						viewBox="0 0 22 17"
-						fill="none"
-					>
-						<path
-							d="M11.0147 9.50142C11.4357 9.50142 11.8077 9.30791 12.2483 8.87251L20.7859 0.50313C20.4041 0.164485 19.7285 0 18.7788 0H2.9862C2.14419 0 1.54695 0.154809 1.20427 0.464428L9.78104 8.87251C10.2118 9.30791 10.5937 9.50142 11.0147 9.50142ZM0.264352 15.3552L7.30396 8.46614L0.274143 1.60615C0.0979083 1.91577 0 2.42857 0 3.15424V13.8458C0 14.5521 0.0881175 15.0552 0.264352 15.3552ZM21.7454 15.3455C21.9119 15.0455 22 14.5424 22 13.8458V3.15424C22 2.44792 21.9021 1.93512 21.7259 1.63517L14.7254 8.46614L21.7454 15.3455ZM3.22118 17H19.0138C19.8754 17 20.4824 16.8355 20.8349 16.5162L13.668 9.48207L13.061 10.0723C12.3854 10.7205 11.7392 11.0302 11.0147 11.0302C10.2902 11.0302 9.63418 10.7205 8.95861 10.0723L8.35158 9.48207L1.19448 16.4969C1.58611 16.8258 2.27147 17 3.22118 17Z"
-							fill="white"
-						/>
-					</svg>
-					<span>Отправить</span>
-				</button>
-			</div>
-			<div className="flex justify-between mt-5">
-				<button className="bg-mainPurple text-white font-bold text-[14px] rounded-md px-[15px] flex justify-center items-center space-x-2 cursor-pointer mt-2 leading-none hover:bg-mainPurpleHover active:bg-mainPurpleActive">
-					+ Документ
-				</button>
+		<Formik
+			initialValues={{
+				theme: meeting?.theme || "",
+				link: meeting?.link || "",
+			}}
+			validationSchema={validationSchema}
+			onSubmit={handleSubmit}
+		>
+			{({ isSubmitting, setFieldValue }) => (
+				<Form>
+					<div className="flex flex-col gap-3 mt-5">
+						<div className="flex flex-col gap-2">
+							<Field
+								className={classNames(
+									"w-full  text-mainPurple text-sm bg-white p-3 rounded-lg outline-none ring-2 focus:bg-lightPurple focus:ring-mainPurple border-transparent ring-mainPurple",
+									{ "bg-gray-200 opacity-50": isSubmitting }
+								)}
+								id="theme"
+								name="theme"
+								placeholder="Введите тему совещания"
+								disabled={isSubmitting}
+							/>
+							<ErrorMessage
+								name="theme"
+								component="div"
+								className="text-crimsonRed text-sm font-bold"
+							/>
+						</div>
+						<div className="flex flex-col gap-2">
+							<Field
+								className={classNames(
+									"w-full text-mainPurple text-sm bg-white p-3 rounded-lg outline-none ring-2 focus:bg-lightPurple focus:ring-mainPurple border-transparent ring-mainPurple",
+									{ "bg-gray-200 opacity-50": isSubmitting }
+								)}
+								id="link"
+								name="link"
+								placeholder="Вставьте ссылку на совещание"
+								disabled={isSubmitting}
+							/>
+							<ErrorMessage
+								name="link"
+								component="div"
+								className="text-crimsonRed text-sm font-bold"
+							/>
+						</div>
+					</div>
+					<div className="mt-2 px-3 py-4 border-2 border-mainPurple rounded-lg">
+						<div className="justify-between flex items-center">
+							<span className="font-bold text-lg text-start text-gardenGreen">
+								Участники
+							</span>
+							<button
+								type="button"
+								className="bg-gardenGreen font-bold text-xl rounded-md text-white p-2 leading-none"
+								onClick={onOpenUserModal}
+								disabled={isSubmitting}
+							>
+								+
+							</button>
+						</div>
+						<ul className="flex flex-col gap-1 mt-2 max-h-[9rem] overflow-y-auto">
+							{members.map((member) => (
+								<li
+									key={member.member_id}
+									className="bg-lightPurple rounded-sm px-3 py-1 flex items-center justify-between gap-2"
+								>
+									<div className="flex items-center space-x-2">
+										<Delete
+											className="w-6 h-6 fill-current text-crimsonRed hover:text-crimsonRed cursor-pointer"
+											onClick={() => handleDeleteMember(member.member_id)}
+										/>
+										<span className="text-[12px] font-bold text-mainPurple">
+											{member.full_name}
+										</span>
+										<span className="text-[10px] text-gray-400">
+											{member.email}
+										</span>
+									</div>
+									<div className="flex items-center gap-2">
+										{member.email && (
+											<input
+												type="checkbox"
+												name="checkbox"
+												id="checkbox"
+												className="w-7 h-7 border-2 cursor-pointer"
+												checked={!!member.should_notify}
+												onChange={() => handleCheckboxChange(member.member_id)}
+												disabled={isSubmitting || member.email_sent}
+											/>
+										)}
+										{member.email_sent && (
+											<span className="text-[10px] text-green-500">
+												Email Sent
+											</span>
+										)}
+									</div>
+								</li>
+							))}
+						</ul>
+					</div>
+					<div className="flex justify-start mt-3">
+						<div className="flex flex-col items-start">
+							<label
+								htmlFor="document"
+								className="bg-mainPurple text-white font-bold text-xs rounded-md px-5 py-2 cursor-pointer hover:bg-mainPurpleHover active:bg-mainPurpleActive"
+							>
+								Загрузить документ
+								<input
+									id="document"
+									name="document"
+									type="file"
+									accept=".pdf,.doc,.docx"
+									className="hidden"
+									onChange={(event) => {
+										handleFileChange(event);
+										const file = event.target.files?.[0];
+										if (file) {
+											setFieldValue("document", file);
+										}
+									}}
+									disabled={isSubmitting}
+								/>
+							</label>
+							{fileName && (
+								<div className="mt-2 flex flex-wrap items-center text-gray-400 gap-2 font-normal text-xs px-2">
+									<Mp4Icon className="w-5 h-5" />
+									<a
+										href={fileURL ?? "#"}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="text-black hover:underline"
+									>
+										{fileName}
+									</a>
+								</div>
+							)}
+							<ErrorMessage
+								name="document"
+								component="div"
+								className="text-crimsonRed text-sm mt-2"
+							/>
+						</div>
+					</div>
 
-				<button className="bg-mainPurple text-white font-bold text-[20px] rounded-md px-[50px] py-2 flex justify-center items-center space-x-2 cursor-pointer mt-2 hover:bg-mainPurpleHover active:bg-mainPurpleActive">
-					Сохранить
-				</button>
-			</div>
-		</form>
+					<div className="flex justify-center mt-3">
+						<button
+							type="submit"
+							className={classNames(
+								" rounded-xl px-14 py-2 bg-mainPurple text-white text-lg font-bold hover:bg-mainPurpleHover active:bg-mainPurpleActive",
+								{ "bg-gray-200 opacity-50 cursor-not-allowed": isSubmitting }
+							)}
+							disabled={isSubmitting}
+						>
+							Сохранить
+						</button>
+					</div>
+					{saveStatus && (
+						<div className="mt-4 text-green-500 text-xs text-end font-bold">
+							{saveStatus}
+						</div>
+					)}
+					{error && (
+						<div className="mt-4 text-red-500 text-xs text-end font-bold">
+							{error}
+						</div>
+					)}
+				</Form>
+			)}
+		</Formik>
 	);
 };
 

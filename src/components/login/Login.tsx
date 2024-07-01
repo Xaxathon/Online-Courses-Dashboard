@@ -36,6 +36,7 @@ const Login = () => {
 				const response = await login(values).unwrap();
 
 				const token = response.data?.token;
+				console.log(token);
 				if (token) {
 					dispatch(setToken(token));
 

@@ -96,7 +96,7 @@ const UserForm = ({ userData }: UserFormProps) => {
 			initialValues={{
 				full_name: userData.full_name || "",
 				department: userData.department || "",
-				login: userData.login || "",
+
 				email: userData.email || "",
 				password: "",
 			}}
@@ -185,23 +185,7 @@ const UserForm = ({ userData }: UserFormProps) => {
 									className="text-crimsonRed text-sm"
 								/>
 							</div>
-							<div className="flex flex-col gap-1">
-								<label className="text-gardenGreen text-lg" htmlFor="login">
-									Логин
-								</label>
-								<Field
-									className="text-mainPurple text-base bg-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gardenGreen focus:border-transparent"
-									id="login"
-									name="login"
-									type="text"
-									disabled={!isEditing}
-								/>
-								<ErrorMessage
-									name="login"
-									component="span"
-									className="text-crimsonRed text-sm"
-								/>
-							</div>
+
 							<div className="flex flex-col gap-1">
 								<label className="text-gardenGreen text-lg" htmlFor="email">
 									E-mail

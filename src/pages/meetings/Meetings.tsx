@@ -3,7 +3,7 @@ import KpiChart from "../../components/kpiChart/KpiChart";
 import Calendar from "../../components/calendar/Calendar";
 import StatWidget from "../../components/statWidget/StatWidget";
 import TaskList from "../../components/taskList/TaskList";
-import Search from "@assets/icons/search.svg";
+import { ReactComponent as Search } from "@assets/icons/search.svg";
 
 const Meetings = () => {
 	return (

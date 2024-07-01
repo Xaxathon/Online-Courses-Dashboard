@@ -15,6 +15,13 @@ import { setToken, setRole } from "../../features/authSlice";
 import { UserRole } from "../../shared/interfaces/user";
 import Keywords from "../../pages/keywords/Keywords";
 import ForgotPassword from "../forgotPassword/ForgotPassword";
+import Meetings from "../../pages/meetings/Meetings";
+import Secretaries from "../../pages/secretaries/Secretaries";
+import Protocol from "../../pages/protocol/Protocol";
+import Protocols from "../../pages/protocols/Protocols";
+import Appointment from "../../pages/appointment/Appointment";
+import AppointmentAddModal from "../appointmentUserAddModal/AppointmentAddUserModal";
+import AppointmentTimeAddFormModal from "../appointmentTimeAddFormModal/AppointmentTimeAddFormModal";
 
 interface PrivateRouteProps {
 	children: ReactNode;
@@ -66,6 +73,10 @@ const Dashboard = () => (
 			<Route path="settings" element={<Settings />} />
 			<Route path="settings/users" element={<UserSettings />} />
 			<Route path="settings/keywords" element={<Keywords />} />
+			<Route path="meetings" element={<Meetings />} />
+			<Route path="secretaries" element={<Secretaries />} />
+			<Route path="protocols" element={<Protocols />} />
+			<Route path="calendar" element={<Appointment />} />
 		</Routes>
 	</div>
 );

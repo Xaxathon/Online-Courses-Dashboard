@@ -5,7 +5,7 @@ import UserSettingForm from "../userSettingForm/UserSettingForm";
 import { InternalUser, UserRole } from "../../shared/interfaces/user";
 import { RootState } from "../../store/store";
 import { useSelector } from "react-redux";
-import Spinner from "@assets/icons/spinner.svg";
+import { ReactComponent as Spinner } from "@assets/icons/spinner.svg";
 
 const UsersSettingListForm = () => {
 	const { data, isLoading, isError, refetch } = useFetchUsersQuery();

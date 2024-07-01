@@ -1,22 +1,11 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
-import svgr from "vite-plugin-svgr";
+import svgr from "@svgr/rollup";
 import path from "path";
 
 export default defineConfig({
 	base: "/",
-	plugins: [
-		react(),
-		svgr({
-			include: "**/*.svg",
-			svgrOptions: {
-				plugins: ["@svgr/plugin-svgo", "@svgr/plugin-jsx"],
-				svgoConfig: {
-					floatPrecision: 2,
-				},
-			},
-		}),
-	],
+	plugins: [react(), svgr()],
 	resolve: {
 		alias: {
 			"@": path.resolve(__dirname, "./src"),

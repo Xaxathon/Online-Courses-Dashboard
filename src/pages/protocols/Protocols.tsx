@@ -1,6 +1,6 @@
 import React from "react";
 
-import AddProtocolIcon from "@assets/icons/addProtocol.svg";
+import { ReactComponent as AddProtocolIcon } from "@assets/icons/addProtocol.svg";
 import ProtocolList from "../../components/protocolList/ProtocolList";
 const Protocols = () => {
 	return (

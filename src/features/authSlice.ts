@@ -11,7 +11,6 @@ const initialState: AuthState = {
 			: undefined,
 		full_name: "",
 		email: "",
-		login: "",
 		department: "",
 		is_active: false,
 		created_at: "",

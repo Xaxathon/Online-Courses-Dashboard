@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import KeywordsItem from "../keywordsItem/KeywordsItem";
 import { useFetchKeywordsQuery } from "../../api/keywordsApi";
 
-import Spinner from "@assets/icons/spinner.svg";
+import { ReactComponent as Spinner } from "@assets/icons/spinner.svg";
 const KeywordsList: React.FC = () => {
 	const { data, error, isLoading } = useFetchKeywordsQuery();
 

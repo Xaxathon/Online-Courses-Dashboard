@@ -10,7 +10,6 @@ export interface LoginResponse {
 		department: string;
 		email: string;
 		full_name: string;
-		login: string;
 		role: UserRole;
 		updated_at: string;
 	};

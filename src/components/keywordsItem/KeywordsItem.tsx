@@ -2,16 +2,17 @@ import React, { useState } from "react";
 import classNames from "classnames";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import Change from "@assets/icons/change.svg";
-import Success from "@assets/icons/change.svg";
-import Delete from "@assets/icons/delete.svg";
+import { ReactComponent as Change } from "@assets/icons/change.svg";
+import { ReactComponent as Success } from "@assets/icons/change.svg";
+import { ReactComponent as Delete } from "@assets/icons/delete.svg";
+import { ReactComponent as Close } from "@assets/icons/сlose-modal.svg";
+
 import { Keyword } from "../../shared/interfaces/keyword";
 import {
 	useUpdateKeywordMutation,
 	useDeleteKeywordMutation,
 	useFetchKeywordsQuery,
 } from "../../api/keywordsApi";
-import Close from "@assets/icons/сlose-modal.svg";
 import KeywordDeleteModal from "../keywordDeleteModal/KeywordDeleteModal";
 
 interface KeywordsItemProps {

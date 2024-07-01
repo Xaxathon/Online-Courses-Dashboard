@@ -2,14 +2,14 @@ export enum UserRole {
 	Admin = "admin",
 	Manager = "manager",
 	Secretary = "secretary",
+	External = "external",
 }
 
 export interface BaseUser {
-	id: number; // Изменено на number
+	id: number;
 	full_name: string;
 	email: string;
 	password: string;
-	login: string;
 	department: string;
 	is_active: boolean;
 	created_at: string;
@@ -19,8 +19,11 @@ export interface BaseUser {
 }
 
 export interface ExternalUser {
+	id?: number;
 	full_name: string;
+	email?: string;
 	external: true;
+	role: UserRole.External;
 }
 
 export interface InternalUser extends BaseUser {
@@ -36,7 +39,6 @@ export type UserResponse = {
 		| "password"
 		| "full_name"
 		| "email"
-		| "login"
 		| "department"
 		| "is_active"
 		| "created_at"
@@ -46,15 +48,17 @@ export type UserResponse = {
 	>;
 };
 
-export type FetchUserResponse = {
-	user: UserResponse;
-};
+export interface FetchUsersResponse {
+	data: {
+		data: InternalUser;
+	};
+}
+
 export type CreateUserRequest = ExternalUser | InternalUser;
 
 export interface FormValues {
 	full_name: string;
 	department: string;
-	login: string;
 	email: string;
 	password: string;
 	avatar?: File;

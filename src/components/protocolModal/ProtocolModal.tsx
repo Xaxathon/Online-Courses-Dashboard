@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import CloseModal from "@assets/icons/сloseModal.svg";
 import Modal from "../modal/Modal";
-const ProtocolModal = () => {
+const ProtocolModal = ({ onClose }: { onClose: () => void }) => {
 	return (
-		<Modal>
+		<Modal onClose={onClose}>
 			<div className="mt-14 text-xl font-bold text-mainPurple text-center">
 				<div className="grid grid-cols-2 gap-4">
 					<div>
