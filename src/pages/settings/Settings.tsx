@@ -1,8 +1,10 @@
-import React from "react";
 import { Link } from "react-router-dom";
+
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
+
 import { UserRole } from "../../shared/interfaces/user";
+
 const Settings = () => {
 	const role = useSelector((state: RootState) => state.auth.role);
 	return (

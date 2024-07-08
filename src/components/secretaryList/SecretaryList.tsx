@@ -1,4 +1,3 @@
-import React from "react";
 import SecretaryItem from "../secretaryItem/SecretaryItem";
 import { User } from "../../shared/interfaces/user";
 import Skeleton from "../skeleton/Skeleton";
@@ -8,6 +7,7 @@ interface SecretaryListProps {
 	selectedSecretaryId: number | null;
 	onSecretarySelect: (id: number) => void;
 	isLoading: boolean;
+	lastSecretaryElementRef: (node: HTMLElement | null) => void;
 }
 
 const SecretaryList = ({
@@ -15,8 +15,9 @@ const SecretaryList = ({
 	onSecretarySelect,
 	selectedSecretaryId,
 	isLoading,
+	lastSecretaryElementRef,
 }: SecretaryListProps) => {
-	if (isLoading) {
+	if (isLoading && secretaries.length === 0) {
 		return (
 			<div className="flex flex-col gap-3 overflow-y-auto h-[80vh]">
 				<Skeleton width="3/4" height="20" className="rounded-md mt-1" />
@@ -34,14 +35,18 @@ const SecretaryList = ({
 			</span>
 		);
 	}
+
 	return (
-		<ul className="flex flex-col gap-3 overflow-y-auto h-[80vh]">
-			{secretaries.map((secretary) => (
+		<ul className="flex flex-col gap-3 overflow-y-auto h-[76vh]">
+			{secretaries.map((secretary, index) => (
 				<SecretaryItem
 					key={secretary.id}
 					fullName={secretary.full_name}
 					isActive={secretary.id === selectedSecretaryId}
 					onClick={() => onSecretarySelect(secretary.id as number)}
+					ref={
+						index === secretaries.length - 1 ? lastSecretaryElementRef : null
+					}
 				/>
 			))}
 		</ul>

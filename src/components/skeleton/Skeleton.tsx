@@ -1,5 +1,3 @@
-import React from "react";
-
 interface Skeleton {
 	width?: string;
 	height?: string;
@@ -10,7 +8,7 @@ const Skeleton = ({ width, height, className }: Skeleton) => {
 		<div
 			className={`animate-pulse bg-gray-300 ${
 				width ? `w-${width}` : "w-full"
-			} ${height ? `h-${height}` : "h-full"} ${className}`}
+			} ${height ? `h-${height}` : `h-${height}`} ${className}`}
 		></div>
 	);
 };

@@ -1,14 +1,19 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+
+import { useNavigate } from "react-router-dom";
+
 import { ReactComponent as Backward } from "@assets/icons/backward.svg";
 import { ReactComponent as AddProtocolIcon } from "@assets/icons/addProtocol.svg";
 
 import UsersSettingListForm from "../../components/usersSettingListForm/UsersSettingListForm";
-import { useNavigate } from "react-router-dom";
-import { useLazyFetchUserQuery, useFetchUsersQuery } from "../../api/authApi";
 import UserForm from "../../components/userForm/UserForm";
-import UserAddFormModal from "../../components/userAddFormModal/userAddFormModal";
+import UserAddFormModal from "../../components/userAddFormModal/UserAddFormModal";
+import Skeleton from "../../components/skeleton/Skeleton";
+
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
+import { useLazyFetchUserQuery } from "../../api/authApi";
+
 import { UserRole } from "../../shared/interfaces/user";
 
 const UserSettings = () => {
@@ -17,7 +22,8 @@ const UserSettings = () => {
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 	const [fetchUser, { data: userData, isLoading, isError }] =
 		useLazyFetchUserQuery();
-	const { refetch: refetchUsers } = useFetchUsersQuery();
+	const [shouldRefetchUsers, setShouldRefetchUsers] = useState(false);
+
 	const role = useSelector((state: RootState) => state.auth.role);
 
 	useEffect(() => {
@@ -34,7 +40,11 @@ const UserSettings = () => {
 
 	const handleCloseModal = () => {
 		setIsModalOpen(false);
-		refetchUsers();
+	};
+
+	const handleUserAdded = () => {
+		setShouldRefetchUsers(true);
+		handleCloseModal();
 	};
 	return (
 		<div className="mt-7 w-full mr-4 mb-20">
@@ -56,7 +66,17 @@ const UserSettings = () => {
 					Мой профиль
 				</h2>
 				<div className="max-w-[66rem] mx-auto mt-6 bg-gray-100 px-6 py-4 rounded-lg">
-					{isLoading && <div>загрузка</div>}
+					{isLoading && (
+						<>
+							<Skeleton width="1/2" height="10" className="rounded-lg mb-6" />
+							<Skeleton width="3/4" height="44" className=" rounded-lg mb-4" />
+							<Skeleton
+								width="1/2"
+								height="10"
+								className=" mx-auto rounded-lg mb-4"
+							/>
+						</>
+					)}
 					{isError && <p>Error loading user data</p>}
 					{userData && <UserForm userData={userData.data} />}
 				</div>
@@ -65,13 +85,18 @@ const UserSettings = () => {
 						Секретари
 					</h3>
 				)}
-				{role !== UserRole.Secretary && <UsersSettingListForm />}
+				{role !== UserRole.Secretary && (
+					<UsersSettingListForm
+						shouldRefetch={shouldRefetchUsers}
+						onRefetchComplete={() => setShouldRefetchUsers(false)}
+					/>
+				)}
 			</div>
 			{isModalOpen && role && role !== UserRole.Secretary && (
 				<UserAddFormModal
 					onClose={handleCloseModal}
 					role={role}
-					refetchUsers={refetchUsers}
+					onUserAdded={handleUserAdded}
 				/>
 			)}
 		</div>

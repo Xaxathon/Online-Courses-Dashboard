@@ -12,8 +12,6 @@ export interface BaseUser {
 	password: string;
 	department: string;
 	is_active: boolean;
-	created_at: string;
-	updated_at: string;
 	avatar: string;
 	role: UserRole;
 }
@@ -41,8 +39,6 @@ export type UserResponse = {
 		| "email"
 		| "department"
 		| "is_active"
-		| "created_at"
-		| "updated_at"
 		| "avatar"
 		| "role"
 	>;
@@ -51,6 +47,26 @@ export type UserResponse = {
 export interface FetchUsersResponse {
 	data: {
 		data: InternalUser;
+		links: {
+			first: string;
+			last: string;
+			prev: string | null;
+			next: string | null;
+		};
+		meta: {
+			current_page: number;
+			from: number;
+			last_page: number;
+			links: Array<{
+				url: string | null;
+				label: string;
+				active: boolean;
+			}>;
+			path: string;
+			per_page: number;
+			to: number;
+			total: number;
+		};
 	};
 }
 
@@ -63,4 +79,11 @@ export interface FormValues {
 	password: string;
 	avatar?: File;
 	is_active?: boolean;
+}
+
+export interface FetchUsersParams {
+	limit?: number;
+	page?: number;
+	search?: string;
+	with_blocked?: string;
 }

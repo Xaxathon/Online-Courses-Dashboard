@@ -1,22 +1,26 @@
-import React, { useEffect } from "react";
 import KeywordsItem from "../keywordsItem/KeywordsItem";
+import Skeleton from "../skeleton/Skeleton";
+
 import { useFetchKeywordsQuery } from "../../api/keywordsApi";
 
-import { ReactComponent as Spinner } from "@assets/icons/spinner.svg";
-const KeywordsList: React.FC = () => {
+const KeywordsList = () => {
 	const { data, error, isLoading } = useFetchKeywordsQuery();
 
 	if (isLoading)
 		return (
-			<div className="h-60 flex justify-center items-center">
-				<Spinner />
+			<div className="mt-10">
+				<SkeletonKeywordsItem />
+				<SkeletonKeywordsItem />
+				<SkeletonKeywordsItem />
+				<SkeletonKeywordsItem />
+				<SkeletonKeywordsItem />
 			</div>
 		);
-	if (error || !data) return <div>Ошибка загрузки ключевых слов</div>;
+	if (error) return <div>Ошибка загрузки ключевых слов</div>;
 
 	return (
 		<ul className="mt-10 max-w-6xl mx-auto">
-			{data.data.length > 0 ? (
+			{data && data.data.length > 0 ? (
 				data.data.map((keyword) => (
 					<KeywordsItem key={keyword.id} keyword={keyword} />
 				))
@@ -28,3 +32,12 @@ const KeywordsList: React.FC = () => {
 };
 
 export default KeywordsList;
+
+const SkeletonKeywordsItem = () => {
+	return (
+		<div className="flex max-w-6xl mx-auto mt-4 rounded-xl bg-gray-100 py-10 px-7 gap-2">
+			<Skeleton width="1/2" height="10" className="rounded-lg" />
+			<Skeleton width="1/2" height="10" className="rounded-lg" />
+		</div>
+	);
+};

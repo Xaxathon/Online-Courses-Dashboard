@@ -1,12 +1,15 @@
-// Login.js
-import React, { useState } from "react";
-import { useFormik, FormikHelpers, FormikErrors } from "formik";
-import * as Yup from "yup";
+import { useState } from "react";
+
 import { Link, useNavigate } from "react-router-dom";
-import { useLoginMutation, useLazyFetchUserQuery } from "../../api/authApi";
+
+import { useFormik, FormikHelpers } from "formik";
+import * as Yup from "yup";
+
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store/store";
 import { setToken, setRole, setUserId } from "../../features/authSlice";
+import { useLoginMutation, useLazyFetchUserQuery } from "../../api/authApi";
+
 import { UserResponse } from "../../shared/interfaces/user";
 import { LoginFormValues } from "../../shared/interfaces/auth";
 

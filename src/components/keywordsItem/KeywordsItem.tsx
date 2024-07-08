@@ -1,52 +1,72 @@
-import React, { useState } from "react";
+import { useState } from "react";
+
 import classNames from "classnames";
-import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
+
 import { ReactComponent as Change } from "@assets/icons/change.svg";
 import { ReactComponent as Success } from "@assets/icons/change.svg";
 import { ReactComponent as Delete } from "@assets/icons/delete.svg";
 import { ReactComponent as Close } from "@assets/icons/сlose-modal.svg";
 
-import { Keyword } from "../../shared/interfaces/keyword";
+import DeleteElementModal from "../deleteElementModal/DeleteElementModal";
+
+import { Formik, Field, Form, ErrorMessage } from "formik";
+import * as Yup from "yup";
+
 import {
 	useUpdateKeywordMutation,
 	useDeleteKeywordMutation,
-	useFetchKeywordsQuery,
 } from "../../api/keywordsApi";
-import KeywordDeleteModal from "../keywordDeleteModal/KeywordDeleteModal";
+
+import { Keyword } from "../../shared/interfaces/keyword";
 
 interface KeywordsItemProps {
 	keyword: Keyword;
 }
 
-const KeywordsItem = ({ keyword }: KeywordsItemProps) => {
+const KeywordsItem: React.FC<KeywordsItemProps> = ({ keyword }) => {
 	const [isEditing, setIsEditing] = useState<boolean>(false);
-	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
 	const [updateKeyword] = useUpdateKeywordMutation();
 	const [deleteKeyword] = useDeleteKeywordMutation();
-	const { refetch: refetchKeywords } = useFetchKeywordsQuery();
+
+	const [apiError, setApiError] = useState<string | null>(null);
+
 	const handleSave = async (values: { title: string; phrase: string }) => {
-		await updateKeyword({ ...keyword, ...values });
-		setIsEditing(false);
+		try {
+			await updateKeyword({ ...keyword, ...values }).unwrap();
+			setIsEditing(false);
+			setApiError(null);
+		} catch (error) {
+			setApiError(
+				"Ошибка при обновлении ключевого слова. Пожалуйста, попробуйте еще раз."
+			);
+		}
 	};
 
 	const handleCancel = () => {
 		setIsEditing(false);
+		setApiError(null);
 	};
 
-	const handleOpenModal = () => {
-		setIsModalOpen(true);
+	const handleDeleteOpenModal = () => {
+		setIsDeleteModalOpen(true);
 	};
 
-	const handleCloseModal = () => {
-		setIsModalOpen(false);
-		refetchKeywords();
+	const handleDeleteCloseModal = () => {
+		setIsDeleteModalOpen(false);
 	};
 
 	const handleDelete = async () => {
 		if (keyword.id !== undefined) {
-			await deleteKeyword({ id: keyword.id });
-			handleCloseModal();
+			try {
+				await deleteKeyword({ id: keyword.id }).unwrap();
+				handleDeleteCloseModal();
+				setApiError(null);
+			} catch (error) {
+				setApiError(
+					"Ошибка при удалении ключевого слова. Пожалуйста, попробуйте еще раз."
+				);
+			}
 		} else {
 			console.error("Ошибка: ID ключевого слова не определен");
 		}
@@ -106,6 +126,11 @@ const KeywordsItem = ({ keyword }: KeywordsItemProps) => {
 								className="text-crimsonRed text-sm mt-1"
 							/>
 						</div>
+						{apiError && (
+							<div className="col-span-2 text-crimsonRed text-sm mt-2">
+								{apiError}
+							</div>
+						)}
 						<div className="flex flex-col items-start justify-center absolute top-1/2 transform -translate-y-1/2 -right-5 gap-4">
 							{isEditing ? (
 								<>
@@ -127,10 +152,9 @@ const KeywordsItem = ({ keyword }: KeywordsItemProps) => {
 										className="cursor-pointer h-8 w-8 fill-current text-mainPurple hover:text-mainPurpleHover"
 										onClick={() => setIsEditing(true)}
 									/>
-
 									<Delete
 										className="cursor-pointer h-8 w-8 fill-current text-gray-600 hover:text-crimsonRedHover"
-										onClick={handleOpenModal}
+										onClick={handleDeleteOpenModal}
 									/>
 								</>
 							)}
@@ -138,12 +162,12 @@ const KeywordsItem = ({ keyword }: KeywordsItemProps) => {
 					</Form>
 				)}
 			</Formik>
-			{isModalOpen && (
-				<KeywordDeleteModal
-					onClose={handleCloseModal}
+			{isDeleteModalOpen && (
+				<DeleteElementModal
+					title="Удаление ключевого слова"
+					description={`${keyword.title.slice(0, 10)} (ID: ${keyword.id})`}
+					onClose={handleDeleteCloseModal}
 					onDelete={handleDelete}
-					keywordId={keyword.id}
-					keywordTitle={keyword.title}
 				/>
 			)}
 		</li>

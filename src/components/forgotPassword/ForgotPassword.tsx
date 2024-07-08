@@ -1,8 +1,12 @@
-import React, { useState } from "react";
-import Backward from "@assets/icons/backward.svg";
+import { useState } from "react";
+
+import { ReactComponent as Backward } from "@assets/icons/backward.svg";
+
 import { useNavigate } from "react-router-dom";
+
 import { useFormik, FormikHelpers } from "formik";
 import * as Yup from "yup";
+
 import { useForgotPasswordMutation } from "../../api/authApi";
 
 const ForgotPassword = () => {

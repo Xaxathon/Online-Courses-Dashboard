@@ -1,19 +1,38 @@
-import React, { useState } from "react";
-import Modal from "../modal/Modal";
+import { useState, useEffect, useRef, useCallback } from "react";
+
 import { ReactComponent as Search } from "@assets/icons/search.svg";
+import { ReactComponent as Spinner } from "@assets/icons/spinner.svg";
+import { ReactComponent as AddProtocolIcon } from "@assets/icons/addProtocol.svg";
+import { ReactComponent as CloseAddIcon } from "@assets/icons/сlose-modal.svg";
+
+import Modal from "../modal/Modal";
+
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+
 import { useFetchUsersQuery, useCreateUserMutation } from "../../api/authApi";
+
 import {
 	InternalUser,
 	ExternalUser,
 	UserRole,
 } from "../../shared/interfaces/user";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
 
 interface AppointmentAddUserModalProps {
 	onClose: () => void;
 	onUserSelect: (user: InternalUser | ExternalUser) => void;
 	selectedMembers: { id: number; full_name: string; email: string }[];
+}
+
+interface ApiResponse {
+	data: {
+		data: (InternalUser | ExternalUser)[];
+		meta: {
+			current_page: number;
+			last_page: number;
+			total: number;
+		};
+	};
 }
 
 const UserSchema = Yup.object().shape({
@@ -23,21 +42,122 @@ const UserSchema = Yup.object().shape({
 		.max(50, "Поле должно содержать максимум 50 символов"),
 	email: Yup.string().email("Неверный формат email"),
 });
+
+const DEFAULT_LIMIT = 15;
+const MIN_USERS_TO_SHOW_MESSAGE = 2;
+const SEARCH_DELAY = 300;
+
 const AppointmentAddUserModal: React.FC<AppointmentAddUserModalProps> = ({
 	onClose,
 	onUserSelect,
-	selectedMembers,
 }) => {
-	const { data, isLoading, isError, refetch } = useFetchUsersQuery();
-	const [createUser] = useCreateUserMutation();
-	const users = data?.data?.data || [];
-	const [searchTerm, setSearchTerm] = useState<string>("");
+	const [page, setPage] = useState(1);
+	const [searchTerm, setSearchTerm] = useState("");
+	const [searchInput, setSearchInput] = useState("");
+	const [allUsers, setAllUsers] = useState<(InternalUser | ExternalUser)[]>([]);
+	const [isSearchMode, setIsSearchMode] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<
 		InternalUser | ExternalUser | null
 	>(null);
 	const [isCreating, setIsCreating] = useState(false);
-	const [filter, setFilter] = useState<"internal" | "external">("internal");
 	const [serverError, setServerError] = useState<string | null>(null);
+	const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+
+	const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+	const { data, isLoading, isError, isFetching, refetch } = useFetchUsersQuery(
+		{
+			limit: searchTerm ? undefined : DEFAULT_LIMIT,
+			page: searchTerm ? undefined : page,
+			search: searchTerm,
+		},
+		{
+			skip: false,
+		}
+	) as {
+		data?: ApiResponse;
+		isLoading: boolean;
+		isError: boolean;
+		isFetching: boolean;
+		refetch: () => void;
+	};
+
+	const [createUser] = useCreateUserMutation();
+
+	const observer = useRef<IntersectionObserver | null>(null);
+
+	const lastUserElementRef = useCallback(
+		(node: HTMLElement | null) => {
+			if (isFetching) return;
+			if (observer.current) observer.current.disconnect();
+
+			observer.current = new IntersectionObserver((entries) => {
+				if (
+					entries[0].isIntersecting &&
+					!isFetching &&
+					!searchTerm &&
+					data?.data.data.length === DEFAULT_LIMIT
+				) {
+					setPage((prevPage) => prevPage + 1);
+				}
+			});
+
+			if (node) observer.current.observe(node);
+		},
+		[isFetching, data, searchTerm]
+	);
+
+	useEffect(() => {
+		if (searchTerm) {
+			setIsSearchMode(true);
+			setPage(1);
+		} else {
+			setIsSearchMode(false);
+			setPage(1);
+			refetch();
+		}
+	}, [searchTerm, refetch]);
+
+	useEffect(() => {
+		if (data?.data.data) {
+			setAllUsers((prevUsers) => {
+				const newUsers = data.data.data;
+				if (isSearchMode || page === 1) {
+					return newUsers;
+				} else {
+					const uniqueNewUsers = newUsers.filter(
+						(newUser) =>
+							!prevUsers.some((prevUser) => prevUser.id === newUser.id)
+					);
+					return [...prevUsers, ...uniqueNewUsers];
+				}
+			});
+		}
+	}, [data, page, isSearchMode]);
+
+	useEffect(() => {
+		if (!isLoading && !isFetching) {
+			setInitialLoadComplete(true);
+		}
+	}, [isLoading, isFetching]);
+
+	useEffect(() => {
+		if (searchTimeoutRef.current) {
+			clearTimeout(searchTimeoutRef.current);
+		}
+
+		if (searchInput !== searchTerm) {
+			searchTimeoutRef.current = setTimeout(() => {
+				setSearchTerm(searchInput);
+			}, SEARCH_DELAY);
+		}
+
+		return () => {
+			if (searchTimeoutRef.current) {
+				clearTimeout(searchTimeoutRef.current);
+			}
+		};
+	}, [searchInput]);
 
 	const handleCreateUser = async (
 		values: ExternalUser,
@@ -75,57 +195,61 @@ const AppointmentAddUserModal: React.FC<AppointmentAddUserModalProps> = ({
 		}
 	};
 
-	const filteredUsers = users.filter((user) => {
-		const isSelected = selectedMembers.some((member) => member.id === user.id);
-		const isMatch =
-			user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			user.email?.toLowerCase().includes(searchTerm.toLowerCase());
-		const isRoleMatch =
-			filter === "external"
-				? user.role === "external"
-				: user.role !== "external";
-		return !isSelected && isMatch && isRoleMatch;
-	});
+	const toggleCreating = () => {
+		setIsCreating(!isCreating);
+		if (isCreating) {
+			setServerError(null);
+		}
+	};
+
+	const showNoMoreUsersMessage =
+		!isFetching &&
+		initialLoadComplete &&
+		allUsers.length >= MIN_USERS_TO_SHOW_MESSAGE &&
+		!isSearchMode &&
+		(data?.data.data.length ?? 0) < DEFAULT_LIMIT;
 
 	return (
 		<Modal onClose={onClose}>
 			<div className="mt-14 w-[35rem] text-xl font-bold text-mainPurple text-center">
-				<div className="flex justify-center items-center bg-gray-100 mt-2 rounded-lg px-3 py-1 mb-5">
-					<input
-						className="bg-transparent p-2 w-full focus:outline-none"
-						type="text"
-						placeholder="Введите запрос"
-						value={searchTerm}
-						onChange={(e) => setSearchTerm(e.target.value)}
-					/>
-					<Search className="w-6 h-6" />
-				</div>
-				<div className="flex justify-center gap-4 mb-5">
-					<button
-						className={`px-4 py-2 rounded ${
-							filter === "external" ? "bg-mainPurple text-white" : "bg-gray-200"
-						}`}
-						onClick={() => setFilter("external")}
-					>
-						Мои участники
-					</button>
-					<button
-						className={`px-4 py-2 rounded ${
-							filter === "internal" ? "bg-mainPurple text-white" : "bg-gray-200"
-						}`}
-						onClick={() => setFilter("internal")}
-					>
-						Другие
-					</button>
+				<div className="flex items-center justify-center mt-2 mb-5 gap-2">
+					<div className="flex justify-center items-center bg-gray-100 rounded-lg px-3 py-1 w-full">
+						<input
+							className="bg-transparent p-2 w-full focus:outline-none"
+							type="text"
+							placeholder="Введите запрос"
+							value={searchInput}
+							onChange={(e) => setSearchInput(e.target.value)}
+						/>
+						{isFetching && searchTerm === searchInput ? (
+							<Spinner className="w-6 h-6 animate-spin" />
+						) : (
+							<Search className="w-6 h-6" />
+						)}
+					</div>
+					{isCreating ? (
+						<CloseAddIcon
+							className="w-10 h-10 cursor-pointer stroke-[0.20rem] stroke-mainPurple hover:stroke-mainPurpleHover active:stroke-mainPurpleActive"
+							onClick={toggleCreating}
+						/>
+					) : (
+						<AddProtocolIcon
+							className="w-10 h-10 cursor-pointer"
+							onClick={toggleCreating}
+						/>
+					)}
 				</div>
 				{!isCreating && (
 					<div className="font-normal text-sm">
 						<ul className="flex flex-col gap-2 h-[20rem] overflow-y-auto">
 							{isLoading && <div>Загрузка...</div>}
 							{isError && <div>Ошибка загрузки данных</div>}
-							{filteredUsers.map((user) => (
+							{allUsers.map((user, index) => (
 								<li
 									key={user.id}
+									ref={
+										allUsers.length === index + 1 ? lastUserElementRef : null
+									}
 									className={`flex justify-between items-center p-3 rounded cursor-pointer ${
 										selectedUser?.id === user.id ? "bg-blue-200" : "bg-gray-200"
 									}`}
@@ -135,14 +259,14 @@ const AppointmentAddUserModal: React.FC<AppointmentAddUserModalProps> = ({
 									<span className="flex-grow">{user.email}</span>
 								</li>
 							))}
-							{filteredUsers.length === 0 && searchTerm && (
+							{showNoMoreUsersMessage && (
+								<div className="text-center mt-4 text-mainPurple">
+									Больше нет пользователей для загрузки
+								</div>
+							)}
+							{allUsers.length === 0 && !isLoading && !isFetching && (
 								<div className="text-center mt-4">
-									<button
-										className="text-mainPurple rounded-lg px-5 py-3 font-bold hover:text-white active:text-white hover:bg-mainPurpleHover active:bg-mainPurpleActive"
-										onClick={() => setIsCreating(true)}
-									>
-										Его нет в списке, создать пользователя?
-									</button>
+									<p>Пользователи не найдены</p>
 								</div>
 							)}
 						</ul>
@@ -194,13 +318,6 @@ const AppointmentAddUserModal: React.FC<AppointmentAddUserModalProps> = ({
 									</div>
 								)}
 								<div className="flex gap-4 mb-20">
-									<button
-										className="mt-5 bg-gray-500 text-gray-300 rounded-lg px-3 py-2 font-bold hover:text-gray-400 active:text-gray-300  hover:bg-gray-300 active:bg-gray-300"
-										type="button"
-										onClick={() => setIsCreating(false)}
-									>
-										Отменить
-									</button>
 									<button
 										className="mt-5 bg-mainPurple text-white rounded-lg px-10 py-2 font-bold hover:bg-mainPurpleHover active:bg-mainPurpleActive"
 										type="submit"

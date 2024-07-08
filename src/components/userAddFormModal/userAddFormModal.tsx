@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
+
+import Modal from "../modal/Modal";
+
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
+
 import { useCreateUserMutation } from "../../api/authApi";
-import Modal from "../modal/Modal";
+
 import {
 	UserRole,
 	CreateUserRequest,
@@ -12,13 +16,13 @@ import {
 interface UserAddFormModalProps {
 	onClose: () => void;
 	role: UserRole;
-	refetchUsers: () => void;
+	onUserAdded: () => void;
 }
 
 const UserAddFormModal = ({
 	onClose,
 	role,
-	refetchUsers,
+	onUserAdded,
 }: UserAddFormModalProps) => {
 	const [createUser, { isLoading }] = useCreateUserMutation();
 	const [backendErrors, setBackendErrors] = useState<string | null>(null);
@@ -60,8 +64,8 @@ const UserAddFormModal = ({
 	) => {
 		try {
 			await createUser(values as CreateUserRequest).unwrap();
+			onUserAdded();
 			onClose();
-			refetchUsers();
 		} catch (err: any) {
 			const errors: any = {};
 			if (err.data?.errors) {

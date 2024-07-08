@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+.calendarContainer {
+    max-width: 29rem;
+    height: 22rem; 
+    box-shadow: 0.3rem 0.3rem 1.3rem rgba(0, 0, 0, 0.25); 
+    border-radius: 1rem; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(180deg, rgba(234, 207, 255, 0.63) 0.55%, rgba(231, 249, 255, 0.54) 100%);
+}
+
+.reactCalendar {
+    background: none;
+    width: 100%;
+    height: 100%;
+    border: none;
+    background-color: transparent;
+    font-family: 'Poppins', sans-serif;
+
+    &__navigation {
+        display: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 0.5rem; 
+        font-weight: 600;
+        color: #7130A3;
+        background: none;
+        border: none;
+        position: relative;
+
+        &__arrow {
+            position: relative;
+            &--prev {
+                margin-right: 0; 
+            }
+            &--next {
+                margin-left: 0; 
+            }
+        }
+        &__label {
+            color: #7130A3;
+            display: none;
+            text-transform: capitalize;
+            margin: 0;
+        }
+    }
+
+    &__month-view {
+        display: none;
+        &__weekdays {
+            text-align: center;
+            font-size: 0.2rem;
+            font-weight: bold;
+            color: #779F7C;
+            text-decoration: none;
+            margin-bottom: 0;
+
+            &__weekday {
+                abbr {
+                    text-decoration: none;
+                }
+            }
+        }
+    }
+
+    &__tile {
+        display: none;
+        height: 0; 
+        display: none;
+        position: relative;
+        font-size: 0;
+        font-weight: bold;
+        color: #053033;
+        flex-direction: column;
+        overflow-y: hidden;
+
+        .event-container {
+            display: none;
+            flex-direction: column;
+          
+        }
+
+        &--active {
+            background: #000000;
+            color: #fff;
+
+            &:enabled:hover {
+                background: #3EB1B8;
+            }
+            &:enabled:focus {
+                background: #3EB1B8;
+            }
+        }
+    }
+}
+
+.event {
+    display: none;
+    
+}

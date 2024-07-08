@@ -13,8 +13,6 @@ const initialState: AuthState = {
 		email: "",
 		department: "",
 		is_active: false,
-		created_at: "",
-		updated_at: "",
 		avatar: "",
 		role: undefined,
 	},

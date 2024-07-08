@@ -1,7 +1,9 @@
 import React from "react";
-import Modal from "../modal/Modal";
+
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+
+import Modal from "../modal/Modal";
 
 interface AppointmentTimeAddFormModalProps {
 	onClose: () => void;

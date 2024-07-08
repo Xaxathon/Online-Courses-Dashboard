@@ -1,5 +1,7 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
+
 import { ReactComponent as CloseModal } from "@assets/icons/сlose-modal.svg";
+
 import Portal from "../portal/Portal";
 
 interface ModalProps {
@@ -9,6 +11,7 @@ interface ModalProps {
 
 const Modal = ({ children, onClose }: ModalProps) => {
 	useEffect(() => {
+		document.body.classList.add("overflow-hidden");
 		const handleEsc = (event: KeyboardEvent) => {
 			if (event.key === "Escape") {
 				onClose();
@@ -16,6 +19,7 @@ const Modal = ({ children, onClose }: ModalProps) => {
 		};
 		window.addEventListener("keydown", handleEsc);
 		return () => {
+			document.body.classList.remove("overflow-hidden");
 			window.removeEventListener("keydown", handleEsc);
 		};
 	}, [onClose]);

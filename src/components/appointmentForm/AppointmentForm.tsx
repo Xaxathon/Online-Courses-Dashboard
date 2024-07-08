@@ -1,19 +1,24 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
+
+import dayjs from "dayjs";
+import classNames from "classnames";
+
+import { ReactComponent as Delete } from "@assets/icons/delete.svg";
+import { ReactComponent as Mp4Icon } from "@assets/icons/mp4Icon.svg";
+
+import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
+import * as Yup from "yup";
+
 import {
 	useCreateMeetingMutation,
 	useUpdateMeetingMutation,
 } from "../../api/meetingsApi";
+
 import {
 	CreateMeeting,
 	Meeting,
 	UpdateMeetingMember,
 } from "../../shared/interfaces/meeting";
-import dayjs from "dayjs";
-import classNames from "classnames";
-import { ReactComponent as Delete } from "@assets/icons/delete.svg";
-import { ReactComponent as Mp4Icon } from "@assets/icons/mp4Icon.svg"; // Предполагается, что у вас есть иконка для mp4 или другого документа
-import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
-import * as Yup from "yup";
 
 interface AppointmentFormProps {
 	meeting: Meeting | null;
@@ -49,9 +54,13 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
 	const [fileURL, setFileURL] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
 
+	const [initialValues, setInitialValues] = useState({
+		theme: "",
+		link: "",
+	});
+
 	useEffect(() => {
 		if (meeting) {
-			console.log("Meeting data:", meeting);
 			setMembers(
 				meeting.members?.map((m) => {
 					const memberId = m.member.id;
@@ -68,19 +77,25 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
 				}) || []
 			);
 			if (meeting.document_url) {
-				console.log("meeting.document_url:", meeting.document_url);
 				setFileURL(meeting.document_url);
 				const fileNameParts = meeting.document_url.split("/");
 				setFileName(fileNameParts[fileNameParts.length - 1]);
-				console.log("fileName:", fileNameParts);
 			} else {
 				setFileURL(null);
 				setFileName(null);
 			}
+			setInitialValues({
+				theme: meeting.theme || "",
+				link: meeting.link || "",
+			});
 		} else {
 			setMembers([]);
 			setFileURL(null);
 			setFileName(null);
+			setInitialValues({
+				theme: "",
+				link: "",
+			});
 		}
 	}, [meeting]);
 
@@ -166,11 +181,11 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
 			}
 			onSave(newMeeting);
 			setSaveStatus("Данные успешно сохранены");
-			setTimeout(() => setSaveStatus(""), 5000); // Скрыть сообщение через 5 секунд
+			setTimeout(() => setSaveStatus(""), 5000);
 		} catch (error: any) {
 			console.error("Failed to save meeting: ", error);
 			setError(error.data?.message || "Ошибка при сохранении данных");
-			setTimeout(() => setError(""), 5000); // Скрыть сообщение через 5 секунд
+			setTimeout(() => setError(""), 5000);
 		} finally {
 			setIsSaving(false);
 			setSubmitting(false);
@@ -193,12 +208,10 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
 
 	return (
 		<Formik
-			initialValues={{
-				theme: meeting?.theme || "",
-				link: meeting?.link || "",
-			}}
+			initialValues={initialValues}
 			validationSchema={validationSchema}
 			onSubmit={handleSubmit}
+			enableReinitialize
 		>
 			{({ isSubmitting, setFieldValue }) => (
 				<Form>
@@ -206,7 +219,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
 						<div className="flex flex-col gap-2">
 							<Field
 								className={classNames(
-									"w-full  text-mainPurple text-sm bg-white p-3 rounded-lg outline-none ring-2 focus:bg-lightPurple focus:ring-mainPurple border-transparent ring-mainPurple",
+									"w-full text-mainPurple text-sm bg-white p-3 rounded-lg outline-none ring-2 focus:bg-lightPurple focus:ring-mainPurple border-transparent ring-mainPurple",
 									{ "bg-gray-200 opacity-50": isSubmitting }
 								)}
 								id="theme"

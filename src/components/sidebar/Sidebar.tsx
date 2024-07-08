@@ -1,15 +1,19 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+
 import { ReactComponent as Calendar } from "@assets/icons/calendar.svg";
 import { ReactComponent as Meetings } from "@assets/icons/meetings.svg";
 import { ReactComponent as Protocol } from "@assets/icons/protocol.svg";
 import { ReactComponent as Settings } from "@assets/icons/settings.svg";
 import { ReactComponent as Logout } from "@assets/icons/logout.svg";
+import { ReactComponent as Secretaries } from "@assets/icons/meetings.svg";
 
-import { useLogoutMutation } from "../../api/authApi";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store";
 import { logout } from "../../features/authSlice";
+
+import { useLogoutMutation } from "../../api/authApi";
+
 import { UserRole } from "../../shared/interfaces/user";
 
 const Sidebar: React.FC = () => {
@@ -30,50 +34,53 @@ const Sidebar: React.FC = () => {
 		}
 	};
 
+	const getHomeRoute = () => {
+		switch (role) {
+			case UserRole.Admin:
+				return "/main/settings";
+			case UserRole.Manager:
+				return "/main/secretaries";
+			case UserRole.Secretary:
+				return "/main/meetings";
+			default:
+				return "/main";
+		}
+	};
+
 	useEffect(() => {
 		if (location.pathname === "/main" && role) {
-			switch (role) {
-				case UserRole.Admin:
-					navigate("/main/settings");
-					break;
-				case UserRole.Manager:
-				case UserRole.Secretary:
-					navigate("/main/meetings");
-					break;
-				default:
-					break;
-			}
+			navigate(getHomeRoute());
 		}
 	}, [role, navigate, location.pathname]);
 
-	const getOpacity = (path: string) =>
-		location.pathname.includes(path)
-			? "opacity-100"
-			: "opacity-40 hover:opacity-70 active:opacity-20";
+	const getLinkStyle = (path: string) => {
+		const baseStyle = "w-8 h-8 transition-all duration-200 ease-in-out";
+		const activeStyle = "text-white";
+		const inactiveStyle =
+			"text-white/40 hover:text-white/70 active:text-white/20";
 
-	const getRoleLink = () => {
-		if (role === UserRole.Secretary) {
-			return "/main/meetings";
-		} else if (role === UserRole.Manager) {
-			return "/main/secretaries";
-		}
-		return "/main";
+		return `${baseStyle} ${
+			location.pathname.includes(path) ? activeStyle : inactiveStyle
+		}`;
 	};
 
 	return (
 		<aside className="sticky top-0 left-2 h-screen z-10 mr-4 py-2">
-			<nav className="min-h-full z-10 flex flex-col items-center py-10 px-9 gap-9 bg-mainPurple rounded-3xl ">
-				<a href="#" className="text-white text-6xl font-baloo cursor-pointer">
+			<nav className="min-h-full z-10 flex flex-col items-center py-10 px-9 gap-9 bg-mainPurple rounded-3xl">
+				<Link
+					to={getHomeRoute()}
+					className="text-white text-6xl font-baloo cursor-pointer"
+				>
 					P
-				</a>
-				<ul className="flex flex-col flex-grow justify-start items-center gap-8 te">
-					{role && [UserRole.Manager, UserRole.Secretary].includes(role) && (
+				</Link>
+				<ul className="flex flex-col flex-grow justify-start items-center gap-8">
+					{role === UserRole.Manager && (
 						<li>
 							<Link
-								to={getRoleLink()}
-								className={`w-8 h-8 ${getOpacity(getRoleLink())}`}
+								to="/main/secretaries"
+								className={getLinkStyle("/main/secretaries")}
 							>
-								<Meetings className="w-8 h-8 fill-current text-white" />
+								<Secretaries className="w-8 h-8 fill-current" />
 							</Link>
 						</li>
 					)}
@@ -81,18 +88,26 @@ const Sidebar: React.FC = () => {
 						<>
 							<li>
 								<Link
-									to="/main/calendar"
-									className={`w-8 h-8 ${getOpacity("/main/calendar")}`}
+									to="/main/meetings"
+									className={getLinkStyle("/main/meetings")}
 								>
-									<Calendar className="w-8 h-8 fill-current text-white" />
+									<Meetings className="w-8 h-8 fill-current" />
+								</Link>
+							</li>
+							<li>
+								<Link
+									to="/main/calendar"
+									className={getLinkStyle("/main/calendar")}
+								>
+									<Calendar className="w-8 h-8 fill-current" />
 								</Link>
 							</li>
 							<li>
 								<Link
 									to="/main/protocols"
-									className={`w-8 h-8 ${getOpacity("/main/protocol")}`}
+									className={getLinkStyle("/main/protocols")}
 								>
-									<Protocol className="w-8 h-8 fill-current text-white" />
+									<Protocol className="w-8 h-8 fill-current" />
 								</Link>
 							</li>
 						</>
@@ -104,15 +119,15 @@ const Sidebar: React.FC = () => {
 							<li>
 								<Link
 									to="/main/settings"
-									className={`w-8 h-8 ${getOpacity("/main/settings")}`}
+									className={getLinkStyle("/main/settings")}
 								>
-									<Settings className="w-8 h-8 fill-current text-white" />
+									<Settings className="w-8 h-8 fill-current" />
 								</Link>
 							</li>
 						)}
 				</ul>
 				<button onClick={handleLogout} className="flex-shrink-0">
-					<Logout className="w-10 h-10 fill-current text-white hover:text-crimsonRed" />
+					<Logout className="w-10 h-10 fill-current text-white hover:text-crimsonRed transition-colors duration-200 ease-in-out" />
 				</button>
 			</nav>
 		</aside>

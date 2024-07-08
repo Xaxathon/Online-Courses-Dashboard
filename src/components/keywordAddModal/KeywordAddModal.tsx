@@ -1,12 +1,17 @@
-import React from "react";
-import Modal from "../modal/Modal";
+import { useState } from "react";
+
 import classNames from "classnames";
+
+import Modal from "../modal/Modal";
+
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+
 import {
 	useCreateKeywordMutation,
 	useFetchKeywordsQuery,
 } from "../../api/keywordsApi";
+
 import { KeywordAdd } from "../../shared/interfaces/keyword";
 
 interface KeywordAddModalProps {
@@ -14,7 +19,9 @@ interface KeywordAddModalProps {
 }
 const KeywordAddModal = ({ onClose }: KeywordAddModalProps) => {
 	const [createKeyword] = useCreateKeywordMutation();
-	const { refetch } = useFetchKeywordsQuery();
+	const { refetch, error: fetchError } = useFetchKeywordsQuery();
+	const [apiError, setApiError] = useState<string | null>(null);
+
 	const validationSchema = Yup.object({
 		title: Yup.string()
 			.min(5, "Поле должно содержать минимум 5 символов")
@@ -39,8 +46,12 @@ const KeywordAddModal = ({ onClose }: KeywordAddModalProps) => {
 			await createKeyword({ keywords: [values] }).unwrap();
 			resetForm();
 			onClose();
-			refetch();
+			await refetch();
+			setApiError(null);
 		} catch (error) {
+			setApiError(
+				"Ошибка при добавлении ключевого слова. Пожалуйста, попробуйте еще раз."
+			);
 			console.error("Ошибка при добавлении ключевого слова:", error);
 		}
 	};
@@ -83,7 +94,9 @@ const KeywordAddModal = ({ onClose }: KeywordAddModalProps) => {
 								className="text-crimsonRed text-sm"
 							/>
 						</div>
-
+						{apiError && (
+							<div className="text-crimsonRed text-sm mt-2">{apiError}</div>
+						)}
 						<button
 							className={classNames(
 								"px-20 mt-5 py-2 mx-auto text-white rounded-lg",

@@ -1,4 +1,4 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "../api/baseQuery";
 import {
 	Keyword,
@@ -57,7 +57,6 @@ export const keywordsApi = createApi({
 	}),
 });
 
-// Хуки для использования в компонентах
 export const {
 	useCreateKeywordMutation,
 	useFetchKeywordsQuery,

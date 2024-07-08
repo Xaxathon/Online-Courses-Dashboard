@@ -3,9 +3,9 @@ import { baseQueryWithReauth } from "../api/baseQuery";
 import { LoginResponse, LoginRequest } from "../shared/interfaces/auth";
 import {
 	UserResponse,
-	User,
 	CreateUserRequest,
 	FetchUsersResponse,
+	FetchUsersParams,
 } from "../shared/interfaces/user";
 
 export const authApi = createApi({
@@ -77,10 +77,16 @@ export const authApi = createApi({
 				body: data,
 			}),
 		}),
-		fetchUsers: builder.query<{ data: { data: User[] } }, void>({
-			query: () => ({
+		fetchUsers: builder.query<FetchUsersResponse, FetchUsersParams>({
+			query: (params) => ({
 				url: "/api/users",
 				method: "GET",
+				params: {
+					limit: params?.limit,
+					page: params?.page,
+					search: params?.search,
+					with_blocked: params?.with_blocked ? "1" : undefined,
+				},
 			}),
 		}),
 	}),

@@ -1,28 +1,25 @@
 import React from "react";
+
 import Modal from "../modal/Modal";
 
-interface KeywordDeleteModalProps {
+interface FreezeUserModalProps {
 	onClose: () => void;
-	onDelete: () => void;
-	keywordTitle: string;
-	keywordId: number;
+	onFreeze: () => void;
+	userName: string;
 }
 
-const KeywordDeleteModal = ({
+const FreezeUserModal: React.FC<FreezeUserModalProps> = ({
 	onClose,
-	onDelete,
-	keywordTitle,
-	keywordId,
-}: KeywordDeleteModalProps) => {
+	onFreeze,
+	userName,
+}) => {
 	return (
 		<Modal onClose={onClose}>
 			<div className="flex flex-col mt-5 text-xl font-bold text-mainPurple text-center">
-				<span>Удаление ключевого слова</span>
-				<span className="mt-10 font-bold">
-					{keywordTitle} (ID: {keywordId})
-				</span>
+				<span>Заморозка пользователя</span>
+				<span className="mt-10 font-bold">{userName}</span>
 				<span className="mt-3 font-normal text-crimsonRed">
-					Вы уверены, что хотите удалить это ключевое слово?
+					Вы уверены, что хотите заморозить этого пользователя?
 				</span>
 				<div className="flex justify-center mt-10">
 					<button
@@ -35,9 +32,9 @@ const KeywordDeleteModal = ({
 					<button
 						type="button"
 						className="mt-4 rounded-xl px-14 py-2 bg-crimsonRed text-white text-xl font-bold hover:bg-crimsonRedHover active:bg-crimsonRedActive"
-						onClick={onDelete}
+						onClick={onFreeze}
 					>
-						Удалить
+						Заморозить
 					</button>
 				</div>
 			</div>
@@ -45,4 +42,4 @@ const KeywordDeleteModal = ({
 	);
 };
 
-export default KeywordDeleteModal;
+export default FreezeUserModal;

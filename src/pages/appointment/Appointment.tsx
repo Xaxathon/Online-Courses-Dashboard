@@ -1,16 +1,34 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+
 import AppointmentCalendar from "../../components/appointmentCalendar/AppointmentCalendar";
 import AppointmentTheme from "../../components/AppointmentTheme/AppointmentTheme";
 import { Meeting } from "../../shared/interfaces/meeting";
-import { useGetMeetingsQuery } from "../../api/meetingsApi";
-import dayjs from "dayjs";
 import Skeleton from "../../components/skeleton/Skeleton";
+
 import { getStartOfMonth, getEndOfMonth } from "../../utils/dateUtils";
 
+import { useGetMeetingsQuery } from "../../api/meetingsApi";
+
 const Appointment = () => {
-	const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+	const location = useLocation();
+	const [selectedDate, setSelectedDate] = useState<Date>(() => {
+		const params = new URLSearchParams(location.search);
+		const dateParam = params.get("date");
+		return dateParam ? new Date(dateParam) : new Date();
+	});
 	const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
 	const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+
+	useEffect(() => {
+		const params = new URLSearchParams(location.search);
+		const dateParam = params.get("date");
+		if (dateParam) {
+			const newDate = new Date(dateParam);
+			setSelectedDate(newDate);
+			setCurrentMonth(newDate);
+		}
+	}, [location.search]);
 
 	const start_date_at = getStartOfMonth(currentMonth);
 	const end_date_at = getEndOfMonth(currentMonth);
@@ -24,6 +42,10 @@ const Appointment = () => {
 
 	const handleMonthChange = (month: Date) => {
 		setCurrentMonth(month);
+	};
+
+	const handleDateChange = (date: Date) => {
+		setSelectedDate(date);
 	};
 
 	const refetchMeetings = async () => {
@@ -68,7 +90,7 @@ const Appointment = () => {
 			) : (
 				<>
 					<AppointmentCalendar
-						onDateChange={setSelectedDate}
+						onDateChange={handleDateChange}
 						onMonthChange={handleMonthChange}
 						meetings={meetings}
 					/>

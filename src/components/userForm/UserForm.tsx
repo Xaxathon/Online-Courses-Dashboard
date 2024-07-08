@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useUpdateUserMutation } from "../../api/authApi";
+
 import Rectangle from "@assets/img/Rectangle.jpg";
 import classNames from "classnames";
+
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
+
+import { useUpdateUserMutation } from "../../api/authApi";
 
 import { BaseUser, FormValues } from "../../shared/interfaces/user";
 
@@ -17,6 +20,7 @@ const UserForm = ({ userData }: UserFormProps) => {
 	const [showPassword, setShowPassword] = useState<boolean>(false);
 	const [backendErrors, setBackendErrors] = useState<string | null>(null);
 	const [updateUser] = useUpdateUserMutation();
+
 	useEffect(() => {
 		if (userData.avatar) {
 			setImageUrl(userData.avatar);
@@ -36,7 +40,6 @@ const UserForm = ({ userData }: UserFormProps) => {
 			reader.readAsDataURL(file);
 		}
 	};
-	console.log(userData);
 
 	const validationSchema = Yup.object({
 		full_name: Yup.string()
@@ -44,10 +47,6 @@ const UserForm = ({ userData }: UserFormProps) => {
 			.max(50, "Поле должно содержать максимум 50 символов")
 			.required("Поле обязательно для заполнения"),
 		department: Yup.string()
-			.min(5, "Поле должно содержать минимум 5 символов")
-			.max(50, "Поле должно содержать максимум 50 символов")
-			.required("Поле обязательно для заполнения"),
-		login: Yup.string()
 			.min(5, "Поле должно содержать минимум 5 символов")
 			.max(50, "Поле должно содержать максимум 50 символов")
 			.required("Поле обязательно для заполнения"),
@@ -69,6 +68,11 @@ const UserForm = ({ userData }: UserFormProps) => {
 			}
 		}
 
+		const avatar = document.getElementById("upload-photo") as HTMLInputElement;
+		if (avatar && avatar.files && avatar.files[0]) {
+			data.append("avatar", avatar.files[0]);
+		}
+
 		const response = await updateUser({ id: userData.id, data });
 
 		if ("error" in response && response.error) {
@@ -79,7 +83,9 @@ const UserForm = ({ userData }: UserFormProps) => {
 						(response.error.data as any).message
 				);
 			} else {
-				setBackendErrors("Ошибка при обновлении данных");
+				setBackendErrors(
+					"Ошибка при обновлении данных. Пожалуйста, попробуйте еще раз."
+				);
 			}
 		} else {
 			setIsEditing(false);
@@ -96,7 +102,6 @@ const UserForm = ({ userData }: UserFormProps) => {
 			initialValues={{
 				full_name: userData.full_name || "",
 				department: userData.department || "",
-
 				email: userData.email || "",
 				password: "",
 			}}
@@ -106,7 +111,7 @@ const UserForm = ({ userData }: UserFormProps) => {
 			{({ isSubmitting, setFieldValue }) => (
 				<Form>
 					<div
-						className={classNames("flex items-center gap-3 font-bold", {
+						className={classNames("flex items-center gap-3", {
 							"opacity-50": !isEditing,
 						})}
 					>
@@ -164,10 +169,10 @@ const UserForm = ({ userData }: UserFormProps) => {
 								</span>
 							</label>
 						</div>
-						<div className="grid grid-cols-2 grid-rows-2 gap-2 font-bold justify-around w-full">
+						<div className="grid grid-cols-2 grid-rows-2 gap-2 justify-around w-full">
 							<div className="flex flex-col gap-1">
 								<label
-									className="text-gardenGreen text-lg"
+									className="text-gardenGreen text-lg font-bold"
 									htmlFor="department"
 								>
 									Наименование отдела
@@ -187,7 +192,10 @@ const UserForm = ({ userData }: UserFormProps) => {
 							</div>
 
 							<div className="flex flex-col gap-1">
-								<label className="text-gardenGreen text-lg" htmlFor="email">
+								<label
+									className="text-gardenGreen text-lg font-bold"
+									htmlFor="email"
+								>
 									E-mail
 								</label>
 								<Field
@@ -204,7 +212,10 @@ const UserForm = ({ userData }: UserFormProps) => {
 								/>
 							</div>
 							<div className="flex flex-col gap-1">
-								<label className="text-gardenGreen text-lg" htmlFor="password">
+								<label
+									className="text-gardenGreen text-lg font-bold"
+									htmlFor="password"
+								>
 									Пароль
 								</label>
 								<div className="relative w-full">

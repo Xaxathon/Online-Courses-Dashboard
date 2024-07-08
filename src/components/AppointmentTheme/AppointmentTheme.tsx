@@ -1,22 +1,29 @@
-import React, { useState, useEffect } from "react";
-import classNames from "classnames";
+import { useState, useEffect } from "react";
+
 import dayjs from "dayjs";
+import classNames from "classnames";
+
+import { ReactComponent as Delete } from "@assets/icons/delete.svg";
+
+import Skeleton from "../skeleton/Skeleton";
 import AppointmentForm from "../appointmentForm/AppointmentForm";
 import AppointmentTimeAddFormModal from "../appointmentTimeAddFormModal/AppointmentTimeAddFormModal";
-import AppointmentAddUserModal from "../appointmentUserAddModal/AppointmentAddUserModal";
+import DeleteElementModal from "../deleteElementModal/DeleteElementModal";
+import ExternalUserAddModal from "../externalUserAddModal/ExternalUserAddModal";
+
+import {
+	filterMeetingsByDate,
+	sortMeetingsByStartTime,
+} from "../../utils/meetingUtils";
+
+import { useDeleteMeetingMutation } from "../../api/meetingsApi";
+
+import { User } from "../../shared/interfaces/user";
 import {
 	Meeting,
 	CreateMeeting,
 	Member,
 } from "../../shared/interfaces/meeting";
-import { ReactComponent as Delete } from "@assets/icons/delete.svg";
-import Skeleton from "../skeleton/Skeleton";
-import { useDeleteMeetingMutation } from "../../api/meetingsApi";
-import { User } from "../../shared/interfaces/user";
-import {
-	filterMeetingsByDate,
-	sortMeetingsByStartTime,
-} from "../../utils/meetingUtils";
 
 interface AppointmentThemeProps {
 	selectedDate: Date | null;
@@ -35,6 +42,7 @@ const AppointmentTheme: React.FC<AppointmentThemeProps> = ({
 }) => {
 	const [isModalOpenTime, setIsModalOpenTime] = useState<boolean>(false);
 	const [isModalOpenUser, setIsModalOpenUser] = useState<boolean>(false);
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
 	const [startTime, setStartTime] = useState<string | null>(null);
 	const [endTime, setEndTime] = useState<string | null>(null);
 	const [newMeetings, setNewMeetings] = useState<CreateMeeting[]>([]);
@@ -55,6 +63,14 @@ const AppointmentTheme: React.FC<AppointmentThemeProps> = ({
 
 	const handleCloseModalUser = () => {
 		setIsModalOpenUser(false);
+	};
+
+	const handleDeleteOpenModal = () => {
+		setIsDeleteModalOpen(true);
+	};
+
+	const handleDeleteCloseModal = () => {
+		setIsDeleteModalOpen(false);
 	};
 
 	const handleUserSelect = (user: Member | User) => {
@@ -139,6 +155,7 @@ const AppointmentTheme: React.FC<AppointmentThemeProps> = ({
 				prevMeetings.filter((meeting) => meeting.id !== id)
 			);
 			await refetchMeetings();
+			handleDeleteCloseModal();
 		} catch (error) {
 			console.error("Failed to delete meeting: ", error);
 		}
@@ -153,7 +170,7 @@ const AppointmentTheme: React.FC<AppointmentThemeProps> = ({
 				{selectedMeeting && (
 					<Delete
 						className="w-6 h-6 fill-current text-crimsonRed hover:text-crimsonRed cursor-pointer absolute right-0"
-						onClick={() => handleDelete(selectedMeeting.id)}
+						onClick={handleDeleteOpenModal}
 					/>
 				)}
 			</div>
@@ -244,7 +261,7 @@ const AppointmentTheme: React.FC<AppointmentThemeProps> = ({
 				/>
 			)}
 			{isModalOpenUser && selectedMeeting && (
-				<AppointmentAddUserModal
+				<ExternalUserAddModal
 					onClose={handleCloseModalUser}
 					onUserSelect={handleUserSelect}
 					selectedMembers={(selectedMeeting.members || []).map((member) => ({
@@ -252,6 +269,17 @@ const AppointmentTheme: React.FC<AppointmentThemeProps> = ({
 						full_name: member.member.full_name,
 						email: member.member.email,
 					}))}
+				/>
+			)}
+
+			{isDeleteModalOpen && selectedMeeting && (
+				<DeleteElementModal
+					title="Удаление совещания"
+					description={`${selectedMeeting.theme.slice(0, 10)} (ID: ${
+						selectedMeeting.id
+					})`}
+					onClose={handleDeleteCloseModal}
+					onDelete={() => handleDelete(selectedMeeting.id)}
 				/>
 			)}
 		</div>

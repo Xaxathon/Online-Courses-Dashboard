@@ -1,39 +1,62 @@
-import { ReactNode, useEffect } from "react";
+import React, { ReactNode, useEffect, lazy, Suspense } from "react";
 import {
 	BrowserRouter as Router,
 	Route,
 	Routes,
 	Navigate,
+	useNavigate,
 } from "react-router-dom";
+
 import { useDispatch, useSelector } from "react-redux";
-import Login from "../login/Login";
-import Sidebar from "../sidebar/Sidebar";
-import UserSettings from "../../pages/userSettings/UserSettings";
-import Settings from "../../pages/settings/Settings";
 import { AppDispatch, RootState } from "../../store/store";
 import { setToken, setRole } from "../../features/authSlice";
 import { UserRole } from "../../shared/interfaces/user";
-import Keywords from "../../pages/keywords/Keywords";
-import ForgotPassword from "../forgotPassword/ForgotPassword";
+
+import Sidebar from "../sidebar/Sidebar";
 import Meetings from "../../pages/meetings/Meetings";
-import Secretaries from "../../pages/secretaries/Secretaries";
-import Protocol from "../../pages/protocol/Protocol";
-import Protocols from "../../pages/protocols/Protocols";
-import Appointment from "../../pages/appointment/Appointment";
-import AppointmentAddModal from "../appointmentUserAddModal/AppointmentAddUserModal";
-import AppointmentTimeAddFormModal from "../appointmentTimeAddFormModal/AppointmentTimeAddFormModal";
+import Login from "../login/Login";
+import ForgotPassword from "../forgotPassword/ForgotPassword";
+
+import { ReactComponent as Spinner } from "../../assets/icons/spinner.svg";
+
+const Settings = lazy(() => import("../../pages/settings/Settings"));
+const UserSettings = lazy(
+	() => import("../../pages/userSettings/UserSettings")
+);
+const Keywords = lazy(() => import("../../pages/keywords/Keywords"));
+const Secretaries = lazy(() => import("../../pages/secretaries/Secretaries"));
+const Protocols = lazy(() => import("../../pages/protocols/Protocols"));
+const Appointment = lazy(() => import("../../pages/appointment/Appointment"));
+const ProtocolAddForm = lazy(
+	() => import("../protocolAddForm/protocolAddForm")
+);
+const Protocol = lazy(() => import("../../pages/protocol/Protocol"));
 
 interface PrivateRouteProps {
 	children: ReactNode;
+	allowedRoles?: UserRole[];
 }
 
-const PrivateRoute = ({ children }: PrivateRouteProps) => {
+const PrivateRoute: React.FC<PrivateRouteProps> = ({
+	children,
+	allowedRoles,
+}) => {
 	const token = useSelector((state: RootState) => state.auth.token);
+	const role = useSelector((state: RootState) => state.auth.role);
+	const navigate = useNavigate();
 
-	return token ? children : <Navigate to="/login" />;
+	useEffect(() => {
+		if (!token) {
+			navigate("/login");
+		} else if (allowedRoles && !allowedRoles.includes(role as UserRole)) {
+			navigate("/main");
+		}
+	}, [token, role, allowedRoles, navigate]);
+
+	return <>{children}</>;
 };
 
-const App = () => {
+const App: React.FC = () => {
 	const dispatch = useDispatch<AppDispatch>();
 
 	useEffect(() => {
@@ -49,36 +72,106 @@ const App = () => {
 
 	return (
 		<Router>
-			<Routes>
-				<Route path="/" element={<Navigate to="/login" />} />
-				<Route path="/login" element={<Login />} />
-				<Route path="/reset-password" element={<ForgotPassword />} />
-				<Route
-					path="/main/*"
-					element={
-						<PrivateRoute>
-							<Dashboard />
-						</PrivateRoute>
-					}
-				/>
-			</Routes>
+			<Suspense
+				fallback={
+					<div className="flex justify-center items-center h-screen w-screen">
+						<Spinner />
+					</div>
+				}
+			>
+				<Routes>
+					<Route path="/" element={<Navigate to="/login" />} />
+					<Route path="/login" element={<Login />} />
+					<Route path="/reset-password" element={<ForgotPassword />} />
+					<Route
+						path="/main/*"
+						element={
+							<PrivateRoute>
+								<Dashboard />
+							</PrivateRoute>
+						}
+					/>
+				</Routes>
+			</Suspense>
 		</Router>
 	);
 };
 
-const Dashboard = () => (
-	<div className="flex">
-		<Sidebar />
-		<Routes>
-			<Route path="settings" element={<Settings />} />
-			<Route path="settings/users" element={<UserSettings />} />
-			<Route path="settings/keywords" element={<Keywords />} />
-			<Route path="meetings" element={<Meetings />} />
-			<Route path="secretaries" element={<Secretaries />} />
-			<Route path="protocols" element={<Protocols />} />
-			<Route path="calendar" element={<Appointment />} />
-		</Routes>
-	</div>
-);
+const Dashboard: React.FC = () => {
+	const role = useSelector((state: RootState) => state.auth.role);
+
+	return (
+		<div className="flex">
+			<Sidebar />
+			<Suspense
+				fallback={
+					<div className="flex justify-center items-center h-screen w-screen">
+						<Spinner />
+					</div>
+				}
+			>
+				<Routes>
+					<Route
+						path="settings"
+						element={
+							<PrivateRoute
+								allowedRoles={[
+									UserRole.Admin,
+									UserRole.Manager,
+									UserRole.Secretary,
+								]}
+							>
+								<Settings />
+							</PrivateRoute>
+						}
+					/>
+					<Route
+						path="settings/users"
+						element={
+							<PrivateRoute
+								allowedRoles={[
+									UserRole.Admin,
+									UserRole.Manager,
+									UserRole.Secretary,
+								]}
+							>
+								<UserSettings />
+							</PrivateRoute>
+						}
+					/>
+
+					{role === UserRole.Admin && (
+						<>
+							{/* При расширение проекта, можно добавить сюда новые админские роуты */}
+						</>
+					)}
+					{role === UserRole.Manager && (
+						<>
+							<Route path="secretaries" element={<Secretaries />} />
+						</>
+					)}
+
+					{role === UserRole.Secretary && (
+						<>
+							<Route path="settings/keywords" element={<Keywords />} />
+							<Route path="meetings" element={<Meetings />} />
+							<Route path="protocols" element={<Protocols />} />
+							<Route path="calendar" element={<Appointment />} />
+							<Route path="protocols/add" element={<ProtocolAddForm />} />
+							<Route
+								path="/protocols/:id"
+								element={
+									<PrivateRoute>
+										<Protocol />
+									</PrivateRoute>
+								}
+							/>
+						</>
+					)}
+				</Routes>
+			</Suspense>
+		</div>
+	);
+};
 
 export default App;
