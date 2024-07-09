@@ -3,24 +3,24 @@ import { useCallback, useEffect, useState, useRef } from "react";
 import { ReactComponent as Search } from "@assets/icons/search.svg";
 import { ReactComponent as Spinner } from "@assets/icons/spinner.svg";
 
-import SecretaryList from "../../components/secretaryList/SecretaryList";
-import SecretaryCarousel from "../../components/secretaryCarousel/SecretaryCarousel";
-import Skeleton from "../../components/skeleton/Skeleton";
+import SecretaryList from "@components/secretaryList/SecretaryList";
+import SecretaryCarousel from "@components/secretaryCarousel/SecretaryCarousel";
+import Skeleton from "@components/skeleton/Skeleton";
 
 import {
 	getPreviousSecretaryId,
 	getNextSecretaryId,
 	filterInternalUsers,
-} from "../../utils/secretaryCarousel";
+} from "@/utils/secretaryCarousel";
 
-import { useFetchManagerStatsQuery } from "../../api/statsApi";
+import { useFetchManagerStatsQuery } from "@/api/statsApi";
 import {
 	useFetchUsersQuery,
 	useLazyFetchUserQuery,
 	useFetchUserByIdQuery,
-} from "../../api/authApi";
+} from "@/api/authApi";
 
-import { BaseUser, User } from "../../shared/interfaces/user";
+import { BaseUser, User } from "@/shared/interfaces/user";
 
 const DEFAULT_LIMIT = 15;
 const MIN_SECRETARIES_TO_SHOW_MESSAGE = 15;

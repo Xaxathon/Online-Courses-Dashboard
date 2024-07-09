@@ -1,10 +1,12 @@
-import { fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { fetchBaseQuery, FetchArgs } from "@reduxjs/toolkit/query/react";
+import { BaseQueryApi } from "@reduxjs/toolkit/query";
 import { RootState } from "../store/store";
-import { setToken, logout } from "../features/authSlice";
+import { setToken, logout } from "../store/slices/authSlice";
 
 interface RefreshResponse {
 	token: string;
 }
+
 const baseQuery = fetchBaseQuery({
 	baseUrl: "http://85.193.90.243",
 	prepareHeaders: (headers, { getState }) => {
@@ -17,7 +19,11 @@ const baseQuery = fetchBaseQuery({
 	},
 });
 
-const baseQueryWithReauth = async (args: any, api: any, extraOptions: any) => {
+const baseQueryWithReauth = async (
+	args: string | FetchArgs,
+	api: BaseQueryApi,
+	extraOptions: {}
+) => {
 	let result = await baseQuery(args, api, extraOptions);
 
 	if (result.error && result.error.status === 401) {
@@ -33,8 +39,8 @@ const baseQueryWithReauth = async (args: any, api: any, extraOptions: any) => {
 	return result;
 };
 
-function isRefreshResponse(data: any): data is RefreshResponse {
-	return data && typeof data === "object" && "token" in data;
+function isRefreshResponse(data: unknown): data is RefreshResponse {
+	return data !== null && typeof data === "object" && "token" in data;
 }
 
 export { baseQuery, baseQueryWithReauth };

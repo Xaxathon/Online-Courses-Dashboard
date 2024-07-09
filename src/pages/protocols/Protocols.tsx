@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 
-import { ReactComponent as AddProtocolIcon } from "@assets/icons/addProtocol.svg";
+import { ReactComponent as AddProtocolIcon } from "@assets/icons/add-icon.svg";
 
-import ProtocolList from "../../components/protocolList/ProtocolList";
+import ProtocolList from "@components/protocolList/ProtocolList";
 
 const Protocols = () => {
 	return (

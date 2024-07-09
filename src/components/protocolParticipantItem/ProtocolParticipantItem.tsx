@@ -1,14 +1,13 @@
 import React from "react";
 
-import { ProtocolMember } from "../../shared/interfaces/protocol";
+import { ProtocolMember } from "@/shared/interfaces/protocol";
 
-interface ParticipantItemProps {
+interface ProtocolParticipantItemProps {
 	user: ProtocolMember;
 	onDelete: (user: ProtocolMember) => void;
 }
 
-// Компонент ParticipantItem
-const ParticipantItem: React.FC<ParticipantItemProps> = ({
+const ProtocolParticipantItem: React.FC<ProtocolParticipantItemProps> = ({
 	user,
 	onDelete,
 }) => {
@@ -22,4 +21,4 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
 	);
 };
 
-export default ParticipantItem;
+export default ProtocolParticipantItem;

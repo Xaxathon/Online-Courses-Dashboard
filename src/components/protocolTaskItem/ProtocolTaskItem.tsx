@@ -3,13 +3,14 @@ import { useNavigate } from "react-router-dom";
 
 import { ReactComponent as Delete } from "@assets/icons/delete.svg";
 
-import { ProtocolTask } from "../../shared/interfaces/protocol";
 import DeleteElementModal from "../deleteElementModal/DeleteElementModal";
 
 import {
 	useDeleteProtocolTaskMutation,
 	useUpdateProtocolTaskMutation,
-} from "../../api/protocolsApi";
+} from "@/api/protocolsApi";
+
+import { ProtocolTask } from "@/shared/interfaces/protocol";
 
 interface TaskItemProps {
 	task: ProtocolTask;
@@ -29,7 +30,7 @@ const getStatusColor = (status: string) => {
 			return "text-black";
 	}
 };
-const TaskItem = forwardRef<HTMLUListElement, TaskItemProps>(
+const ProtocolTaskItem = forwardRef<HTMLUListElement, TaskItemProps>(
 	({ task, onDelete, onUpdate }, ref) => {
 		const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 		const [deleteProtocolTask] = useDeleteProtocolTaskMutation();
@@ -170,4 +171,4 @@ const TaskItem = forwardRef<HTMLUListElement, TaskItemProps>(
 	}
 );
 
-export default TaskItem;
+export default ProtocolTaskItem;

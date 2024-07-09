@@ -38,6 +38,18 @@ export const authApi = createApi({
 				},
 			}),
 		}),
+
+		resetPassword: builder.mutation({
+			query: (data) => ({
+				url: "/api/change-password/reset",
+				method: "POST",
+				body: data,
+				headers: {
+					Accept: "application/json",
+				},
+			}),
+		}),
+
 		fetchUser: builder.query<UserResponse, void>({
 			query: () => ({
 				url: "/api/me",
@@ -96,6 +108,7 @@ export const {
 	useLoginMutation,
 	useLogoutMutation,
 	useForgotPasswordMutation,
+	useResetPasswordMutation,
 	useLazyFetchUserQuery,
 	useFetchUserByIdQuery,
 	useUpdateUserMutation,

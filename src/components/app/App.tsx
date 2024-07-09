@@ -8,29 +8,32 @@ import {
 } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../store/store";
-import { setToken, setRole } from "../../features/authSlice";
-import { UserRole } from "../../shared/interfaces/user";
+import { AppDispatch, RootState } from "@/store/store";
+import { setToken, setRole } from "@/store/slices/authSlice";
+import { UserRole } from "@/shared/interfaces/user";
 
-import Sidebar from "../sidebar/Sidebar";
-import Meetings from "../../pages/meetings/Meetings";
-import Login from "../login/Login";
-import ForgotPassword from "../forgotPassword/ForgotPassword";
+import { ReactComponent as Spinner } from "@/assets/icons/spinner.svg";
 
-import { ReactComponent as Spinner } from "../../assets/icons/spinner.svg";
+import Sidebar from "@components/sidebar/Sidebar";
+import MainPage from "@pages/mainPage/MainPage";
+import Login from "@components/login/Login";
+import ForgotPassword from "@components/forgotPassword/ForgotPassword";
+import NotFoundPage from "@pages/404/NotFoundPage";
 
-const Settings = lazy(() => import("../../pages/settings/Settings"));
-const UserSettings = lazy(
-	() => import("../../pages/userSettings/UserSettings")
+const Settings = lazy(() => import("@pages/settings/Settings"));
+const UserSettings = lazy(() => import("@pages/userSettings/UserSettings"));
+const ResetPassword = lazy(
+	() => import("@components/resetPassword/ResetPassword")
 );
-const Keywords = lazy(() => import("../../pages/keywords/Keywords"));
-const Secretaries = lazy(() => import("../../pages/secretaries/Secretaries"));
-const Protocols = lazy(() => import("../../pages/protocols/Protocols"));
-const Appointment = lazy(() => import("../../pages/appointment/Appointment"));
+const Keywords = lazy(() => import("@pages/keywords/Keywords"));
+const Secretaries = lazy(() => import("@pages/secretaries/Secretaries"));
+const Protocols = lazy(() => import("@pages/protocols/Protocols"));
+const Protocol = lazy(() => import("@pages/protocol/Protocol"));
+
+const Meetings = lazy(() => import("@pages/meetings/Meetings"));
 const ProtocolAddForm = lazy(
-	() => import("../protocolAddForm/protocolAddForm")
+	() => import("@components/protocolAddForm/protocolAddForm")
 );
-const Protocol = lazy(() => import("../../pages/protocol/Protocol"));
 
 interface PrivateRouteProps {
 	children: ReactNode;
@@ -83,6 +86,8 @@ const App: React.FC = () => {
 					<Route path="/" element={<Navigate to="/login" />} />
 					<Route path="/login" element={<Login />} />
 					<Route path="/reset-password" element={<ForgotPassword />} />
+					<Route path="/reset-password/2" element={<ResetPassword />} />{" "}
+					{/* Реализовать на странице сброса пароля */}
 					<Route
 						path="/main/*"
 						element={
@@ -91,6 +96,7 @@ const App: React.FC = () => {
 							</PrivateRoute>
 						}
 					/>
+					<Route path="*" element={<NotFoundPage />} />
 				</Routes>
 			</Suspense>
 		</Router>
@@ -153,10 +159,10 @@ const Dashboard: React.FC = () => {
 
 					{role === UserRole.Secretary && (
 						<>
+							<Route path="home" element={<MainPage />} />
 							<Route path="settings/keywords" element={<Keywords />} />
-							<Route path="meetings" element={<Meetings />} />
 							<Route path="protocols" element={<Protocols />} />
-							<Route path="calendar" element={<Appointment />} />
+							<Route path="meetings" element={<Meetings />} />
 							<Route path="protocols/add" element={<ProtocolAddForm />} />
 							<Route
 								path="/protocols/:id"
@@ -168,6 +174,7 @@ const Dashboard: React.FC = () => {
 							/>
 						</>
 					)}
+					<Route path="*" element={<NotFoundPage />} />
 				</Routes>
 			</Suspense>
 		</div>

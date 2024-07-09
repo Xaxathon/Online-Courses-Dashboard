@@ -6,12 +6,13 @@ import { useFormik, FormikHelpers } from "formik";
 import * as Yup from "yup";
 
 import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../store/store";
-import { setToken, setRole, setUserId } from "../../features/authSlice";
-import { useLoginMutation, useLazyFetchUserQuery } from "../../api/authApi";
 
-import { UserResponse } from "../../shared/interfaces/user";
-import { LoginFormValues } from "../../shared/interfaces/auth";
+import { AppDispatch } from "@/store/store";
+import { setToken, setRole, setUserId } from "@/store/slices/authSlice";
+import { useLoginMutation, useLazyFetchUserQuery } from "@/api/authApi";
+
+import { UserResponse } from "@/shared/interfaces/user";
+import { LoginFormValues } from "@/shared/interfaces/auth";
 
 const Login = () => {
 	const [login, { isLoading }] = useLoginMutation();
@@ -39,7 +40,6 @@ const Login = () => {
 				const response = await login(values).unwrap();
 
 				const token = response.data?.token;
-				console.log(token);
 				if (token) {
 					dispatch(setToken(token));
 

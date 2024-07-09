@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { ReactComponent as Change } from "@assets/icons/change.svg";
 import { ReactComponent as Success } from "@assets/icons/change.svg";
 import { ReactComponent as Delete } from "@assets/icons/delete.svg";
-import { ReactComponent as Close } from "@assets/icons/сlose-modal.svg";
+import { ReactComponent as Close } from "@assets/icons/сlose-icon.svg";
 
 import DeleteElementModal from "../deleteElementModal/DeleteElementModal";
 
@@ -15,9 +15,9 @@ import * as Yup from "yup";
 import {
 	useUpdateKeywordMutation,
 	useDeleteKeywordMutation,
-} from "../../api/keywordsApi";
+} from "@/api/keywordsApi";
 
-import { Keyword } from "../../shared/interfaces/keyword";
+import { Keyword } from "@/shared/interfaces/keyword";
 
 interface KeywordsItemProps {
 	keyword: Keyword;

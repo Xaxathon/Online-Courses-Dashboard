@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 
 import { useParams } from "react-router-dom";
 
-import { ReactComponent as AddProtocolIcon } from "@assets/icons/addProtocol.svg";
+import { ReactComponent as AddProtocolIcon } from "@assets/icons/add-icon.svg";
 
-import ParticipantItem from "../participantItem/ParticipantItem";
+import ProtocolParticipantItem from "../protocolParticipantItem/ProtocolParticipantItem";
 import DeleteElementModal from "../deleteElementModal/DeleteElementModal";
 import ExternalUserAddModal from "../externalUserAddModal/ExternalUserAddModal";
 
@@ -12,10 +12,10 @@ import {
 	useGetProtocolMembersQuery,
 	useAddProtocolMemberMutation,
 	useDeleteProtocolMemberMutation,
-} from "../../api/protocolsApi";
+} from "@/api/protocolsApi";
 
-import { ProtocolMember } from "../../shared/interfaces/protocol";
-import { ExternalUser, InternalUser } from "../../shared/interfaces/user";
+import { ProtocolMember } from "@/shared/interfaces/protocol";
+import { ExternalUser, InternalUser } from "@/shared/interfaces/user";
 
 const ProtocolParticipantList = () => {
 	const { id: protocolIdStr } = useParams<{ id: string }>();
@@ -154,7 +154,7 @@ const ProtocolParticipantList = () => {
 
 			<ul className="flex gap-4 overflow-x-auto mt-4">
 				{usersResponse?.map((user: ProtocolMember) => (
-					<ParticipantItem
+					<ProtocolParticipantItem
 						key={user.id}
 						user={user}
 						onDelete={handleOpenDeleteModal}

@@ -12,9 +12,9 @@ import { ReactComponent as Spinner } from "@assets/icons/spinner.svg";
 import ProtocolItem from "../protocolItem/ProtocolItem";
 import Skeleton from "../skeleton/Skeleton";
 
-import { useGetProtocolsQuery } from "../../api/protocolsApi";
+import { useGetProtocolsQuery } from "@/api/protocolsApi";
 
-import { Protocol } from "../../shared/interfaces/protocol";
+import { Protocol } from "@/shared/interfaces/protocol";
 
 const DEFAULT_LIMIT = 15;
 const MIN_PROTOCOLS_TO_SHOW_MESSAGE = 15;

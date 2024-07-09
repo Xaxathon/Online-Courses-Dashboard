@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { ReactComponent as CloseModal } from "@assets/icons/сlose-modal.svg";
+import { ReactComponent as CloseModal } from "@assets/icons/сlose-icon.svg";
 
 import Portal from "../portal/Portal";
 

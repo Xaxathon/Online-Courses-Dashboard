@@ -1,152 +1,87 @@
-import { useState, useCallback, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
-import { ReactComponent as Search } from "@assets/icons/search.svg";
-import { ReactComponent as Spinner } from "@assets/icons/spinner.svg";
+import MeetingCalendar from "@components/meetingCalendar/MeetingCalendar";
+import MeetingTheme from "@components/meetingTheme/MeetingTheme";
+import Skeleton from "@components/skeleton/Skeleton";
 
-import CalendarWrapper from "../../components/calendarMeetingWrapper/CalendarMeetingWrapper";
-import KpiChart from "../../components/kpiChart/KpiChart";
-import StatWidget from "../../components/statWidget/StatWidget";
-import TaskList from "../../components/taskList/TaskList";
+import { getStartOfMonth, getEndOfMonth } from "@/utils/dateUtils";
 
-import dayjs from "dayjs";
-import debounce from "lodash/debounce";
+import { useGetMeetingsQuery } from "@/api/meetingsApi";
 
-import { getStartOfMonth, getEndOfMonth } from "../../utils/dateUtils";
-
-import { RootState } from "../../store/store";
-
-import {
-	useFetchEntityStatsQuery,
-	useFetchKpiTasksStatsQuery,
-	useFetchMeetingStatsQuery,
-} from "../../api/statsApi";
-
-const DEBOUNCE_DELAY = 1000;
+import { Meeting } from "@/shared/interfaces/meeting";
 
 const Meetings = () => {
+	const location = useLocation();
+	const [selectedDate, setSelectedDate] = useState<Date>(() => {
+		const params = new URLSearchParams(location.search);
+		const dateParam = params.get("date");
+		return dateParam ? new Date(dateParam) : new Date();
+	});
+	const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
 	const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
-	const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-	const [searchTerm, setSearchTerm] = useState("");
-	const [isSearching, setIsSearching] = useState(false);
 
-	const userId = useSelector((state: RootState) => state.auth.user?.id);
+	useEffect(() => {
+		const params = new URLSearchParams(location.search);
+		const dateParam = params.get("date");
+		if (dateParam) {
+			const newDate = new Date(dateParam);
+			setSelectedDate(newDate);
+			setCurrentMonth(newDate);
+		}
+	}, [location.search]);
 
 	const start_date_at = getStartOfMonth(currentMonth);
 	const end_date_at = getEndOfMonth(currentMonth);
 
-	const { data: entityStats } = useFetchEntityStatsQuery(userId || 0, {
-		skip: !userId,
+	const { data, error, isLoading, refetch } = useGetMeetingsQuery({
+		start_date_at,
+		end_date_at,
 	});
 
-	const formattedDate = dayjs(currentMonth).format("YYYY-MM");
+	const meetings = data?.data || [];
 
-	const { data: kpiStats } = useFetchKpiTasksStatsQuery(
-		{
-			secretaryId: userId || 0,
-			date: formattedDate,
-		},
-		{
-			skip: !userId,
-		}
-	);
-
-	const { data: meetingStats, refetch: refetchMeetingStats } =
-		useFetchMeetingStatsQuery(
-			{
-				start_date_at,
-				end_date_at,
-			},
-			{
-				skip: !userId,
-			}
-		);
-
-	const debouncedSearch = useCallback(
-		debounce((term: string) => {
-			setSearchTerm(term);
-			setIsSearching(false);
-		}, DEBOUNCE_DELAY),
-		[]
-	);
-
-	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const term = e.target.value;
-		setIsSearching(true);
-		debouncedSearch(term);
+	const handleMonthChange = (month: Date) => {
+		setCurrentMonth(month);
 	};
 
 	const handleDateChange = (date: Date) => {
 		setSelectedDate(date);
 	};
 
-	const handleMonthChange = useCallback((date: Date) => {
-		setCurrentMonth(date);
-	}, []);
-
-	useEffect(() => {
-		refetchMeetingStats();
-	}, [currentMonth, refetchMeetingStats]);
-
-	// Преобразуем meetingStats в массив дат
-	const meetingDates = meetingStats
-		? meetingStats.map((meeting) => new Date(meeting.event_date))
-		: [];
+	const refetchMeetings = async () => {
+		await refetch();
+	};
 
 	return (
-		<div className="grid grid-cols-[minmax(20rem,_30rem)_minmax(30rem,_70rem)] gap-6 px-4 mt-7">
-			<div className="flex w-full flex-col gap-2 ">
-				<div className="max-w-[30rem] rounded-xl flex justify-center items-center">
-					<CalendarWrapper
-						value={selectedDate}
-						onChange={handleDateChange}
+		<div className="ml-3 grid grid-cols-[800px_minmax(470px,_470px)] gap-3 justify-between items-start mt-5 mr-6 w-full">
+			{isLoading ? (
+				<div className="ml-3 grid grid-cols-[800px_minmax(470px,_470px)] gap-3 justify-between items-start mt-5 mr-6 w-full h-full pb-[5rem]">
+					<div className="flex flex-col items-center justify-center bg-gray-100 rounded-lg p-5 mt-5 h-full">
+						<Skeleton width="full" height="full" className="rounded-lg mb-4" />
+					</div>
+					<div className="flex flex-col items-center justify-center bg-gray-100 rounded-lg p-5 mt-5 h-full">
+						<Skeleton width="full" height="full" className="rounded-lg mb-4" />
+					</div>
+				</div>
+			) : error ? (
+				<div>Error loading meetings</div>
+			) : (
+				<>
+					<MeetingCalendar
+						onDateChange={handleDateChange}
 						onMonthChange={handleMonthChange}
-						meetingDates={meetingDates}
+						meetings={meetings}
 					/>
-				</div>
-
-				<KpiChart data={kpiStats || []} />
-				<div className="flex gap-5 items-center justify-center">
-					{entityStats && (
-						<>
-							<StatWidget
-								title="Статистика совещаний"
-								inProcess={entityStats.meetings.in_process}
-								success={entityStats.meetings.success}
-							/>
-							<StatWidget
-								title="Статистика протоколов"
-								inProcess={entityStats.protocols.in_process}
-								success={entityStats.protocols.success}
-							/>
-						</>
-					)}
-				</div>
-			</div>
-			<div className="">
-				<div className="flex justify-center items-center w-full bg-gray-100 mt-2 rounded-lg px-3 py-1 mb-5">
-					<input
-						className="bg-transparent p-2 w-full focus:outline-none"
-						type="text"
-						placeholder="Введите запрос"
-						onChange={handleSearchChange}
+					<MeetingTheme
+						selectedDate={selectedDate}
+						selectedMeeting={selectedMeeting}
+						onMeetingSelect={setSelectedMeeting}
+						meetings={meetings}
+						refetchMeetings={refetchMeetings}
 					/>
-					{isSearching ? (
-						<Spinner className="w-6 h-6 animate-spin" />
-					) : (
-						<Search className="w-6 h-6" />
-					)}
-				</div>
-
-				<ul className="flex justify-around font-bold  xl:text-lg text-xs  text-center text-mainPurple mb-2">
-					<li>Задача</li>
-					<li>Ответственный</li>
-					<li>Дедлайн</li>
-					<li>Статус</li>
-					<li>№Протокола</li>
-				</ul>
-				<TaskList searchTerm={searchTerm} />
-			</div>
+				</>
+			)}
 		</div>
 	);
 };

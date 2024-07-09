@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ReactComponent as Backward } from "@assets/icons/backward.svg";
-import { ReactComponent as FileUploadIcon } from "@assets/icons/fileUploadIcon.svg";
-import { ReactComponent as Mp4Icon } from "@assets/icons/mp4Icon.svg";
+import { ReactComponent as FileUploadIcon } from "@assets/icons/file-upload-icon.svg";
+import { ReactComponent as Mp4Icon } from "@assets/icons/mp4-icon.svg";
 
 import dayjs from "dayjs";
 import { useFormik } from "formik";
@@ -16,11 +16,11 @@ import {
 	handleDragOver,
 	handleDragLeave,
 	handleDrop,
-} from "../../utils/videoFileHandlers";
+} from "@/utils/videoFileHandlers";
 
-import { useCreateProtocolMutation } from "../../api/protocolsApi";
+import { useCreateProtocolMutation } from "@/api/protocolsApi";
 
-import { ExternalUser, InternalUser } from "../../shared/interfaces/user";
+import { ExternalUser, InternalUser } from "@/shared/interfaces/user";
 
 const ProtocolAddForm = () => {
 	const [file, setFile] = useState<File | null>(null);
@@ -173,7 +173,6 @@ const ProtocolAddForm = () => {
 							type="text"
 							value={formik.values.secretaryName}
 							onClick={() => handleOpenModalUser("secretary")}
-							placeholder="Выберите секретаря"
 							readOnly
 						/>
 						{formik.touched.secretary_id && formik.errors.secretary_id ? (
@@ -192,7 +191,6 @@ const ProtocolAddForm = () => {
 							type="text"
 							value={formik.values.directorName}
 							onClick={() => handleOpenModalUser("director")}
-							placeholder="Выберите руководителя"
 							readOnly
 						/>
 						{formik.touched.director_id && formik.errors.director_id ? (

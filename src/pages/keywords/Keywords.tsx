@@ -2,10 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ReactComponent as Backward } from "@assets/icons/backward.svg";
-import { ReactComponent as AddProtocolIcon } from "@assets/icons/addProtocol.svg";
+import { ReactComponent as AddKeywordIcon } from "@assets/icons/add-icon.svg";
 
-import KeywordsList from "../../components/keywordsList/KeywordsList";
-import KeywordAddModal from "../../components/keywordAddModal/KeywordAddModal";
+import KeywordsList from "@components/keywordsList/KeywordsList";
+import KeywordAddModal from "@components/keywordAddModal/KeywordAddModal";
 
 const Keywords = () => {
 	const navigate = useNavigate();
@@ -35,7 +35,7 @@ const Keywords = () => {
 					Ключевые слова
 				</h1>
 
-				<AddProtocolIcon
+				<AddKeywordIcon
 					className="w-9 h-9 cursor-pointer "
 					onClick={handleOpenModal}
 				/>

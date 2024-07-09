@@ -5,14 +5,15 @@ import * as Yup from "yup";
 
 import Modal from "../modal/Modal";
 
-interface AppointmentTimeAddFormModalProps {
+interface MeetingTimeAddFormModalProps {
 	onClose: () => void;
 	onTimeSubmit: (start: string, end: string) => void;
 }
 
-const AppointmentTimeAddFormModal: React.FC<
-	AppointmentTimeAddFormModalProps
-> = ({ onClose, onTimeSubmit }) => {
+const MeetingTimeAddFormModal: React.FC<MeetingTimeAddFormModalProps> = ({
+	onClose,
+	onTimeSubmit,
+}) => {
 	const validationSchema = Yup.object({
 		startTime: Yup.string().required("Время начала обязательно для заполнения"),
 		endTime: Yup.string().required(
@@ -76,4 +77,4 @@ const AppointmentTimeAddFormModal: React.FC<
 	);
 };
 
-export default AppointmentTimeAddFormModal;
+export default MeetingTimeAddFormModal;

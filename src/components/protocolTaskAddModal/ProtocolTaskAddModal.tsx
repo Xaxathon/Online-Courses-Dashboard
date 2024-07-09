@@ -4,11 +4,11 @@ import { Formik, Form, Field, FieldArray, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
 import Modal from "../modal/Modal";
-import ProtocolAddUserModal from "../protocolAddUserModal/ProtocolAddUserModal";
+import ExternalUserAddModal from "../externalUserAddModal/ExternalUserAddModal";
 
-import { useCreateProtocolTaskMutation } from "../../api/protocolsApi";
+import { useCreateProtocolTaskMutation } from "@/api/protocolsApi";
 
-import { ExternalUser, InternalUser } from "../../shared/interfaces/user";
+import { ExternalUser, InternalUser } from "@/shared/interfaces/user";
 
 const validationSchema = Yup.object().shape({
 	tasks: Yup.array().of(
@@ -30,6 +30,7 @@ const ProtocolTaskAddModal: React.FC<{
 	const [currentTaskIndex, setCurrentTaskIndex] = useState<number | null>(null);
 	const [createTask, { error: backendError }] = useCreateProtocolTaskMutation();
 	const formRef = useRef<any>(null);
+	const [isSaving, setIsSaving] = useState<boolean>(false);
 
 	const handleOpenModalUser = useCallback((index: number) => {
 		setCurrentTaskIndex(index);
@@ -58,6 +59,7 @@ const ProtocolTaskAddModal: React.FC<{
 
 	const handleSubmit = useCallback(
 		async (values: any, { setSubmitting }: any) => {
+			setIsSaving(true);
 			try {
 				if (protocolData) {
 					for (const task of values.tasks) {
@@ -72,6 +74,7 @@ const ProtocolTaskAddModal: React.FC<{
 				console.error("Failed to create task:", error);
 			} finally {
 				setSubmitting(false);
+				setIsSaving(false);
 			}
 		},
 		[protocolData, protocolId, createTask, onClose]
@@ -100,13 +103,13 @@ const ProtocolTaskAddModal: React.FC<{
 												<div key={index}>
 													<Field
 														name={`tasks[${index}].essence`}
-														className="text-base bg-lightPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent w-full"
+														className="text-base bg-lightPurple w-[98%] p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
 														type="text"
 													/>
 													<ErrorMessage
 														name={`tasks[${index}].essence`}
 														component="div"
-														className="text-red-500 text-sm"
+														className="text-crimsonRed mt-1 text-start text-sm"
 													/>
 												</div>
 											))}
@@ -123,14 +126,14 @@ const ProtocolTaskAddModal: React.FC<{
 												<div key={index}>
 													<Field
 														name={`tasks[${index}].responsible_name`}
-														className="text-base bg-lightPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent cursor-pointer w-full"
+														className="text-base bg-lightPurple w-[98%] p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent cursor-pointer "
 														onClick={() => handleOpenModalUser(index)}
 														readOnly
 													/>
 													<ErrorMessage
 														name={`tasks[${index}].responsible_name`}
 														component="div"
-														className="text-red-500 text-sm"
+														className="text-crimsonRed mt-1 text-start  text-sm"
 													/>
 												</div>
 											))}
@@ -151,7 +154,7 @@ const ProtocolTaskAddModal: React.FC<{
 								<ErrorMessage
 									name="deadline"
 									component="div"
-									className="text-red-500 text-sm"
+									className="text-crimsonRed mt-1  text-start text-sm"
 								/>
 							</div>
 							<div className="flex justify-end gap-4 mb-2">
@@ -174,8 +177,12 @@ const ProtocolTaskAddModal: React.FC<{
 								</FieldArray>
 								<button
 									type="submit"
-									className="py-3 px-2 rounded-lg bg-mainPurple text-white font-bold text-center hover:bg-mainPurpleHover active:bg-mainPurpleActive"
-									disabled={isSubmitting}
+									className={`py-3 px-2 rounded-lg text-white font-bold text-center ${
+										isSaving
+											? "bg-gray-500 cursor-not-allowed"
+											: "bg-mainPurple hover:bg-mainPurpleHover active:bg-mainPurpleActive"
+									}`}
+									disabled={isSaving}
 								>
 									Сохранить
 								</button>
@@ -185,14 +192,14 @@ const ProtocolTaskAddModal: React.FC<{
 				)}
 			</Formik>
 			{backendError && (
-				<div className="text-red-500 mt-4">
+				<div className="text-crimsonRed mt-4">
 					Ошибка:{" "}
 					{(backendError as any)?.data?.message ||
 						"Произошла ошибка при сохранении задачи"}
 				</div>
 			)}
 			{isModalOpenUser && (
-				<ProtocolAddUserModal
+				<ExternalUserAddModal
 					onClose={handleCloseModalUser}
 					onUserSelect={handleUserSelect}
 				/>

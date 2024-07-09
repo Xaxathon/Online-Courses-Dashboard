@@ -5,13 +5,13 @@ import Modal from "../modal/Modal";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
 
-import { useCreateUserMutation } from "../../api/authApi";
+import { useCreateUserMutation } from "@/api/authApi";
 
 import {
 	UserRole,
 	CreateUserRequest,
 	InternalUser,
-} from "../../shared/interfaces/user";
+} from "@/shared/interfaces/user";
 
 interface UserAddFormModalProps {
 	onClose: () => void;

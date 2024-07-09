@@ -2,14 +2,14 @@ import React from "react";
 
 import { ReactComponent as Left } from "@assets/icons/left-arrow.svg";
 import { ReactComponent as Right } from "@assets/icons/right-arrow.svg";
-import Rectangle from "@assets/img/Rectangle.jpg";
+import AvatarError from "@assets/img/avatar.jpg";
 
 import StatWidget from "../statWidget/StatWidget";
 import Skeleton from "../skeleton/Skeleton";
 import KpiChart from "../kpiChart/KpiChart";
 
-import { useFetchEntityStatsQuery } from "../../api/statsApi";
-import { BaseUser } from "../../shared/interfaces/user";
+import { useFetchEntityStatsQuery } from "@/api/statsApi";
+import { BaseUser } from "@/shared/interfaces/user";
 
 interface SecretaryCarouselProps {
 	userData: BaseUser | undefined;
@@ -45,16 +45,16 @@ const SecretaryCarousel = ({
 			<div className="w-full bg-time-gradient py-3 px-5 rounded-lg">
 				<div className="flex space-x-5 text-black font-normal text-xs">
 					<img
-						src={userData.avatar || Rectangle}
+						src={userData.avatar || AvatarError}
 						alt="avatar"
 						className="w-20 h-20 rounded-lg object-cover"
 					/>
 					<div className="flex flex-col gap-1">
 						<h2 className="text-mainPurple font-bold text-base">
-							{userData.full_name ?? "Неизвестно"}
+							{userData.full_name ?? "Ошибка получения имени"}
 						</h2>
-						<span>{userData.role ? "Секретарь" : "Роль неизвестна"}</span>
-						<span>{userData.department ?? "Отдел неизвестен"}</span>
+						<span>{userData.role ? "Секретарь" : "Ошибка получения роли"}</span>
+						<span>{userData.department ?? "Ошибка получения отдела"}</span>
 					</div>
 				</div>
 			</div>

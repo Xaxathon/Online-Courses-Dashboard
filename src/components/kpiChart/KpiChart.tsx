@@ -12,7 +12,7 @@ import {
 import styled from "styled-components";
 import CustomBar from "./CustomBar";
 
-import { KpiTasksStatsData } from "../../shared/interfaces/stats";
+import { KpiTasksStatsData } from "@/shared/interfaces/stats";
 
 interface KpiChartProps {
 	data: KpiTasksStatsData[];

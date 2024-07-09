@@ -10,16 +10,16 @@ import * as Yup from "yup";
 import {
 	useCreateKeywordMutation,
 	useFetchKeywordsQuery,
-} from "../../api/keywordsApi";
+} from "@/api/keywordsApi";
 
-import { KeywordAdd } from "../../shared/interfaces/keyword";
+import { KeywordAdd } from "@/shared/interfaces/keyword";
 
 interface KeywordAddModalProps {
 	onClose: () => void;
 }
 const KeywordAddModal = ({ onClose }: KeywordAddModalProps) => {
 	const [createKeyword] = useCreateKeywordMutation();
-	const { refetch, error: fetchError } = useFetchKeywordsQuery();
+	const { refetch } = useFetchKeywordsQuery();
 	const [apiError, setApiError] = useState<string | null>(null);
 
 	const validationSchema = Yup.object({

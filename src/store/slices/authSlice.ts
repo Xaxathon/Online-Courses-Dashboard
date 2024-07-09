@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AuthState } from "../shared/interfaces/auth";
-import { UserRole } from "../shared/interfaces/user";
+import { AuthState } from "@/shared/interfaces/auth";
+import { UserRole } from "@/shared/interfaces/user";
 
 const initialState: AuthState = {
 	token: localStorage.getItem("token"),

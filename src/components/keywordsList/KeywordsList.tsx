@@ -1,7 +1,7 @@
 import KeywordsItem from "../keywordsItem/KeywordsItem";
 import Skeleton from "../skeleton/Skeleton";
 
-import { useFetchKeywordsQuery } from "../../api/keywordsApi";
+import { useFetchKeywordsQuery } from "@/api/keywordsApi";
 
 const KeywordsList = () => {
 	const { data, error, isLoading } = useFetchKeywordsQuery();

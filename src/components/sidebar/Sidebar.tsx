@@ -2,19 +2,19 @@ import { useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
 import { ReactComponent as Calendar } from "@assets/icons/calendar.svg";
-import { ReactComponent as Meetings } from "@assets/icons/meetings.svg";
+import { ReactComponent as Home } from "@assets/icons/home.svg";
 import { ReactComponent as Protocol } from "@assets/icons/protocol.svg";
 import { ReactComponent as Settings } from "@assets/icons/settings.svg";
 import { ReactComponent as Logout } from "@assets/icons/logout.svg";
-import { ReactComponent as Secretaries } from "@assets/icons/meetings.svg";
+import { ReactComponent as Secretaries } from "@assets/icons/home.svg";
 
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../store/store";
-import { logout } from "../../features/authSlice";
+import { AppDispatch, RootState } from "@/store/store";
+import { logout } from "@/store/slices/authSlice";
 
-import { useLogoutMutation } from "../../api/authApi";
+import { useLogoutMutation } from "@/api/authApi";
 
-import { UserRole } from "../../shared/interfaces/user";
+import { UserRole } from "@/shared/interfaces/user";
 
 const Sidebar: React.FC = () => {
 	const [logoutApi] = useLogoutMutation();
@@ -41,7 +41,7 @@ const Sidebar: React.FC = () => {
 			case UserRole.Manager:
 				return "/main/secretaries";
 			case UserRole.Secretary:
-				return "/main/meetings";
+				return "/main/home";
 			default:
 				return "/main";
 		}
@@ -87,17 +87,14 @@ const Sidebar: React.FC = () => {
 					{role === UserRole.Secretary && (
 						<>
 							<li>
-								<Link
-									to="/main/meetings"
-									className={getLinkStyle("/main/meetings")}
-								>
-									<Meetings className="w-8 h-8 fill-current" />
+								<Link to="/main/home" className={getLinkStyle("/main/home")}>
+									<Home className="w-8 h-8 fill-current" />
 								</Link>
 							</li>
 							<li>
 								<Link
-									to="/main/calendar"
-									className={getLinkStyle("/main/calendar")}
+									to="/main/meetings"
+									className={getLinkStyle("/main/meetings")}
 								>
 									<Calendar className="w-8 h-8 fill-current" />
 								</Link>

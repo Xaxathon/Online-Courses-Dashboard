@@ -3,11 +3,11 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { ReactComponent as Spinner } from "@assets/icons/spinner.svg";
 
 import Skeleton from "../skeleton/Skeleton";
-import TaskItem from "../taskItem/TaskItem";
+import ProtocolTaskItem from "../protocolTaskItem/ProtocolTaskItem";
 
-import { useGetProtocolTasksQuery } from "../../api/protocolsApi";
+import { useGetProtocolTasksQuery } from "@/api/protocolsApi";
 
-import { ProtocolTask } from "../../shared/interfaces/protocol";
+import { ProtocolTask } from "@/shared/interfaces/protocol";
 
 const DEFAULT_LIMIT = 15;
 const MIN_TASKS_TO_SHOW_MESSAGE = 15;
@@ -16,7 +16,7 @@ interface TaskListProps {
 	searchTerm: string;
 }
 
-const TaskList: React.FC<TaskListProps> = ({ searchTerm }) => {
+const ProtocolTaskList: React.FC<TaskListProps> = ({ searchTerm }) => {
 	const [page, setPage] = useState(1);
 	const [allTasks, setAllTasks] = useState<ProtocolTask[]>([]);
 	const [initialLoadComplete, setInitialLoadComplete] = useState(false);
@@ -125,7 +125,7 @@ const TaskList: React.FC<TaskListProps> = ({ searchTerm }) => {
 	return (
 		<div className="h-[78vh] overflow-y-auto rounded-lg ">
 			{allTasks.map((task, index) => (
-				<TaskItem
+				<ProtocolTaskItem
 					ref={allTasks.length === index + 1 ? lastTaskElementRef : null}
 					key={`${task.id}-${index}`}
 					task={task}
@@ -145,7 +145,7 @@ const TaskList: React.FC<TaskListProps> = ({ searchTerm }) => {
 	);
 };
 
-export default TaskList;
+export default ProtocolTaskList;
 
 const SkeletonTaskItem = () => {
 	return (

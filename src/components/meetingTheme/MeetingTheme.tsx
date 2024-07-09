@@ -6,24 +6,20 @@ import classNames from "classnames";
 import { ReactComponent as Delete } from "@assets/icons/delete.svg";
 
 import Skeleton from "../skeleton/Skeleton";
-import AppointmentForm from "../appointmentForm/AppointmentForm";
-import AppointmentTimeAddFormModal from "../appointmentTimeAddFormModal/AppointmentTimeAddFormModal";
+import MeetingForm from "../meetingForm/MeetingForm";
+import MeetingTimeAddFormModal from "../meetingTimeAddFormModal/MeetingTimeAddFormModal";
 import DeleteElementModal from "../deleteElementModal/DeleteElementModal";
 import ExternalUserAddModal from "../externalUserAddModal/ExternalUserAddModal";
 
 import {
 	filterMeetingsByDate,
 	sortMeetingsByStartTime,
-} from "../../utils/meetingUtils";
+} from "@/utils/meetingUtils";
 
-import { useDeleteMeetingMutation } from "../../api/meetingsApi";
+import { useDeleteMeetingMutation } from "@/api/meetingsApi";
 
-import { User } from "../../shared/interfaces/user";
-import {
-	Meeting,
-	CreateMeeting,
-	Member,
-} from "../../shared/interfaces/meeting";
+import { User } from "@/shared/interfaces/user";
+import { Meeting, CreateMeeting, Member } from "@/shared/interfaces/meeting";
 
 interface AppointmentThemeProps {
 	selectedDate: Date | null;
@@ -236,7 +232,7 @@ const AppointmentTheme: React.FC<AppointmentThemeProps> = ({
 							<div>Конец: {endTime}</div>
 						</div>
 					)}
-					<AppointmentForm
+					<MeetingForm
 						meeting={selectedMeeting}
 						selectedDate={selectedDate}
 						startTime={startTime}
@@ -255,7 +251,7 @@ const AppointmentTheme: React.FC<AppointmentThemeProps> = ({
 				</>
 			)}
 			{isModalOpenTime && (
-				<AppointmentTimeAddFormModal
+				<MeetingTimeAddFormModal
 					onClose={handleCloseModalTime}
 					onTimeSubmit={handleTimeSubmit}
 				/>

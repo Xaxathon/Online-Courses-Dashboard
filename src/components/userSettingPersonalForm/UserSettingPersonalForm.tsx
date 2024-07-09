@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from "react";
 
-import Rectangle from "@assets/img/Rectangle.jpg";
+import AvatarError from "@assets/img/avatar.jpg";
 import classNames from "classnames";
 
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
 
-import { useUpdateUserMutation } from "../../api/authApi";
+import { useUpdateUserMutation } from "@/api/authApi";
 
-import { BaseUser, FormValues } from "../../shared/interfaces/user";
+import { BaseUser, FormValues } from "@/shared/interfaces/user";
 
-interface UserFormProps {
+interface UserSettingPersonalFormProps {
 	userData: BaseUser;
 }
 
-const UserForm = ({ userData }: UserFormProps) => {
+const UserSettingPersonalForm = ({
+	userData,
+}: UserSettingPersonalFormProps) => {
 	const [isEditing, setIsEditing] = useState<boolean>(false);
-	const [imageUrl, setImageUrl] = useState(userData.avatar || Rectangle);
+	const [imageUrl, setImageUrl] = useState(userData.avatar || AvatarError);
 	const [showPassword, setShowPassword] = useState<boolean>(false);
 	const [backendErrors, setBackendErrors] = useState<string | null>(null);
 	const [updateUser] = useUpdateUserMutation();
@@ -299,4 +301,4 @@ const UserForm = ({ userData }: UserFormProps) => {
 	);
 };
 
-export default UserForm;
+export default UserSettingPersonalForm;

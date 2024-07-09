@@ -4,11 +4,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ReactComponent as Delete } from "@assets/icons/delete.svg";
 import { ReactComponent as Backward } from "@assets/icons/backward.svg";
 
-import ProtocolTaskAddModal from "../../components/protocolTaskAddModal/ProtocolTaskAddModal";
-import DeleteElementModal from "../../components/deleteElementModal/DeleteElementModal";
-import ProtocolParticipantList from "../../components/protocolParticipantList/ProtocolParticipantList";
-import ExternalUserAddModal from "../../components/externalUserAddModal/ExternalUserAddModal";
-import Skeleton from "../../components/skeleton/Skeleton";
+import ProtocolTaskAddModal from "@components/protocolTaskAddModal/ProtocolTaskAddModal";
+import DeleteElementModal from "@components/deleteElementModal/DeleteElementModal";
+import ProtocolParticipantList from "@components/protocolParticipantList/ProtocolParticipantList";
+import ExternalUserAddModal from "@components/externalUserAddModal/ExternalUserAddModal";
+import Skeleton from "@components/skeleton/Skeleton";
 
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -18,9 +18,9 @@ import {
 	useGetProtocolQuery,
 	useUpdateProtocolMutation,
 	useDeleteProtocolMutation,
-} from "../../api/protocolsApi";
+} from "@/api/protocolsApi";
 
-import { ExternalUser, InternalUser } from "../../shared/interfaces/user";
+import { ExternalUser, InternalUser } from "@/shared/interfaces/user";
 
 const Protocol = () => {
 	const { id } = useParams<{ id: string }>();
@@ -99,7 +99,6 @@ const Protocol = () => {
 				console.log("Success:", response);
 				setInitialValues(values);
 				setShouldFetchProtocol(true);
-				await refetch();
 			} catch (error) {
 				console.error("Error:", error);
 			}
@@ -177,16 +176,12 @@ const Protocol = () => {
 
 	if (isLoading)
 		return (
-			<div className="grid grid-cols-2 w-full mt-10 gap-5 mx-5">
+			<div className="grid grid-cols-2 w-full my-10 gap-5 mx-5">
 				<div className="flex flex-col justify-center items-center bg-gray-100 rounded-2xl p-5 w-full gap-3">
-					<Skeleton width="1/2" height="10" className="rounded-lg mx-auto" />
-					<Skeleton width="1/2" height="20" className="rounded-lg mx-auto" />
-					<Skeleton width="1/2" height="10" className="rounded-lg mx-auto" />
+					<Skeleton width="full" height="full" className="rounded-lg mx-auto" />
 				</div>
 				<div className="flex flex-col justify-center items-center bg-gray-100 rounded-2xl p-5 w-full gap-3">
-					<Skeleton width="1/2" height="10" className="rounded-lg mx-auto" />
-					<Skeleton width="1/2" height="20" className="rounded-lg mx-auto" />
-					<Skeleton width="1/2" height="10" className="rounded-lg mx-auto" />
+					<Skeleton width="full" height="full" className="rounded-lg mx-auto" />
 				</div>
 			</div>
 		);

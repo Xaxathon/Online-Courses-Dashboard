@@ -17,7 +17,7 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = (props) => {
 
 	const handleDateClick = (date: Date) => {
 		const formattedDate = dayjs(date).format("YYYY-MM-DD");
-		navigate(`/main/calendar?date=${formattedDate}`);
+		navigate(`/main/meetings?date=${formattedDate}`);
 	};
 
 	return (

@@ -1,21 +1,18 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import Modal from "../modal/Modal";
 
 import { ReactComponent as Search } from "@assets/icons/search.svg";
 import { ReactComponent as Spinner } from "@assets/icons/spinner.svg";
-import { ReactComponent as AddProtocolIcon } from "@assets/icons/addProtocol.svg";
-import { ReactComponent as CloseAddIcon } from "@assets/icons/сlose-modal.svg";
+import { ReactComponent as AddUserIcon } from "@assets/icons/add-icon.svg";
+import { ReactComponent as CloseIcon } from "@assets/icons/сlose-icon.svg";
+
+import Modal from "../modal/Modal";
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
-import { useFetchUsersQuery, useCreateUserMutation } from "../../api/authApi";
+import { useFetchUsersQuery, useCreateUserMutation } from "@/api/authApi";
 
-import {
-	InternalUser,
-	ExternalUser,
-	UserRole,
-} from "../../shared/interfaces/user";
+import { InternalUser, ExternalUser, UserRole } from "@/shared/interfaces/user";
 
 interface ExternalUserAddModalProps {
 	onClose: () => void;
@@ -228,12 +225,12 @@ const ExternalUserAddModal: React.FC<ExternalUserAddModalProps> = ({
 						)}
 					</div>
 					{isCreating ? (
-						<CloseAddIcon
+						<CloseIcon
 							className="w-10 h-10 cursor-pointer stroke-[0.20rem] stroke-mainPurple hover:stroke-mainPurpleHover active:stroke-mainPurpleActive"
 							onClick={toggleCreating}
 						/>
 					) : (
-						<AddProtocolIcon
+						<AddUserIcon
 							className="w-10 h-10 cursor-pointer"
 							onClick={toggleCreating}
 						/>

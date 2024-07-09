@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import classNames from "classnames";
 
 import { ReactComponent as Delete } from "@assets/icons/delete.svg";
-import { ReactComponent as Mp4Icon } from "@assets/icons/mp4Icon.svg";
+import { ReactComponent as Mp4Icon } from "@assets/icons/mp4-icon.svg";
 
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
@@ -12,13 +12,13 @@ import * as Yup from "yup";
 import {
 	useCreateMeetingMutation,
 	useUpdateMeetingMutation,
-} from "../../api/meetingsApi";
+} from "@/api/meetingsApi";
 
 import {
 	CreateMeeting,
 	Meeting,
 	UpdateMeetingMember,
-} from "../../shared/interfaces/meeting";
+} from "@/shared/interfaces/meeting";
 
 interface AppointmentFormProps {
 	meeting: Meeting | null;
@@ -296,9 +296,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
 											/>
 										)}
 										{member.email_sent && (
-											<span className="text-[10px] text-green-500">
-												Email Sent
-											</span>
+											<span className="text-[10px] text-green-500"></span>
 										)}
 									</div>
 								</li>

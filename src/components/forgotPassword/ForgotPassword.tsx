@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useFormik, FormikHelpers } from "formik";
 import * as Yup from "yup";
 
-import { useForgotPasswordMutation } from "../../api/authApi";
+import { useForgotPasswordMutation } from "@/api/authApi";
 
 const ForgotPassword = () => {
 	const navigate = useNavigate();

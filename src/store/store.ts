@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
+
 import { authApi } from "../api/authApi";
-import authReducer from "../features/authSlice";
+import authReducer from "./slices/authSlice";
 import { keywordsApi } from "../api/keywordsApi";
 import meetingsApi from "../api/meetingsApi";
 import protocolsApi from "../api/protocolsApi";

@@ -6,7 +6,7 @@ import styled from "styled-components";
 
 import dayjs from "dayjs";
 
-import { Meeting } from "../../shared/interfaces/meeting";
+import { Meeting } from "@/shared/interfaces/meeting";
 
 interface CustomCalendarProps {
 	onDateChange: (date: Date) => void;
@@ -14,7 +14,7 @@ interface CustomCalendarProps {
 	meetings: Meeting[];
 }
 
-const AppointmentCalendar: React.FC<CustomCalendarProps> = ({
+const MeetingCalendar: React.FC<CustomCalendarProps> = ({
 	onDateChange,
 	onMonthChange,
 	meetings,
@@ -40,7 +40,7 @@ const AppointmentCalendar: React.FC<CustomCalendarProps> = ({
 			setDate(currentDate);
 			// Обновляем URL с текущей датой
 			navigate(
-				`/main/calendar?date=${dayjs(currentDate).format("YYYY-MM-DD")}`,
+				`/main/meetings?date=${dayjs(currentDate).format("YYYY-MM-DD")}`,
 				{ replace: true }
 			);
 		}
@@ -52,7 +52,7 @@ const AppointmentCalendar: React.FC<CustomCalendarProps> = ({
 				const newDate = dayjs(value).startOf("day").toDate();
 				setDate(newDate);
 				onDateChange(newDate);
-				navigate(`/main/calendar?date=${dayjs(newDate).format("YYYY-MM-DD")}`);
+				navigate(`/main/meetings?date=${dayjs(newDate).format("YYYY-MM-DD")}`);
 			}
 		},
 		[onDateChange, navigate]
@@ -127,9 +127,9 @@ const AppointmentCalendar: React.FC<CustomCalendarProps> = ({
 	);
 };
 
-export default AppointmentCalendar;
+export default MeetingCalendar;
 
-// Styled components (updated)
+// Styled components
 
 const CalendarContainer = styled.div`
 	max-width: 100%;

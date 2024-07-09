@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Protocol, ProtocolStage } from "../../shared/interfaces/protocol";
+import { Protocol, ProtocolStage } from "@/shared/interfaces/protocol";
 
 interface ProtocolItemProps {
 	protocol: Protocol;

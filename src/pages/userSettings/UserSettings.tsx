@@ -3,18 +3,18 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ReactComponent as Backward } from "@assets/icons/backward.svg";
-import { ReactComponent as AddProtocolIcon } from "@assets/icons/addProtocol.svg";
+import { ReactComponent as AddUserIcon } from "@assets/icons/add-icon.svg";
 
-import UsersSettingListForm from "../../components/usersSettingListForm/UsersSettingListForm";
-import UserForm from "../../components/userForm/UserForm";
-import UserAddFormModal from "../../components/userAddFormModal/UserAddFormModal";
-import Skeleton from "../../components/skeleton/Skeleton";
+import UserConfigurationListForm from "@components/userConfigurationListForm/UserConfigurationListForm";
+import UserSettingPersonalForm from "@components/userSettingPersonalForm/UserSettingPersonalForm";
+import UserAddFormModal from "@components/userAddFormModal/UserAddFormModal";
+import Skeleton from "@components/skeleton/Skeleton";
 
 import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
-import { useLazyFetchUserQuery } from "../../api/authApi";
+import { RootState } from "@/store/store";
+import { useLazyFetchUserQuery } from "@/api/authApi";
 
-import { UserRole } from "../../shared/interfaces/user";
+import { UserRole } from "@/shared/interfaces/user";
 
 const UserSettings = () => {
 	const navigate = useNavigate();
@@ -55,7 +55,7 @@ const UserSettings = () => {
 				/>
 				<h1 className="text-center w-full">Данные о пользователях</h1>
 				{role && [UserRole.Admin, UserRole.Manager].includes(role) && (
-					<AddProtocolIcon
+					<AddUserIcon
 						className="w-10 h-10 cursor-pointer"
 						onClick={handleOpenModal}
 					/>
@@ -78,7 +78,7 @@ const UserSettings = () => {
 						</>
 					)}
 					{isError && <p>Error loading user data</p>}
-					{userData && <UserForm userData={userData.data} />}
+					{userData && <UserSettingPersonalForm userData={userData.data} />}
 				</div>
 				{role === UserRole.Manager && (
 					<h3 className="font-bold text-mainPurple mx-auto text-2xl text-center mt-7">
@@ -86,7 +86,7 @@ const UserSettings = () => {
 					</h3>
 				)}
 				{role !== UserRole.Secretary && (
-					<UsersSettingListForm
+					<UserConfigurationListForm
 						shouldRefetch={shouldRefetchUsers}
 						onRefetchComplete={() => setShouldRefetchUsers(false)}
 					/>

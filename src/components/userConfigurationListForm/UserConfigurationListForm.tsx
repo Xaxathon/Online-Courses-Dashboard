@@ -3,27 +3,27 @@ import { useCallback, useState, useEffect, useRef } from "react";
 import { ReactComponent as Spinner } from "@assets/icons/spinner.svg";
 
 import classNames from "classnames";
-import UserSettingForm from "../userSettingForm/UserSettingForm";
+import UserConfigurationForm from "../userConfigurationForm/UserConfigurationForm";
 import Skeleton from "../skeleton/Skeleton";
 
 import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
-import { useFetchUsersQuery } from "../../api/authApi";
+import { RootState } from "@/store/store";
+import { useFetchUsersQuery } from "@/api/authApi";
 
-import { InternalUser, UserRole } from "../../shared/interfaces/user";
+import { InternalUser, UserRole } from "@/shared/interfaces/user";
 
 const DEFAULT_LIMIT = 10;
 const MIN_USERS_TO_SHOW_MESSAGE = 10;
 
-interface UsersSettingListFormProps {
+interface UserConfigurationListFormProps {
 	shouldRefetch: boolean;
 	onRefetchComplete: () => void;
 }
 
-const UsersSettingListForm = ({
+const UserConfigurationListForm = ({
 	shouldRefetch,
 	onRefetchComplete,
-}: UsersSettingListFormProps) => {
+}: UserConfigurationListFormProps) => {
 	const [page, setPage] = useState(1);
 	const [allUsers, setAllUsers] = useState<InternalUser[]>([]);
 	const [initialLoadComplete, setInitialLoadComplete] = useState(false);
@@ -173,7 +173,7 @@ const UsersSettingListForm = ({
 				</div>
 			)}
 			{filteredUsers.map((user, index) => (
-				<UserSettingForm
+				<UserConfigurationForm
 					key={user.id}
 					user={user}
 					ref={index === allUsers.length - 1 ? lastUserElementRef : null}
@@ -195,4 +195,4 @@ const UsersSettingListForm = ({
 	);
 };
 
-export default UsersSettingListForm;
+export default UserConfigurationListForm;
