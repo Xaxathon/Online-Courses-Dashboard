@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import { Calendar as LibCalendar, CalendarProps } from "react-calendar";
@@ -14,11 +14,11 @@ interface CustomCalendarProps {
 	meetings: Meeting[];
 }
 
-const MeetingCalendar: React.FC<CustomCalendarProps> = ({
+const MeetingCalendar = ({
 	onDateChange,
 	onMonthChange,
 	meetings,
-}) => {
+}: CustomCalendarProps) => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const [date, setDate] = useState<Date>(() => {
@@ -35,10 +35,9 @@ const MeetingCalendar: React.FC<CustomCalendarProps> = ({
 		if (dateParam) {
 			setDate(dayjs(dateParam).startOf("day").toDate());
 		} else {
-			// Если дата не указана в URL, используем текущую дату
 			const currentDate = dayjs().startOf("day").toDate();
 			setDate(currentDate);
-			// Обновляем URL с текущей датой
+
 			navigate(
 				`/main/meetings?date=${dayjs(currentDate).format("YYYY-MM-DD")}`,
 				{ replace: true }
@@ -46,67 +45,64 @@ const MeetingCalendar: React.FC<CustomCalendarProps> = ({
 		}
 	}, [location.search]);
 
-	const handleDateChange: CalendarProps["onChange"] = useCallback(
-		(value: any) => {
-			if (value instanceof Date) {
-				const newDate = dayjs(value).startOf("day").toDate();
-				setDate(newDate);
-				onDateChange(newDate);
-				navigate(`/main/meetings?date=${dayjs(newDate).format("YYYY-MM-DD")}`);
-			}
-		},
-		[onDateChange, navigate]
-	);
+	const handleDateChange: CalendarProps["onChange"] = (value: any) => {
+		if (value instanceof Date) {
+			const newDate = dayjs(value).startOf("day").toDate();
+			setDate(newDate);
+			onDateChange(newDate);
+			navigate(`/main/meetings?date=${dayjs(newDate).format("YYYY-MM-DD")}`);
+		}
+	};
 
 	const handleActiveStartDateChange: CalendarProps["onActiveStartDateChange"] =
-		useCallback(
-			({ activeStartDate }: { activeStartDate: Date | null }) => {
-				if (activeStartDate) {
-					onMonthChange(activeStartDate);
-				}
-			},
-			[onMonthChange]
-		);
-
-	const tileContent = useCallback(
-		({ date: tileDate, view }: { date: Date; view: string }) => {
-			if (view === "month" && Array.isArray(meetings)) {
-				const dayMeetings = meetings.filter((meeting) =>
-					dayjs(meeting.event_date).isSame(dayjs(tileDate), "day")
-				);
-				return (
-					<div>
-						{dayMeetings.map((meeting) => (
-							<Event key={meeting.id}>
-								{meeting.theme && meeting.theme.length > 7
-									? `${meeting.theme.slice(0, 6)}...`
-									: meeting.theme}{" "}
-							</Event>
-						))}
-					</div>
-				);
+		({ activeStartDate }: { activeStartDate: Date | null }) => {
+			if (activeStartDate) {
+				onMonthChange(activeStartDate);
 			}
-			return null;
-		},
-		[meetings]
-	);
+		};
 
-	const tileClassName = useCallback(
-		({ date: tileDate, view }: { date: Date; view: string }) => {
-			if (view === "month") {
-				return dayjs(tileDate).isSame(date, "day") ? "selected-date" : "";
-			}
-			return "";
-		},
-		[date]
-	);
+	const tileContent = ({
+		date: tileDate,
+		view,
+	}: {
+		date: Date;
+		view: string;
+	}) => {
+		if (view === "month" && Array.isArray(meetings)) {
+			const dayMeetings = meetings.filter((meeting) =>
+				dayjs(meeting.event_date).isSame(dayjs(tileDate), "day")
+			);
+			return (
+				<div>
+					{dayMeetings.map((meeting) => (
+						<Event key={meeting.id}>
+							{meeting.theme && meeting.theme.length > 7
+								? `${meeting.theme.slice(0, 6)}...`
+								: meeting.theme}{" "}
+						</Event>
+					))}
+				</div>
+			);
+		}
+		return null;
+	};
 
-	const renderMonthLabel = useCallback(
-		(locale: string | undefined, date: Date) => {
-			return dayjs(date).format("MMMM");
-		},
-		[]
-	);
+	const tileClassName = ({
+		date: tileDate,
+		view,
+	}: {
+		date: Date;
+		view: string;
+	}) => {
+		if (view === "month") {
+			return dayjs(tileDate).isSame(date, "day") ? "selected-date" : "";
+		}
+		return "";
+	};
+
+	const renderMonthLabel = (locale: string | undefined, date: Date) => {
+		return dayjs(date).format("MMMM");
+	};
 
 	return (
 		<CalendarContainer>
@@ -128,8 +124,6 @@ const MeetingCalendar: React.FC<CustomCalendarProps> = ({
 };
 
 export default MeetingCalendar;
-
-// Styled components
 
 const CalendarContainer = styled.div`
 	max-width: 100%;

@@ -50,7 +50,7 @@ export const authApi = createApi({
 			}),
 		}),
 
-		fetchUser: builder.query<UserResponse, void>({
+		fetchPersonalUser: builder.query<UserResponse, void>({
 			query: () => ({
 				url: "/api/me",
 				method: "GET",
@@ -109,7 +109,7 @@ export const {
 	useLogoutMutation,
 	useForgotPasswordMutation,
 	useResetPasswordMutation,
-	useLazyFetchUserQuery,
+	useLazyFetchPersonalUserQuery,
 	useFetchUserByIdQuery,
 	useUpdateUserMutation,
 	useCreateUserMutation,

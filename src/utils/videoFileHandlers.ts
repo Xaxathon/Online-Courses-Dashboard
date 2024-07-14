@@ -1,6 +1,6 @@
 import { ChangeEvent, DragEvent, Dispatch, SetStateAction } from "react";
 
-const allowedFileTypes = [
+export const allowedFileTypes = [
 	"video/mp4",
 	"video/x-msvideo",
 	"video/quicktime",

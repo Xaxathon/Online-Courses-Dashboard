@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { ReactComponent as Search } from "@assets/icons/search.svg";
 import { ReactComponent as Spinner } from "@assets/icons/spinner.svg";
@@ -14,12 +14,7 @@ import { useFetchUsersQuery, useCreateUserMutation } from "@/api/authApi";
 
 import { InternalUser, ExternalUser, UserRole } from "@/shared/interfaces/user";
 
-interface ExternalUserAddModalProps {
-	onClose: () => void;
-	onUserSelect: (user: InternalUser | ExternalUser) => void;
-	selectedMembers?: { id: number; full_name: string; email: string }[];
-}
-
+// Добавил данный интерфейс для того, чтобы получить список пользователей
 interface ApiResponse {
 	data: {
 		data: (InternalUser | ExternalUser)[];
@@ -31,6 +26,10 @@ interface ApiResponse {
 	};
 }
 
+interface ExternalUserAddModalProps {
+	onClose: () => void;
+	onUserSelect: (user: InternalUser | ExternalUser) => void;
+}
 const UserSchema = Yup.object().shape({
 	full_name: Yup.string()
 		.required("Обязательное поле")
@@ -40,25 +39,20 @@ const UserSchema = Yup.object().shape({
 });
 
 const DEFAULT_LIMIT = 15;
-const MIN_USERS_TO_SHOW_MESSAGE = 2;
-const SEARCH_DELAY = 300;
+const SEARCH_DELAY = 500;
 
-const ExternalUserAddModal: React.FC<ExternalUserAddModalProps> = ({
+const ExternalUserAddModal = ({
 	onClose,
 	onUserSelect,
-	selectedMembers = [],
-}) => {
+}: ExternalUserAddModalProps) => {
 	const [page, setPage] = useState(1);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [searchInput, setSearchInput] = useState("");
 	const [allUsers, setAllUsers] = useState<(InternalUser | ExternalUser)[]>([]);
-	const [isSearchMode, setIsSearchMode] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<
 		InternalUser | ExternalUser | null
 	>(null);
 	const [isCreating, setIsCreating] = useState(false);
-	const [serverError, setServerError] = useState<string | null>(null);
-	const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
 	const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -79,47 +73,33 @@ const ExternalUserAddModal: React.FC<ExternalUserAddModalProps> = ({
 		refetch: () => void;
 	};
 
-	const [createUser] = useCreateUserMutation();
+	const [createUser, { isError: isCreateError }] = useCreateUserMutation();
 
 	const observer = useRef<IntersectionObserver | null>(null);
 
-	const lastUserElementRef = useCallback(
-		(node: HTMLElement | null) => {
-			if (isFetching) return;
-			if (observer.current) observer.current.disconnect();
+	const lastUserElementRef = (node: HTMLElement | null) => {
+		if (isFetching) return;
+		if (observer.current) observer.current.disconnect();
 
-			observer.current = new IntersectionObserver((entries) => {
-				if (
-					entries[0].isIntersecting &&
-					!isFetching &&
-					!searchTerm &&
-					data?.data.data.length === DEFAULT_LIMIT
-				) {
-					setPage((prevPage) => prevPage + 1);
-				}
-			});
+		observer.current = new IntersectionObserver((entries) => {
+			if (
+				entries[0].isIntersecting &&
+				!isFetching &&
+				!searchTerm &&
+				data?.data.data.length === DEFAULT_LIMIT
+			) {
+				setPage((prevPage) => prevPage + 1);
+			}
+		});
 
-			if (node) observer.current.observe(node);
-		},
-		[isFetching, data, searchTerm]
-	);
-
-	useEffect(() => {
-		if (searchTerm) {
-			setIsSearchMode(true);
-			setPage(1);
-		} else {
-			setIsSearchMode(false);
-			setPage(1);
-			refetch();
-		}
-	}, [searchTerm, refetch]);
+		if (node) observer.current.observe(node);
+	};
 
 	useEffect(() => {
 		if (data?.data.data) {
 			setAllUsers((prevUsers) => {
 				const newUsers = data.data.data;
-				if (isSearchMode || page === 1) {
+				if (page === 1) {
 					return newUsers;
 				} else {
 					const uniqueNewUsers = newUsers.filter(
@@ -130,13 +110,7 @@ const ExternalUserAddModal: React.FC<ExternalUserAddModalProps> = ({
 				}
 			});
 		}
-	}, [data, page, isSearchMode]);
-
-	useEffect(() => {
-		if (!isLoading && !isFetching) {
-			setInitialLoadComplete(true);
-		}
-	}, [isLoading, isFetching]);
+	}, [data, page]);
 
 	useEffect(() => {
 		if (searchTimeoutRef.current) {
@@ -166,7 +140,6 @@ const ExternalUserAddModal: React.FC<ExternalUserAddModalProps> = ({
 			setErrors: (errors: any) => void;
 		}
 	) => {
-		setServerError(null);
 		try {
 			const createdUser: any = await createUser(values).unwrap();
 			setSelectedUser(createdUser);
@@ -178,8 +151,6 @@ const ExternalUserAddModal: React.FC<ExternalUserAddModalProps> = ({
 			setSubmitting(false);
 			if (error.data && error.data.errors) {
 				setErrors(error.data.errors);
-			} else {
-				setServerError("Не удалось создать пользователя. Попробуйте еще раз.");
 			}
 		}
 	};
@@ -194,17 +165,7 @@ const ExternalUserAddModal: React.FC<ExternalUserAddModalProps> = ({
 
 	const toggleCreating = () => {
 		setIsCreating(!isCreating);
-		if (isCreating) {
-			setServerError(null);
-		}
 	};
-
-	const showNoMoreUsersMessage =
-		!isFetching &&
-		initialLoadComplete &&
-		allUsers.length >= MIN_USERS_TO_SHOW_MESSAGE &&
-		!isSearchMode &&
-		(data?.data.data.length ?? 0) < DEFAULT_LIMIT;
 
 	return (
 		<Modal onClose={onClose}>
@@ -212,7 +173,7 @@ const ExternalUserAddModal: React.FC<ExternalUserAddModalProps> = ({
 				<div className="flex items-center justify-center mt-2 mb-5 gap-2">
 					<div className="flex justify-center items-center bg-gray-100 rounded-lg px-3 py-1 w-full">
 						<input
-							className="bg-transparent p-2 w-full focus:outline-none"
+							className="bg-transparent p-2 w-full font-normal focus:outline-none"
 							type="text"
 							placeholder="Поиск пользователей"
 							value={searchInput}
@@ -239,8 +200,14 @@ const ExternalUserAddModal: React.FC<ExternalUserAddModalProps> = ({
 				{!isCreating && (
 					<div className="font-normal text-sm">
 						<ul className="flex flex-col gap-2 h-[20rem] overflow-y-auto">
-							{isLoading && <div>Загрузка...</div>}
-							{isError && <div>Ошибка загрузки данных</div>}
+							{isLoading && (
+								<Spinner className="block w-8 h-8 animate-spin mx-auto" />
+							)}
+							{isError && (
+								<span className="block mx-auto text-crimsonRed">
+									Ошибка загрузки данных
+								</span>
+							)}
 							{allUsers.map((user, index) => (
 								<li
 									key={user.id}
@@ -252,15 +219,12 @@ const ExternalUserAddModal: React.FC<ExternalUserAddModalProps> = ({
 									}`}
 									onClick={() => handleUserClick(user)}
 								>
-									<span className="font-bold flex-grow">{user.full_name}</span>
-									<span className="flex-grow">{user.email}</span>
+									<span className="font-bold flex-grow text-start">
+										{user.full_name}
+									</span>
+									<span className="flex-grow text-end">{user.email}</span>
 								</li>
 							))}
-							{showNoMoreUsersMessage && (
-								<div className="text-center mt-4 text-mainPurple">
-									Больше нет пользователей для загрузки
-								</div>
-							)}
 							{allUsers.length === 0 && !isLoading && !isFetching && (
 								<div className="text-center mt-4">
 									<p>Пользователи не найдены</p>
@@ -309,10 +273,10 @@ const ExternalUserAddModal: React.FC<ExternalUserAddModalProps> = ({
 									/>
 								</div>
 
-								{serverError && (
-									<div className="flex text-crimsonRed text-base">
-										{serverError}
-									</div>
+								{isCreateError && (
+									<span className="text-start text-crimsonRed text-base">
+										Не удалось создать пользователя. Попробуйте еще раз.
+									</span>
 								)}
 								<div className="flex gap-4 mb-20">
 									<button

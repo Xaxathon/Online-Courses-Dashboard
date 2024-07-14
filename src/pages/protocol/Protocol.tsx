@@ -15,12 +15,20 @@ import * as Yup from "yup";
 import ReactPlayer from "react-player";
 
 import {
+	handleGeneratePDF,
+	handleGenerateDOCX,
+} from "@/utils/documentGenerators";
+
+import {
 	useGetProtocolQuery,
 	useUpdateProtocolMutation,
 	useDeleteProtocolMutation,
+	useGeneratePDFMutation,
+	useGenerateDOCXMutation,
 } from "@/api/protocolsApi";
 
 import { ExternalUser, InternalUser } from "@/shared/interfaces/user";
+import ProtocolTextModal from "@/components/protocolTextModal/ProtocolTextModal";
 
 const Protocol = () => {
 	const { id } = useParams<{ id: string }>();
@@ -37,13 +45,19 @@ const Protocol = () => {
 	const [updateProtocol] = useUpdateProtocolMutation();
 	const [deleteProtocol] = useDeleteProtocolMutation();
 
+	const [generatePDF] = useGeneratePDFMutation();
+	const [generateDOCX] = useGenerateDOCXMutation();
+
 	const [isModalOpenUser, setIsModalOpenUser] = useState<boolean>(false);
 	const [isModalOpenTask, setIsModalOpenTask] = useState<boolean>(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+	const [isModalOpenText, setIsModalOpenText] = useState<boolean>(false);
+
 	const [isSelectingFor, setIsSelectingFor] = useState<
 		"secretary" | "supervisor" | null
 	>(null);
-	const [isExecuting, setIsExecuting] = useState<boolean>(false);
+	const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+
 	const [initialValues, setInitialValues] = useState({
 		theme: "",
 		agenda: "",
@@ -51,11 +65,10 @@ const Protocol = () => {
 		secretaryName: "",
 		director_id: 0,
 		directorName: "",
-		execute: false,
+		status: "process",
 	});
 
 	const navigate = useNavigate();
-
 	useEffect(() => {
 		if (protocol) {
 			setInitialValues({
@@ -65,17 +78,11 @@ const Protocol = () => {
 				secretaryName: protocol.data.secretary.full_name,
 				director_id: protocol.data.director.id,
 				directorName: protocol.data.director.full_name,
-				execute: protocol.data.execute,
+				status: protocol.data.status,
 			});
 			setShouldFetchProtocol(false);
 		}
 	}, [protocol]);
-
-	useEffect(() => {
-		if (error) {
-			console.error("Failed to fetch protocol:", error);
-		}
-	}, [error]);
 
 	const formik = useFormik({
 		initialValues: initialValues,
@@ -93,7 +100,6 @@ const Protocol = () => {
 						agenda: values.agenda,
 						secretary_id: values.secretary_id,
 						director_id: values.director_id,
-						execute: values.execute,
 					},
 				}).unwrap();
 				console.log("Success:", response);
@@ -113,6 +119,11 @@ const Protocol = () => {
 	const handleCloseModalUser = () => {
 		setIsModalOpenUser(false);
 		setIsSelectingFor(null);
+	};
+
+	const handleCloseTextModal = () => {
+		setIsModalOpenText(false);
+		setShouldFetchProtocol(true);
 	};
 
 	const handleUserSelect = (user: InternalUser | ExternalUser) => {
@@ -138,31 +149,23 @@ const Protocol = () => {
 		}
 	};
 
-	const handleExecute = async () => {
+	const handleStatusToggle = async () => {
 		if (!protocol) return;
-		setIsExecuting(true);
+		setIsUpdatingStatus(true);
 		try {
-			const newExecuteValue = !protocol.data.execute;
-			const response = await updateProtocol({
+			const newStatus =
+				initialValues.status === "success" ? "process" : "success";
+			await updateProtocol({
 				id: Number(id),
-				data: { execute: newExecuteValue },
+				data: { status: newStatus },
 			}).unwrap();
-			console.log("Execute Success:", response);
-			setInitialValues((prev) => ({ ...prev, execute: newExecuteValue }));
+
+			setInitialValues((prev) => ({ ...prev, status: newStatus }));
 			setShouldFetchProtocol(true);
-			refetch();
 		} catch (error) {
-			console.error("Execute Error:", error);
+			console.error("Status Update Error:", error);
 		}
-		setIsExecuting(false);
-	};
-
-	const handleDeleteOpenModal = () => {
-		setIsDeleteModalOpen(true);
-	};
-
-	const handleDeleteCloseModal = () => {
-		setIsDeleteModalOpen(false);
+		setIsUpdatingStatus(false);
 	};
 
 	const handleDelete = async () => {
@@ -205,38 +208,54 @@ const Protocol = () => {
 					className="w-9 h-9 cursor-pointer fill-current text-mainPurple hover:text-mainPurpleHover active:text-mainPurpleActive"
 					onClick={() => navigate(-1)}
 				/>
-				<h1 className="lg:text-2xl text-xl">Протокол {protocol.data.id}</h1>
+				<h1 className="lg:text-2xl text-xl">
+					Протокол {protocol.data.protocol_number}
+				</h1>
 				<div className="flex gap-8 justify-center items-center">
 					<div className="flex gap-4">
-						<button className="text-base bg-mainPurple text-white px-4 py-1 rounded-lg hover:bg-mainPurpleHover active:bg-mainPurpleActive">
-							PDF
-						</button>
-						<button className="text-base bg-mainPurple text-white px-4 py-2 rounded-lg hover:bg-mainPurpleHover active:bg-mainPurpleActive">
-							DOCX
-						</button>
+						{protocol?.data.stage === "final" && (
+							<div className="flex gap-4">
+								<button
+									className="text-base bg-mainPurple text-white px-4 py-1 rounded-lg hover:bg-mainPurpleHover active:bg-mainPurpleActive"
+									onClick={() => handleGeneratePDF(generatePDF, Number(id))}
+								>
+									PDF
+								</button>
+								<button
+									className="text-base bg-mainPurple text-white px-4 py-2 rounded-lg hover:bg-mainPurpleHover active:bg-mainPurpleActive"
+									onClick={() => handleGenerateDOCX(generateDOCX, Number(id))}
+								>
+									DOCX
+								</button>
+							</div>
+						)}
 					</div>
 
 					<Delete
 						className="w-7 h-7 fill-current text-crimsonRed hover:text-crimsonRed cursor-pointer"
-						onClick={handleDeleteOpenModal}
+						onClick={() => setIsDeleteModalOpen(true)}
 					/>
 				</div>
 			</div>
-			<div className="grid grid-cols-2 grid-rows-1 mt-6 gap-4">
+			<div className="grid grid-cols-2 grid-rows-1 mt-6 gap-4 w-full">
 				<div className="bg-gray-100 py-5 px-3 rounded-xl">
 					<ProtocolParticipantList />
 					<h2 className="font-bold text-xl text-mainPurple text-center mt-8">
 						Видеозапись
 					</h2>
-					<div className="bg-gray-300 w-full mt-5">
-						<ReactPlayer
-							url={protocol.data.video_path}
-							playing={false}
-							loop={true}
-							controls
-							width="100%"
-							height="100%"
-						/>
+					<div className="bg-black w-full mt-5">
+						<div className="relative pt-[56.25%]">
+							{" "}
+							<ReactPlayer
+								url={protocol.data.video_path}
+								playing={false}
+								loop={true}
+								controls
+								width="100%"
+								height="100%"
+								className="absolute top-0 left-0"
+							/>
+						</div>
 					</div>
 				</div>
 				<div className="flex justify-center w-full bg-gray-100 py-5 xl:px-10 px-5 lg:px-7 rounded-xl">
@@ -329,18 +348,23 @@ const Protocol = () => {
 			<div className="flex gap-4">
 				<button
 					className={`my-6 text-white font-bold text-xl px-3 py-2 rounded-lg ${
-						isExecuting
-							? "bg-mainPurpleHover cursor-not-allowed"
-							: initialValues.execute
+						isUpdatingStatus
 							? "bg-gray-500 cursor-not-allowed"
+							: initialValues.status === "success"
+							? "bg-gardenGreen hover:bg-gardenGreenHover"
 							: "bg-mainPurple hover:bg-mainPurpleHover active:bg-mainPurpleActive"
 					}`}
-					onClick={handleExecute}
-					disabled={isExecuting || initialValues.execute}
+					onClick={handleStatusToggle}
+					disabled={isUpdatingStatus}
 				>
-					{initialValues.execute ? "Исполнено" : "Исполнить протокол"}
+					{initialValues.status === "success"
+						? "Исполнено"
+						: "Исполнить протокол"}
 				</button>
-				<button className="my-6 text-white font-bold text-xl bg-mainPurple py-3 px-2 rounded-lg hover:bg-mainPurpleHover active:bg-mainPurpleActive">
+				<button
+					className="my-6 text-white font-bold text-xl bg-mainPurple py-3 px-2 rounded-lg hover:bg-mainPurpleHover active:bg-mainPurpleActive"
+					onClick={() => setIsModalOpenText(true)}
+				>
 					Текст протокола
 				</button>
 			</div>
@@ -359,11 +383,22 @@ const Protocol = () => {
 				/>
 			)}
 
+			{isModalOpenText && (
+				<ProtocolTextModal
+					protocolId={protocol.data.id}
+					location={protocol.data.location}
+					city={protocol.data.city}
+					event_start_time={protocol.data.event_start_time}
+					final_transcript={protocol.data.final_transcript}
+					onClose={() => setIsModalOpenText(false)}
+				/>
+			)}
+
 			{isDeleteModalOpen && (
 				<DeleteElementModal
 					title="Удаление протокола"
-					description={`Протокол ID: ${id}`}
-					onClose={handleDeleteCloseModal}
+					description={`Протокол №${protocol.data.protocol_number}`}
+					onClose={handleCloseTextModal}
 					onDelete={handleDelete}
 				/>
 			)}

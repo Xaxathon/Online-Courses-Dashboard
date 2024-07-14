@@ -1,11 +1,10 @@
 import { useState, useEffect, ChangeEvent } from "react";
 
-import dayjs from "dayjs";
-import classNames from "classnames";
-
 import { ReactComponent as Delete } from "@assets/icons/delete.svg";
 import { ReactComponent as Mp4Icon } from "@assets/icons/mp4-icon.svg";
 
+import dayjs from "dayjs";
+import classNames from "classnames";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
 
@@ -19,8 +18,14 @@ import {
 	Meeting,
 	UpdateMeetingMember,
 } from "@/shared/interfaces/meeting";
+import { FormValues } from "@/shared/interfaces/user";
 
-interface AppointmentFormProps {
+interface ExtendedUpdateMeetingMember extends UpdateMeetingMember {
+	full_name: string;
+	email: string;
+	email_sent: boolean;
+}
+interface MeetingFormProps {
 	meeting: Meeting | null;
 	selectedDate: Date | null;
 	startTime: string | null;
@@ -29,52 +34,48 @@ interface AppointmentFormProps {
 	onOpenUserModal: () => void;
 }
 
-interface ExtendedUpdateMeetingMember extends UpdateMeetingMember {
-	full_name: string;
-	email: string;
-	email_sent: boolean;
-}
+const validationSchema = Yup.object({
+	theme: Yup.string().required("Тема обязательна для заполнения"),
+	link: Yup.string()
+		.url("Некорректная ссылка")
+		.required("Ссылка обязательна для заполнения"),
+});
 
-const AppointmentForm: React.FC<AppointmentFormProps> = ({
+const MeetingForm = ({
 	meeting,
 	selectedDate,
 	startTime,
 	endTime,
 	onSave,
 	onOpenUserModal,
-}) => {
+}: MeetingFormProps) => {
 	const [members, setMembers] = useState<ExtendedUpdateMeetingMember[]>([]);
-
-	const [createMeeting] = useCreateMeetingMutation();
-	const [updateMeeting] = useUpdateMeetingMutation();
-
-	const [isSaving, setIsSaving] = useState<boolean>(false);
-	const [saveStatus, setSaveStatus] = useState<string>("");
 	const [fileName, setFileName] = useState<string | null>(null);
 	const [fileURL, setFileURL] = useState<string | null>(null);
-	const [error, setError] = useState<string | null>(null);
 
-	const [initialValues, setInitialValues] = useState({
-		theme: "",
-		link: "",
-	});
+	const [createMeeting, { isLoading: isCreating, error: createError }] =
+		useCreateMeetingMutation();
+	const [updateMeeting, { isLoading: isUpdating, error: updateError }] =
+		useUpdateMeetingMutation();
+
+	const isSubmitting = isCreating || isUpdating;
+	const error = createError || updateError;
+
+	const initialValues: Pick<FormValues, "theme" | "link"> = {
+		theme: meeting?.theme || "",
+		link: meeting?.link || "",
+	};
 
 	useEffect(() => {
 		if (meeting) {
 			setMembers(
-				meeting.members?.map((m) => {
-					const memberId = m.member.id;
-					if (memberId === undefined) {
-						throw new Error("Member ID is undefined");
-					}
-					return {
-						member_id: memberId,
-						should_notify: m.email_sent || m.should_notify,
-						full_name: m.member.full_name,
-						email: m.member.email,
-						email_sent: m.email_sent ?? false,
-					};
-				}) || []
+				meeting.members?.map((m) => ({
+					member_id: m.member.id!,
+					should_notify: m.email_sent || m.should_notify,
+					full_name: m.member.full_name,
+					email: m.member.email,
+					email_sent: m.email_sent ?? false,
+				})) || []
 			);
 			if (meeting.document_url) {
 				setFileURL(meeting.document_url);
@@ -84,54 +85,21 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
 				setFileURL(null);
 				setFileName(null);
 			}
-			setInitialValues({
-				theme: meeting.theme || "",
-				link: meeting.link || "",
-			});
 		} else {
 			setMembers([]);
 			setFileURL(null);
 			setFileName(null);
-			setInitialValues({
-				theme: "",
-				link: "",
-			});
 		}
 	}, [meeting]);
 
-	const validationSchema = Yup.object({
-		theme: Yup.string().required("Тема обязательна для заполнения"),
-		link: Yup.string()
-			.url("Некорректная ссылка")
-			.required("Ссылка обязательна для заполнения"),
-	});
-
-	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-		if (event.target.files && event.target.files.length > 0) {
-			const file = event.target.files[0];
-			setFileName(file.name);
-			const fileReader = new FileReader();
-			fileReader.onload = () => {
-				setFileURL(fileReader.result as string);
-			};
-			fileReader.readAsDataURL(file);
-		}
-	};
-
 	const handleSubmit = async (
-		values: any,
-		{ setSubmitting }: FormikHelpers<any>
+		values: Pick<FormValues, "theme" | "link">,
+		{ setSubmitting }: FormikHelpers<Pick<FormValues, "theme" | "link">>
 	) => {
-		setIsSaving(true);
-		setSaveStatus("");
-		setError(null);
-
 		const data = new FormData();
-		for (const key in values) {
-			if (values[key as keyof typeof values]) {
-				data.append(key, values[key as keyof typeof values] as Blob | string);
-			}
-		}
+		Object.entries(values).forEach(([key, value]) => {
+			if (value) data.append(key, value as string);
+		});
 
 		data.append("event_date", dayjs(selectedDate).format("YYYY-MM-DD"));
 		data.append("event_start_time", startTime || "");
@@ -152,23 +120,22 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
 		}
 
 		const newMeeting: CreateMeeting = {
-			theme: values.theme,
-			link: values.link,
+			theme: values.theme || "",
+			link: values.link || "",
 			event_date: dayjs(selectedDate).format("YYYY-MM-DD"),
 			event_start_time: startTime || "",
 			event_end_time: endTime || "",
-			members: members.map(
-				({ member_id, should_notify, full_name, email, email_sent }) => ({
-					id: member_id,
-					member: {
-						id: member_id,
-						full_name,
-						email,
-					},
-					email_sent,
-					should_notify: should_notify ?? false,
-				})
-			),
+			members:
+				members.length > 0
+					? members.map(
+							({ member_id, should_notify, full_name, email, email_sent }) => ({
+								id: member_id,
+								member: { id: member_id, full_name, email },
+								email_sent,
+								should_notify: should_notify ?? false,
+							})
+					  )
+					: [],
 			document: fileURL || undefined,
 		};
 
@@ -180,15 +147,20 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
 				await createMeeting({ data }).unwrap();
 			}
 			onSave(newMeeting);
-			setSaveStatus("Данные успешно сохранены");
-			setTimeout(() => setSaveStatus(""), 5000);
-		} catch (error: any) {
+		} catch (error: unknown) {
 			console.error("Failed to save meeting: ", error);
-			setError(error.data?.message || "Ошибка при сохранении данных");
-			setTimeout(() => setError(""), 5000);
 		} finally {
-			setIsSaving(false);
 			setSubmitting(false);
+		}
+	};
+
+	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0];
+		if (file) {
+			setFileName(file.name);
+			const fileReader = new FileReader();
+			fileReader.onload = (e) => setFileURL(e.target?.result as string);
+			fileReader.readAsDataURL(file);
 		}
 	};
 
@@ -203,7 +175,9 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
 	};
 
 	const handleDeleteMember = (id: number) => {
-		setMembers(members.filter((member) => member.member_id !== id));
+		setMembers((prevMembers) =>
+			prevMembers.filter((member) => member.member_id !== id)
+		);
 	};
 
 	return (
@@ -213,7 +187,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
 			onSubmit={handleSubmit}
 			enableReinitialize
 		>
-			{({ isSubmitting, setFieldValue }) => (
+			{({ setFieldValue }) => (
 				<Form>
 					<div className="flex flex-col gap-3 mt-5">
 						<div className="flex flex-col gap-2">
@@ -292,11 +266,8 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
 												className="w-7 h-7 border-2 cursor-pointer"
 												checked={!!member.should_notify}
 												onChange={() => handleCheckboxChange(member.member_id)}
-												disabled={isSubmitting || member.email_sent}
+												disabled={member.email_sent}
 											/>
-										)}
-										{member.email_sent && (
-											<span className="text-[10px] text-green-500"></span>
 										)}
 									</div>
 								</li>
@@ -307,7 +278,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
 						<div className="flex flex-col items-start">
 							<label
 								htmlFor="document"
-								className="bg-mainPurple text-white font-bold text-xs rounded-md px-5 py-2 cursor-pointer hover:bg-mainPurpleHover active:bg-mainPurpleActive"
+								className="bg-gardenGreen text-white font-bold text-xs rounded-md px-5 py-2 cursor-pointer hover:bg-gardenGreenHover"
 							>
 								Загрузить документ
 								<input
@@ -346,12 +317,11 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
 							/>
 						</div>
 					</div>
-
 					<div className="flex justify-center mt-3">
 						<button
 							type="submit"
 							className={classNames(
-								" rounded-xl px-14 py-2 bg-mainPurple text-white text-lg font-bold hover:bg-mainPurpleHover active:bg-mainPurpleActive",
+								"rounded-xl px-14 py-2 bg-mainPurple text-white text-lg font-bold hover:bg-mainPurpleHover active:bg-mainPurpleActive",
 								{ "bg-gray-200 opacity-50 cursor-not-allowed": isSubmitting }
 							)}
 							disabled={isSubmitting}
@@ -359,14 +329,9 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
 							Сохранить
 						</button>
 					</div>
-					{saveStatus && (
-						<div className="mt-4 text-green-500 text-xs text-end font-bold">
-							{saveStatus}
-						</div>
-					)}
 					{error && (
-						<div className="mt-4 text-red-500 text-xs text-end font-bold">
-							{error}
+						<div className="mt-4 text-crimsonRed text-xs text-end font-bold">
+							Произошла ошибка при сохранении данных
 						</div>
 					)}
 				</Form>
@@ -375,4 +340,4 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
 	);
 };
 
-export default AppointmentForm;
+export default MeetingForm;

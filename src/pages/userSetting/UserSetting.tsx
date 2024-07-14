@@ -12,17 +12,16 @@ import Skeleton from "@components/skeleton/Skeleton";
 
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { useLazyFetchUserQuery } from "@/api/authApi";
+import { useLazyFetchPersonalUserQuery } from "@/api/authApi";
 
 import { UserRole } from "@/shared/interfaces/user";
 
-const UserSettings = () => {
+const UserSetting = () => {
 	const navigate = useNavigate();
 
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 	const [fetchUser, { data: userData, isLoading, isError }] =
-		useLazyFetchUserQuery();
-	const [shouldRefetchUsers, setShouldRefetchUsers] = useState(false);
+		useLazyFetchPersonalUserQuery();
 
 	const role = useSelector((state: RootState) => state.auth.role);
 
@@ -43,7 +42,6 @@ const UserSettings = () => {
 	};
 
 	const handleUserAdded = () => {
-		setShouldRefetchUsers(true);
 		handleCloseModal();
 	};
 	return (
@@ -85,12 +83,7 @@ const UserSettings = () => {
 						Секретари
 					</h3>
 				)}
-				{role !== UserRole.Secretary && (
-					<UserConfigurationListForm
-						shouldRefetch={shouldRefetchUsers}
-						onRefetchComplete={() => setShouldRefetchUsers(false)}
-					/>
-				)}
+				{role !== UserRole.Secretary && <UserConfigurationListForm />}
 			</div>
 			{isModalOpen && role && role !== UserRole.Secretary && (
 				<UserAddFormModal
@@ -103,4 +96,4 @@ const UserSettings = () => {
 	);
 };
 
-export default UserSettings;
+export default UserSetting;

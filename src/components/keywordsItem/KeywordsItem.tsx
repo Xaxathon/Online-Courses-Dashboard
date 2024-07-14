@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useCallback, useState } from "react";
 
 import classNames from "classnames";
 
@@ -21,54 +21,33 @@ import { Keyword } from "@/shared/interfaces/keyword";
 
 interface KeywordsItemProps {
 	keyword: Keyword;
+	refetch: () => void;
 }
 
-const KeywordsItem: React.FC<KeywordsItemProps> = ({ keyword }) => {
+const KeywordsItem = memo(({ keyword, refetch }: KeywordsItemProps) => {
 	const [isEditing, setIsEditing] = useState<boolean>(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
-	const [updateKeyword] = useUpdateKeywordMutation();
-	const [deleteKeyword] = useDeleteKeywordMutation();
-
-	const [apiError, setApiError] = useState<string | null>(null);
+	const [updateKeyword, { isLoading: isUpdating, error: updateError }] =
+		useUpdateKeywordMutation();
+	const [deleteKeyword, { error: deleteError }] = useDeleteKeywordMutation();
 
 	const handleSave = async (values: { title: string; phrase: string }) => {
 		try {
 			await updateKeyword({ ...keyword, ...values }).unwrap();
 			setIsEditing(false);
-			setApiError(null);
 		} catch (error) {
-			setApiError(
-				"Ошибка при обновлении ключевого слова. Пожалуйста, попробуйте еще раз."
-			);
+			console.error("Ошибка при обновлении ключевого слова:", error);
 		}
-	};
-
-	const handleCancel = () => {
-		setIsEditing(false);
-		setApiError(null);
-	};
-
-	const handleDeleteOpenModal = () => {
-		setIsDeleteModalOpen(true);
-	};
-
-	const handleDeleteCloseModal = () => {
-		setIsDeleteModalOpen(false);
 	};
 
 	const handleDelete = async () => {
 		if (keyword.id !== undefined) {
 			try {
 				await deleteKeyword({ id: keyword.id }).unwrap();
-				handleDeleteCloseModal();
-				setApiError(null);
+				refetch();
 			} catch (error) {
-				setApiError(
-					"Ошибка при удалении ключевого слова. Пожалуйста, попробуйте еще раз."
-				);
+				console.error("Ошибка при удалении ключевого слова:", error);
 			}
-		} else {
-			console.error("Ошибка: ID ключевого слова не определен");
 		}
 	};
 
@@ -76,16 +55,21 @@ const KeywordsItem: React.FC<KeywordsItemProps> = ({ keyword }) => {
 		title: Yup.string().required("Название обязательно"),
 		phrase: Yup.string().required("Фраза обязательна"),
 	});
-
+	console.log("render keywords item");
 	return (
-		<li className="relative mb-5 mr-5 pr-10 text-gardenGreen text-base font-normal rounded-xl bg-gray-100 py-7 px-8">
+		<li className="relative mb-5 mr-5 pr-10 text-gardenGreen text-base font-normal rounded-xl bg-gray-100 py-7 px-8 hover:bg-gray-200  transition-colors duration-200">
 			<Formik
 				initialValues={{ title: keyword.title, phrase: keyword.phrase }}
 				validationSchema={validationSchema}
 				onSubmit={handleSave}
 			>
 				{({ isSubmitting }) => (
-					<Form className="w-full grid grid-cols-2 gap-3">
+					<Form
+						className={classNames(
+							"w-full grid grid-cols-2 gap-3 bg-transparent border-none transition-all duration-500",
+							{ "opacity-50": isUpdating }
+						)}
+					>
 						<div className="w-full">
 							<Field
 								className={classNames(
@@ -126,9 +110,12 @@ const KeywordsItem: React.FC<KeywordsItemProps> = ({ keyword }) => {
 								className="text-crimsonRed text-sm mt-1"
 							/>
 						</div>
-						{apiError && (
+						{(updateError || deleteError) && (
 							<div className="col-span-2 text-crimsonRed text-sm mt-2">
-								{apiError}
+								{updateError
+									? "Ошибка при обновлении ключевого слова"
+									: "Ошибка при удалении ключевого слова"}
+								. Пожалуйста, попробуйте еще раз.
 							</div>
 						)}
 						<div className="flex flex-col items-start justify-center absolute top-1/2 transform -translate-y-1/2 -right-5 gap-4">
@@ -143,7 +130,7 @@ const KeywordsItem: React.FC<KeywordsItemProps> = ({ keyword }) => {
 									</button>
 									<Close
 										className="cursor-pointer h-8 w-8 stroke-[0.2rem] stroke-crimsonRed hover:stroke-crimsonRedHover active:stroke-crimsonRedActive"
-										onClick={handleCancel}
+										onClick={() => setIsEditing(false)}
 									/>
 								</>
 							) : (
@@ -154,7 +141,7 @@ const KeywordsItem: React.FC<KeywordsItemProps> = ({ keyword }) => {
 									/>
 									<Delete
 										className="cursor-pointer h-8 w-8 fill-current text-gray-600 hover:text-crimsonRedHover"
-										onClick={handleDeleteOpenModal}
+										onClick={() => setIsDeleteModalOpen(true)}
 									/>
 								</>
 							)}
@@ -166,12 +153,12 @@ const KeywordsItem: React.FC<KeywordsItemProps> = ({ keyword }) => {
 				<DeleteElementModal
 					title="Удаление ключевого слова"
 					description={`${keyword.title.slice(0, 10)} (ID: ${keyword.id})`}
-					onClose={handleDeleteCloseModal}
+					onClose={() => setIsDeleteModalOpen(false)}
 					onDelete={handleDelete}
 				/>
 			)}
 		</li>
 	);
-};
+});
 
 export default KeywordsItem;

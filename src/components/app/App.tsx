@@ -19,17 +19,19 @@ import MainPage from "@pages/mainPage/MainPage";
 import Login from "@components/login/Login";
 import ForgotPassword from "@components/forgotPassword/ForgotPassword";
 import NotFoundPage from "@pages/404/NotFoundPage";
+import Notification from "@/components/protocolNotification/Notification";
 
 const Settings = lazy(() => import("@pages/settings/Settings"));
-const UserSettings = lazy(() => import("@pages/userSettings/UserSettings"));
+const UserSetting = lazy(() => import("@/pages/userSetting/UserSetting"));
 const ResetPassword = lazy(
 	() => import("@components/resetPassword/ResetPassword")
 );
-const Keywords = lazy(() => import("@pages/keywords/Keywords"));
+const KeywordSetting = lazy(
+	() => import("@/pages/keywordSetting/KeywordSetting")
+);
 const Secretaries = lazy(() => import("@pages/secretaries/Secretaries"));
 const Protocols = lazy(() => import("@pages/protocols/Protocols"));
 const Protocol = lazy(() => import("@pages/protocol/Protocol"));
-
 const Meetings = lazy(() => import("@pages/meetings/Meetings"));
 const ProtocolAddForm = lazy(
 	() => import("@components/protocolAddForm/protocolAddForm")
@@ -98,6 +100,7 @@ const App: React.FC = () => {
 					/>
 					<Route path="*" element={<NotFoundPage />} />
 				</Routes>
+				<Notification />
 			</Suspense>
 		</Router>
 	);
@@ -141,7 +144,7 @@ const Dashboard: React.FC = () => {
 									UserRole.Secretary,
 								]}
 							>
-								<UserSettings />
+								<UserSetting />
 							</PrivateRoute>
 						}
 					/>
@@ -160,7 +163,7 @@ const Dashboard: React.FC = () => {
 					{role === UserRole.Secretary && (
 						<>
 							<Route path="home" element={<MainPage />} />
-							<Route path="settings/keywords" element={<Keywords />} />
+							<Route path="settings/keywords" element={<KeywordSetting />} />
 							<Route path="protocols" element={<Protocols />} />
 							<Route path="meetings" element={<Meetings />} />
 							<Route path="protocols/add" element={<ProtocolAddForm />} />

@@ -1,5 +1,3 @@
-import React from "react";
-
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
@@ -10,10 +8,10 @@ interface MeetingTimeAddFormModalProps {
 	onTimeSubmit: (start: string, end: string) => void;
 }
 
-const MeetingTimeAddFormModal: React.FC<MeetingTimeAddFormModalProps> = ({
+const MeetingTimeAddFormModal = ({
 	onClose,
 	onTimeSubmit,
-}) => {
+}: MeetingTimeAddFormModalProps) => {
 	const validationSchema = Yup.object({
 		startTime: Yup.string().required("Время начала обязательно для заполнения"),
 		endTime: Yup.string().required(

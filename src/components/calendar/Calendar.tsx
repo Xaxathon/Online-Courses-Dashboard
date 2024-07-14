@@ -4,29 +4,26 @@ import { Calendar as DateCalendar, CalendarProps } from "react-calendar";
 
 import styled from "styled-components";
 import "react-calendar/dist/Calendar.css";
-
 import dayjs from "dayjs";
-
-type Value = Date | null;
 
 interface CustomCalendarProps {
 	onChange: (date: Date) => void;
 	onMonthChange?: (date: Date) => void;
 	onDateClick?: (date: Date) => void;
-	value: Value;
+	value: Date | null;
 	meetingDates?: Date[];
 	showMeetingDots?: boolean;
 }
 
-const Calendar: React.FC<CustomCalendarProps> = ({
+const Calendar = ({
 	onChange,
 	onMonthChange,
 	onDateClick,
 	value,
 	meetingDates = [],
 	showMeetingDots = false,
-}) => {
-	const [date, setDate] = useState<Value>(value);
+}: CustomCalendarProps) => {
+	const [date, setDate] = useState<Date | null>(value);
 
 	const handleDateChange: CalendarProps["onChange"] = (value) => {
 		if (value instanceof Date) {

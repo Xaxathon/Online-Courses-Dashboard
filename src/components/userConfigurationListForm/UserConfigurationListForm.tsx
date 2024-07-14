@@ -2,7 +2,6 @@ import { useCallback, useState, useEffect, useRef } from "react";
 
 import { ReactComponent as Spinner } from "@assets/icons/spinner.svg";
 
-import classNames from "classnames";
 import UserConfigurationForm from "../userConfigurationForm/UserConfigurationForm";
 import Skeleton from "../skeleton/Skeleton";
 
@@ -13,21 +12,10 @@ import { useFetchUsersQuery } from "@/api/authApi";
 import { InternalUser, UserRole } from "@/shared/interfaces/user";
 
 const DEFAULT_LIMIT = 10;
-const MIN_USERS_TO_SHOW_MESSAGE = 10;
 
-interface UserConfigurationListFormProps {
-	shouldRefetch: boolean;
-	onRefetchComplete: () => void;
-}
-
-const UserConfigurationListForm = ({
-	shouldRefetch,
-	onRefetchComplete,
-}: UserConfigurationListFormProps) => {
+const UserConfigurationListForm = () => {
 	const [page, setPage] = useState(1);
 	const [allUsers, setAllUsers] = useState<InternalUser[]>([]);
-	const [initialLoadComplete, setInitialLoadComplete] = useState(false);
-	const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
 
 	const role = useSelector((state: RootState) => state.auth.role);
 
@@ -39,29 +27,19 @@ const UserConfigurationListForm = ({
 
 	const observer = useRef<IntersectionObserver | null>(null);
 
-	useEffect(() => {
-		if (shouldRefetch) {
-			setPage(1);
-			setAllUsers([]);
-			refetch().then(() => {
-				onRefetchComplete();
-			});
-		}
-	}, [shouldRefetch, refetch, onRefetchComplete]);
-
 	const lastUserElementRef = useCallback(
 		(node: HTMLElement | null) => {
 			if (isFetching) return;
+
 			if (observer.current) observer.current.disconnect();
 
 			observer.current = new IntersectionObserver((entries) => {
-				if (
-					entries[0].isIntersecting &&
-					!isFetching &&
+				const hasMoreData =
 					data?.data?.data &&
 					Array.isArray(data.data.data) &&
-					data.data.data.length === DEFAULT_LIMIT
-				) {
+					data.data.data.length === DEFAULT_LIMIT;
+
+				if (entries[0].isIntersecting && !isFetching && hasMoreData) {
 					setPage((prevPage) => prevPage + 1);
 				}
 			});
@@ -88,78 +66,29 @@ const UserConfigurationListForm = ({
 				}
 			});
 		}
-	}, [data, page]);
-
-	useEffect(() => {
-		if (!isLoading && !isFetching) {
-			setInitialLoadComplete(true);
-		}
-	}, [isLoading, isFetching]);
-
-	const handleRefetch = () => {
-		refetch();
-	};
-
-	const handleRoleClick = (role: UserRole) => {
-		setSelectedRole(role === selectedRole ? null : role);
-	};
-
-	const filteredUsers = selectedRole
-		? allUsers.filter((user) => user.role === selectedRole)
-		: allUsers;
+	}, [data]);
 
 	if (isError)
 		return (
-			<div>
-				<p>Ошибка при загрузке данных</p>
+			<div className="flex flex-col justify-center items-center mt-10 gap-4">
+				<p className="text-center text-crimsonRed font-bold">
+					Ошибка при загрузке данных
+				</p>
 				<button
-					onClick={handleRefetch}
-					className="bg-red-500 text-white p-2 rounded-lg"
+					onClick={() => refetch()}
+					className=" bg-crimsonRed text-white px-10 text-base py-2 rounded-lg"
 				>
 					Обновить
 				</button>
 			</div>
 		);
 
-	const showNoMoreUsersMessage =
-		!isFetching &&
-		initialLoadComplete &&
-		filteredUsers.length >= MIN_USERS_TO_SHOW_MESSAGE &&
-		data?.data?.data &&
-		Array.isArray(data.data.data) &&
-		data.data.data.length < DEFAULT_LIMIT;
-
 	return (
 		<div className="max-w-[66rem] mx-auto">
 			{role === UserRole.Admin && (
-				<ul className="flex justify-center items-center gap-3 mt-7">
-					<li
-						className={classNames(
-							"lg:p-3 p-2 w-1/2 rounded-lg font-bold lg:text-xl text-base text-center cursor-pointer",
-							{
-								"bg-mainPurple text-white": selectedRole === UserRole.Manager,
-								"bg-gray-500 text-gray-300  hover:bg-gray-400 hover:text-gray-200 active:bg-gray-300 active:text-white":
-									selectedRole !== UserRole.Manager,
-							}
-						)}
-						onClick={() => handleRoleClick(UserRole.Manager)}
-					>
-						Менеджеры
-					</li>
-					<li
-						className={classNames(
-							"lg:p-3 p-2 w-1/2 rounded-lg font-bold lg:text-xl text-base  text-center cursor-pointer",
-							{
-								"bg-mainPurple text-white": selectedRole === UserRole.Secretary,
-								"bg-gray-500 text-gray-300 hover:bg-gray-400 hover:text-gray-200 active:bg-gray-300 active:text-white":
-									selectedRole !== UserRole.Secretary,
-							}
-						)}
-						onClick={() => handleRoleClick(UserRole.Secretary)}
-					>
-						Секретари
-					</li>
-				</ul>
+				<div className="flex justify-center items-center gap-3 mt-7 text-2xl font-bold text-mainPurple">
+					Пользователи
+				</div>
 			)}
 			{isLoading && allUsers.length === 0 && (
 				<div className="max-w-[66rem] mx-auto mt-6 bg-gray-100 px-6 py-4 rounded-lg">
@@ -172,7 +101,7 @@ const UserConfigurationListForm = ({
 					/>
 				</div>
 			)}
-			{filteredUsers.map((user, index) => (
+			{allUsers.map((user, index) => (
 				<UserConfigurationForm
 					key={user.id}
 					user={user}
@@ -183,12 +112,6 @@ const UserConfigurationListForm = ({
 			{isFetching && (
 				<div className="flex justify-center items-center mt-4">
 					<Spinner className="w-6 h-6 animate-spin" />
-				</div>
-			)}
-
-			{showNoMoreUsersMessage && (
-				<div className="text-center mt-4 text-mainPurple">
-					Больше нет пользователей для загрузки
 				</div>
 			)}
 		</div>

@@ -1,11 +1,8 @@
-import { useState } from "react";
-
-import classNames from "classnames";
-
 import Modal from "../modal/Modal";
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import classNames from "classnames";
 
 import {
 	useCreateKeywordMutation,
@@ -18,9 +15,9 @@ interface KeywordAddModalProps {
 	onClose: () => void;
 }
 const KeywordAddModal = ({ onClose }: KeywordAddModalProps) => {
-	const [createKeyword] = useCreateKeywordMutation();
+	const [createKeyword, { isError: isCreateError }] =
+		useCreateKeywordMutation();
 	const { refetch } = useFetchKeywordsQuery();
-	const [apiError, setApiError] = useState<string | null>(null);
 
 	const validationSchema = Yup.object({
 		title: Yup.string()
@@ -47,11 +44,7 @@ const KeywordAddModal = ({ onClose }: KeywordAddModalProps) => {
 			resetForm();
 			onClose();
 			await refetch();
-			setApiError(null);
 		} catch (error) {
-			setApiError(
-				"Ошибка при добавлении ключевого слова. Пожалуйста, попробуйте еще раз."
-			);
 			console.error("Ошибка при добавлении ключевого слова:", error);
 		}
 	};
@@ -94,8 +87,11 @@ const KeywordAddModal = ({ onClose }: KeywordAddModalProps) => {
 								className="text-crimsonRed text-sm"
 							/>
 						</div>
-						{apiError && (
-							<div className="text-crimsonRed text-sm mt-2">{apiError}</div>
+						{isCreateError && (
+							<span className="block mx-auto text-crimsonRed text-sm mt-2">
+								{" "}
+								Не удалось добавить ключевое слово. Попробуйте еще раз.
+							</span>
 						)}
 						<button
 							className={classNames(

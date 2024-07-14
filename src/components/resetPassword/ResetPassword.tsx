@@ -14,7 +14,7 @@ interface ApiError {
 	};
 }
 
-const PasswordReset = () => {
+const ResetPassword = () => {
 	const navigate = useNavigate();
 	const [resetPassword, { isLoading }] = useResetPasswordMutation();
 	const [formError, setFormError] = useState("");
@@ -122,4 +122,4 @@ const PasswordReset = () => {
 	);
 };
 
-export default PasswordReset;
+export default ResetPassword;

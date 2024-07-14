@@ -1,5 +1,3 @@
-import React from "react";
-
 import Modal from "../modal/Modal";
 
 interface FreezeUserModalProps {
@@ -8,11 +6,11 @@ interface FreezeUserModalProps {
 	userName: string;
 }
 
-const FreezeUserModal: React.FC<FreezeUserModalProps> = ({
+const FreezeUserModal = ({
 	onClose,
 	onFreeze,
 	userName,
-}) => {
+}: FreezeUserModalProps) => {
 	return (
 		<Modal onClose={onClose}>
 			<div className="flex flex-col mt-5 text-xl font-bold text-mainPurple text-center">

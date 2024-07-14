@@ -1,5 +1,3 @@
-import React from "react";
-
 import { useNavigate } from "react-router-dom";
 
 import dayjs from "dayjs";
@@ -12,7 +10,7 @@ interface CalendarWrapperProps {
 	meetingDates: Date[];
 }
 
-const CalendarWrapper: React.FC<CalendarWrapperProps> = (props) => {
+const CalendarWrapper = (props: CalendarWrapperProps) => {
 	const navigate = useNavigate();
 
 	const handleDateClick = (date: Date) => {

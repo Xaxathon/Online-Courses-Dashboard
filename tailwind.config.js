@@ -1,5 +1,6 @@
-/** @type {import('tailwindcss').Config} */
-export default {
+
+
+export default = {
 	content: ["./src/**/*.{js,ts,jsx,tsx}"],
 	theme: {
 		extend: {
@@ -40,6 +41,17 @@ export default {
 				baloo: ['"Baloo Bhai"', "cursive"],
 				poppins: ["Poppins", "sans-serif"],
 			},
+			keyframes: {
+				"fade-in-out": {
+					"0%": { opacity: "0" },
+					"10%": { opacity: "1" },
+					"90%": { opacity: "1" },
+					"100%": { opacity: "0" },
+				},
+			},
+			animation: {
+				"fade-in-out": "fade-in-out 5s ease-in-out",
+			},
 		},
 		fontFamily: {
 			sans: ["Poppins", "sans-serif"],
@@ -47,3 +59,4 @@ export default {
 	},
 	plugins: [],
 };
+

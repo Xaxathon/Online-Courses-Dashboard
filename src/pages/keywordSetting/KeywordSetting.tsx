@@ -7,7 +7,7 @@ import { ReactComponent as AddKeywordIcon } from "@assets/icons/add-icon.svg";
 import KeywordsList from "@components/keywordsList/KeywordsList";
 import KeywordAddModal from "@components/keywordAddModal/KeywordAddModal";
 
-const Keywords = () => {
+const KeywordSetting = () => {
 	const navigate = useNavigate();
 	const [isModalOpen, setModalOpen] = useState(false);
 
@@ -50,4 +50,4 @@ const Keywords = () => {
 	);
 };
 
-export default Keywords;
+export default KeywordSetting;

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, ChangeEvent, useMemo } from "react";
 import { useSelector } from "react-redux";
 
 import { ReactComponent as Search } from "@assets/icons/search.svg";
@@ -21,6 +21,7 @@ import {
 	useFetchKpiTasksStatsQuery,
 	useFetchMeetingStatsQuery,
 } from "@/api/statsApi";
+import { KpiTasksStatsData } from "@/shared/interfaces/stats";
 
 const DEBOUNCE_DELAY = 1000;
 
@@ -41,16 +42,17 @@ const MainPage = () => {
 
 	const formattedDate = dayjs(currentMonth).format("YYYY-MM");
 
-	const { data: kpiStats } = useFetchKpiTasksStatsQuery(
-		{
-			secretaryId: userId || 0,
-			date: formattedDate,
-		},
-		{
-			skip: !userId,
-		}
-	);
-
+	const { data: kpiStats, isLoading: isKpiLoading } =
+		useFetchKpiTasksStatsQuery(
+			{
+				secretaryId: userId || 0,
+				date: formattedDate,
+			},
+			{
+				skip: !userId,
+			}
+		);
+	console.log(kpiStats);
 	const { data: meetingStats, refetch: refetchMeetingStats } =
 		useFetchMeetingStatsQuery(
 			{
@@ -70,7 +72,7 @@ const MainPage = () => {
 		[]
 	);
 
-	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const term = e.target.value;
 		setIsSearching(true);
 		debouncedSearch(term);
@@ -88,10 +90,21 @@ const MainPage = () => {
 		refetchMeetingStats();
 	}, [currentMonth, refetchMeetingStats]);
 
-	// Преобразуем meetingStats в массив дат
 	const meetingDates = meetingStats
 		? meetingStats.map((meeting) => new Date(meeting.event_date))
 		: [];
+
+	const formattedKpiData = useMemo(() => {
+		if (!kpiStats) return [];
+		return Object.entries(kpiStats).map(([week, data]) => ({
+			week: `${week} неделя`,
+			in_process: data.in_process,
+			success: data.success,
+			expired: data.expired,
+		}));
+	}, [kpiStats]);
+
+	console.log("Formatted KPI Data:", formattedKpiData);
 
 	return (
 		<div className="grid grid-cols-[minmax(20rem,_30rem)_minmax(30rem,_70rem)] gap-6 px-4 mt-7">
@@ -105,7 +118,12 @@ const MainPage = () => {
 					/>
 				</div>
 
-				<KpiChart data={kpiStats || []} />
+				<KpiChart
+					data={formattedKpiData}
+					isLoading={isKpiLoading}
+					currentMonth={currentMonth}
+					onMonthChange={handleMonthChange}
+				/>
 				<div className="flex gap-5 items-center justify-center">
 					{entityStats && (
 						<>

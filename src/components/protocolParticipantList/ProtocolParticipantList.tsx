@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { useParams } from "react-router-dom";
 
@@ -19,51 +19,59 @@ import { ExternalUser, InternalUser } from "@/shared/interfaces/user";
 
 const ProtocolParticipantList = () => {
 	const { id: protocolIdStr } = useParams<{ id: string }>();
-	const protocolId = protocolIdStr ? Number(protocolIdStr) : undefined;
 
+	const [isAddUserModalOpen, setIsAddUserModalOpen] = useState<boolean>(false);
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+
+	const protocolId = protocolIdStr ? Number(protocolIdStr) : undefined;
+	// Добавил условие для проверки (сужение типов)
 	if (protocolId === undefined || isNaN(protocolId)) {
 		throw new Error("Invalid protocol ID");
 	}
-	const {
-		data: usersResponse,
-		error,
-		refetch,
-	} = useGetProtocolMembersQuery(protocolId);
 
-	const [addMember] = useAddProtocolMemberMutation();
-	const [deleteMember] = useDeleteProtocolMemberMutation();
-	const [isAddUserModalOpen, setIsAddUserModalOpen] = useState<boolean>(false);
-	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+	const { data: usersResponse, refetch } =
+		useGetProtocolMembersQuery(protocolId);
+
+	const [addMember, { isError: isAddingError }] =
+		useAddProtocolMemberMutation();
+	const [deleteMember, { isError: isDeletingError }] =
+		useDeleteProtocolMemberMutation();
+
 	const [selectedUser, setSelectedUser] = useState<{
 		id: number;
 		member: { full_name: string };
 	} | null>(null);
-	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-	useEffect(() => {
-		if (error) {
-			console.error("Failed to fetch users:", error);
-			if (
-				"data" in error &&
-				typeof error.data === "object" &&
-				error.data &&
-				"message" in error.data
-			) {
-				setErrorMessage(error.data.message as string);
-			} else {
-				setErrorMessage("Произошла ошибка при загрузке участников");
+	const handleUserSelect = async (user: InternalUser | ExternalUser) => {
+		if (user.id !== undefined) {
+			try {
+				await addMember({
+					protocolId: protocolId,
+					memberId: user.id,
+				}).unwrap();
+				refetch();
+			} catch (error) {
+				console.error("Failed to add member:", error);
 			}
 		} else {
-			setErrorMessage(null);
+			console.error("Failed to add member: user id is undefined");
 		}
-	}, [error]);
-
-	const handleOpenAddUserModal = () => {
-		setIsAddUserModalOpen(true);
 	};
 
-	const handleCloseAddUserModal = () => {
-		setIsAddUserModalOpen(false);
+	const handleDeleteUser = async () => {
+		if (selectedUser) {
+			try {
+				await deleteMember({
+					memberId: selectedUser.id,
+				}).unwrap();
+				refetch();
+				handleCloseDeleteModal();
+			} catch (error) {
+				console.error("Failed to delete member:", error);
+			}
+		} else {
+			console.error("Failed to add member: user id is undefined");
+		}
 	};
 
 	const handleOpenDeleteModal = (user: {
@@ -79,67 +87,6 @@ const ProtocolParticipantList = () => {
 		setSelectedUser(null);
 	};
 
-	const handleUserSelect = async (user: InternalUser | ExternalUser) => {
-		if (user.id !== undefined) {
-			try {
-				await addMember({
-					protocolId: protocolId,
-					memberId: user.id,
-				}).unwrap();
-				refetch();
-				setErrorMessage(null);
-			} catch (error) {
-				console.error("Failed to add member:", error);
-				if (
-					error &&
-					typeof error === "object" &&
-					"data" in error &&
-					typeof error.data === "object" &&
-					error.data &&
-					"message" in error.data
-				) {
-					setErrorMessage(error.data.message as string);
-				} else {
-					setErrorMessage("Не удалось добавить участника");
-				}
-			} finally {
-				handleCloseAddUserModal();
-			}
-		} else {
-			console.error("Failed to add member: user id is undefined");
-			setErrorMessage(
-				"Не удалось добавить участника: ID пользователя не определен"
-			);
-		}
-	};
-
-	const handleDeleteUser = async () => {
-		if (selectedUser) {
-			try {
-				await deleteMember({
-					memberId: selectedUser.id,
-				}).unwrap();
-				refetch();
-				setErrorMessage(null);
-			} catch (error) {
-				console.error("Failed to delete member:", error);
-				if (
-					error &&
-					typeof error === "object" &&
-					"data" in error &&
-					typeof error.data === "object" &&
-					error.data &&
-					"message" in error.data
-				) {
-					setErrorMessage(error.data.message as string);
-				} else {
-					setErrorMessage("Не удалось удалить участника");
-				}
-			} finally {
-				handleCloseDeleteModal();
-			}
-		}
-	};
 	return (
 		<>
 			<div className="relative flex items-center justify-center p-2 bg-lightPurple rounded-lg">
@@ -148,7 +95,7 @@ const ProtocolParticipantList = () => {
 				</h2>
 				<AddProtocolIcon
 					className="absolute right-0 mr-6 w-8 h-8 cursor-pointer"
-					onClick={handleOpenAddUserModal}
+					onClick={() => setIsAddUserModalOpen(true)}
 				/>
 			</div>
 
@@ -161,14 +108,21 @@ const ProtocolParticipantList = () => {
 					/>
 				))}
 			</ul>
-			{errorMessage && (
+
+			{isAddingError && (
 				<div className="mt-2 p-2 bg-red-100 border border-red-400 text-crimsonRed rounded-lg">
-					{errorMessage}
+					Не удалось добавить участника, либо он уже в списке
 				</div>
 			)}
+			{isDeletingError && (
+				<div className="mt-2 p-2 bg-red-100 border border-red-400 text-crimsonRed rounded-lg">
+					Не удалось удалить участника
+				</div>
+			)}
+
 			{isAddUserModalOpen && (
 				<ExternalUserAddModal
-					onClose={handleCloseAddUserModal}
+					onClose={() => setIsAddUserModalOpen(false)}
 					onUserSelect={handleUserSelect}
 				/>
 			)}

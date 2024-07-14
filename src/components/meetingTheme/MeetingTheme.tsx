@@ -1,7 +1,4 @@
-import { useState, useEffect } from "react";
-
-import dayjs from "dayjs";
-import classNames from "classnames";
+import { useState, useEffect, useCallback } from "react";
 
 import { ReactComponent as Delete } from "@assets/icons/delete.svg";
 
@@ -11,6 +8,9 @@ import MeetingTimeAddFormModal from "../meetingTimeAddFormModal/MeetingTimeAddFo
 import DeleteElementModal from "../deleteElementModal/DeleteElementModal";
 import ExternalUserAddModal from "../externalUserAddModal/ExternalUserAddModal";
 
+import dayjs from "dayjs";
+import classNames from "classnames";
+
 import {
 	filterMeetingsByDate,
 	sortMeetingsByStartTime,
@@ -18,10 +18,10 @@ import {
 
 import { useDeleteMeetingMutation } from "@/api/meetingsApi";
 
-import { User } from "@/shared/interfaces/user";
 import { Meeting, CreateMeeting, Member } from "@/shared/interfaces/meeting";
+import { User } from "@/shared/interfaces/user";
 
-interface AppointmentThemeProps {
+interface MeetingThemeProps {
 	selectedDate: Date | null;
 	selectedMeeting: Meeting | null;
 	onMeetingSelect: (meeting: Meeting | null) => void;
@@ -29,83 +29,34 @@ interface AppointmentThemeProps {
 	refetchMeetings: () => void;
 }
 
-const AppointmentTheme: React.FC<AppointmentThemeProps> = ({
+const MeetingTheme = ({
 	selectedDate,
 	selectedMeeting,
 	onMeetingSelect,
 	meetings,
 	refetchMeetings,
-}) => {
-	const [isModalOpenTime, setIsModalOpenTime] = useState<boolean>(false);
-	const [isModalOpenUser, setIsModalOpenUser] = useState<boolean>(false);
-	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+}: MeetingThemeProps) => {
+	const [isModalOpenTime, setIsModalOpenTime] = useState(false);
+	const [isModalOpenUser, setIsModalOpenUser] = useState(false);
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
 	const [startTime, setStartTime] = useState<string | null>(null);
 	const [endTime, setEndTime] = useState<string | null>(null);
+
 	const [newMeetings, setNewMeetings] = useState<CreateMeeting[]>([]);
 	const [filteredMeetings, setFilteredMeetings] = useState<Meeting[]>([]);
+
 	const [deleteMeeting] = useDeleteMeetingMutation();
-
-	const handleOpenModalTime = () => {
-		setIsModalOpenTime(true);
-	};
-
-	const handleCloseModalTime = () => {
-		setIsModalOpenTime(false);
-	};
-
-	const handleOpenModalUser = () => {
-		setIsModalOpenUser(true);
-	};
-
-	const handleCloseModalUser = () => {
-		setIsModalOpenUser(false);
-	};
-
-	const handleDeleteOpenModal = () => {
-		setIsDeleteModalOpen(true);
-	};
-
-	const handleDeleteCloseModal = () => {
-		setIsDeleteModalOpen(false);
-	};
-
-	const handleUserSelect = (user: Member | User) => {
-		if (selectedMeeting) {
-			const updatedMeeting = {
-				...selectedMeeting,
-				members: [
-					...(selectedMeeting.members || []),
-					{
-						id: selectedMeeting.members
-							? selectedMeeting.members.length + 1
-							: 1,
-						member: {
-							...user,
-							email: user.email || "",
-						},
-						email_sent: false,
-						should_notify: false,
-					},
-				],
-			};
-			onMeetingSelect(updatedMeeting);
-		}
-		setIsModalOpenUser(false);
-	};
-
-	useEffect(() => {
-		if (selectedDate) {
-			console.log(`Selected Date: ${dayjs(selectedDate).format("YYYY-MM-DD")}`);
-		}
-	}, [selectedDate]);
 
 	useEffect(() => {
 		if (selectedDate && Array.isArray(meetings)) {
 			const dateMeetings = filterMeetingsByDate(meetings, selectedDate);
 			const allMeetings = [...dateMeetings, ...newMeetings];
-			setFilteredMeetings(sortMeetingsByStartTime(allMeetings));
-			if (allMeetings.length > 0) {
-				const firstMeeting = allMeetings[0];
+			const sortedMeetings = sortMeetingsByStartTime(allMeetings);
+			setFilteredMeetings(sortedMeetings);
+
+			if (sortedMeetings.length > 0) {
+				const firstMeeting = sortedMeetings[0];
 				onMeetingSelect(firstMeeting);
 				setStartTime(firstMeeting.event_start_time.slice(0, 5));
 				setEndTime(firstMeeting.event_end_time.slice(0, 5));
@@ -150,12 +101,44 @@ const AppointmentTheme: React.FC<AppointmentThemeProps> = ({
 			setFilteredMeetings((prevMeetings) =>
 				prevMeetings.filter((meeting) => meeting.id !== id)
 			);
-			await refetchMeetings();
-			handleDeleteCloseModal();
-		} catch (error) {
+			refetchMeetings();
+			setIsDeleteModalOpen(false);
+		} catch (error: unknown) {
 			console.error("Failed to delete meeting: ", error);
 		}
 	};
+
+	const handleUserSelect = (user: Member | User) => {
+		if (selectedMeeting) {
+			const updatedMeeting = {
+				...selectedMeeting,
+				members: [
+					...(selectedMeeting.members || []),
+					{
+						id: selectedMeeting.members
+							? selectedMeeting.members.length + 1
+							: 1,
+						member: { ...user, email: user.email || "" },
+						email_sent: false,
+						should_notify: false,
+					},
+				],
+			};
+			onMeetingSelect(updatedMeeting);
+		}
+		setIsModalOpenUser(false);
+	};
+
+	const handleSave = useCallback(
+		async (savedMeeting: Meeting) => {
+			setFilteredMeetings((prevMeetings) =>
+				prevMeetings.map((m) => (m.id === savedMeeting.id ? savedMeeting : m))
+			);
+			setNewMeetings([]);
+			refetchMeetings();
+		},
+		[refetchMeetings]
+	);
 
 	return (
 		<div className="min-h-dynamic border-effect border bg-white shadow-effect px-3 py-5 rounded-lg">
@@ -166,17 +149,17 @@ const AppointmentTheme: React.FC<AppointmentThemeProps> = ({
 				{selectedMeeting && (
 					<Delete
 						className="w-6 h-6 fill-current text-crimsonRed hover:text-crimsonRed cursor-pointer absolute right-0"
-						onClick={handleDeleteOpenModal}
+						onClick={() => setIsDeleteModalOpen(true)}
 					/>
 				)}
 			</div>
 
 			<div className="flex items-center relative mt-3">
-				<ul className="w-full flex items-center gap-2 overflow-x-auto justify-start max-h-full ">
+				<ul className="w-full flex items-center gap-2 overflow-x-auto justify-start max-h-full">
 					{filteredMeetings.length === 0 ? (
 						<li
 							className="flex flex-grow items-center border px-2 flex-shrink-0 w-1/4 justify-center border-mainPurple rounded-lg py-2 cursor-pointer"
-							onClick={handleOpenModalTime}
+							onClick={() => setIsModalOpenTime(true)}
 						>
 							Нажмите, чтобы создать тему совещания
 						</li>
@@ -201,7 +184,7 @@ const AppointmentTheme: React.FC<AppointmentThemeProps> = ({
 					)}
 					<div
 						className="absolute right-0 flex items-center justify-center font-bold text-lg text-white bg-mainPurple py-2 px-3 rounded-md cursor-pointer"
-						onClick={handleOpenModalTime}
+						onClick={() => setIsModalOpenTime(true)}
 					>
 						+
 					</div>
@@ -237,44 +220,30 @@ const AppointmentTheme: React.FC<AppointmentThemeProps> = ({
 						selectedDate={selectedDate}
 						startTime={startTime}
 						endTime={endTime}
-						onSave={async (savedMeeting) => {
-							setFilteredMeetings((prevMeetings) =>
-								prevMeetings.map((m) =>
-									m.id === savedMeeting.id ? savedMeeting : m
-								)
-							);
-							setNewMeetings([]);
-							await refetchMeetings();
-						}}
-						onOpenUserModal={handleOpenModalUser}
+						onSave={handleSave}
+						onOpenUserModal={() => setIsModalOpenUser(true)}
 					/>
 				</>
 			)}
 			{isModalOpenTime && (
 				<MeetingTimeAddFormModal
-					onClose={handleCloseModalTime}
+					onClose={() => setIsModalOpenTime(false)}
 					onTimeSubmit={handleTimeSubmit}
 				/>
 			)}
 			{isModalOpenUser && selectedMeeting && (
 				<ExternalUserAddModal
-					onClose={handleCloseModalUser}
+					onClose={() => setIsModalOpenUser(false)}
 					onUserSelect={handleUserSelect}
-					selectedMembers={(selectedMeeting.members || []).map((member) => ({
-						id: member.member.id!,
-						full_name: member.member.full_name,
-						email: member.member.email,
-					}))}
 				/>
 			)}
-
 			{isDeleteModalOpen && selectedMeeting && (
 				<DeleteElementModal
 					title="Удаление совещания"
 					description={`${selectedMeeting.theme.slice(0, 10)} (ID: ${
 						selectedMeeting.id
 					})`}
-					onClose={handleDeleteCloseModal}
+					onClose={() => setIsDeleteModalOpen(false)}
 					onDelete={() => handleDelete(selectedMeeting.id)}
 				/>
 			)}
@@ -282,4 +251,4 @@ const AppointmentTheme: React.FC<AppointmentThemeProps> = ({
 	);
 };
 
-export default AppointmentTheme;
+export default MeetingTheme;

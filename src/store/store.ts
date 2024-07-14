@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-
+import notificationReducer from "./slices/notificationSlice";
 import { authApi } from "../api/authApi";
 import authReducer from "./slices/authSlice";
 import { keywordsApi } from "../api/keywordsApi";
@@ -10,6 +10,7 @@ import { statsApi } from "../api/statsApi";
 export const store = configureStore({
 	reducer: {
 		auth: authReducer,
+		notification: notificationReducer,
 		[authApi.reducerPath]: authApi.reducer,
 		[keywordsApi.reducerPath]: keywordsApi.reducer,
 		[meetingsApi.reducerPath]: meetingsApi.reducer,
@@ -18,7 +19,15 @@ export const store = configureStore({
 	},
 
 	middleware: (getDefaultMiddleware) =>
-		getDefaultMiddleware().concat(
+		getDefaultMiddleware({
+			serializableCheck: {
+				ignoredActions: [
+					`${protocolsApi.reducerPath}/executeMutation/fulfilled`,
+					`${protocolsApi.reducerPath}/executeMutation/rejected`,
+				],
+				ignoredPaths: [`${protocolsApi.reducerPath}.mutations`],
+			},
+		}).concat(
 			authApi.middleware,
 			keywordsApi.middleware,
 			meetingsApi.middleware,

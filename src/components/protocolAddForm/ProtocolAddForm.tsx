@@ -12,25 +12,34 @@ import * as Yup from "yup";
 import Calendar from "../calendar/Calendar";
 import ExternalUserAddModal from "../externalUserAddModal/ExternalUserAddModal";
 
+import { ReactComponent as Spinner } from "../../assets/icons/spinner.svg";
+
 import {
 	handleDragOver,
 	handleDragLeave,
 	handleDrop,
+	handleFileChange,
+	allowedFileTypes,
 } from "@/utils/videoFileHandlers";
 
 import { useCreateProtocolMutation } from "@/api/protocolsApi";
 
 import { ExternalUser, InternalUser } from "@/shared/interfaces/user";
+import Portal from "../portal/Portal";
 
 const ProtocolAddForm = () => {
+	const navigate = useNavigate();
+
 	const [file, setFile] = useState<File | null>(null);
 	const [isDragging, setIsDragging] = useState<boolean>(false);
-	const [error, setError] = useState<string | null>(null);
+	const [fileError, setFileError] = useState<string | null>(null);
+
 	const [isModalOpenUser, setIsModalOpenUser] = useState<boolean>(false);
 	const [isSelectingFor, setIsSelectingFor] = useState<
 		"secretary" | "director" | null
 	>(null);
-	const [createProtocol] = useCreateProtocolMutation();
+
+	const [createProtocol, { isLoading, isError }] = useCreateProtocolMutation();
 
 	const formik = useFormik({
 		initialValues: {
@@ -61,16 +70,15 @@ const ProtocolAddForm = () => {
 			if (file) {
 				formData.append("video", file);
 			} else {
-				setError("Поле video должно быть файлом.");
+				setFileError("Поле video должно быть файлом.");
 				return;
 			}
 
 			try {
-				const response = await createProtocol(formData).unwrap();
-				console.log("Success:", response);
-				// Дополнительные действия после успешного создания протокола
-			} catch (error) {
-				console.error("Error:", error);
+				await createProtocol(formData).unwrap();
+				navigate("/main/protocols");
+			} catch (error: any) {
+				console.error("Ошибка:", error);
 			}
 		},
 	});
@@ -94,7 +102,6 @@ const ProtocolAddForm = () => {
 			isSelectingFor! === "secretary" ? "secretaryName" : "directorName",
 			user.full_name
 		);
-		handleCloseModalUser();
 	};
 
 	const handleDateChange = (date: Date) => {
@@ -102,22 +109,18 @@ const ProtocolAddForm = () => {
 	};
 
 	const handleFileUploadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const uploadedFile = e.currentTarget.files
-			? e.currentTarget.files[0]
-			: null;
-		setFile(uploadedFile);
-		if (uploadedFile) {
-			formik.setFieldValue("video", uploadedFile.name);
-			setError(null);
+		console.log("File upload change");
+		handleFileChange(e, setFile, setFileError);
+		if (e.currentTarget.files && e.currentTarget.files[0]) {
+			formik.setFieldValue("video", e.currentTarget.files[0].name);
 		} else {
 			formik.setFieldValue("video", "");
-			setError("Поле video должно быть файлом.");
 		}
 	};
 
-	const navigate = useNavigate();
 	return (
 		<div className="w-full mx-5 mt-7">
+			{isLoading && <ProtocolLoadingView />}
 			<div className="font-bold text-mainPurple text-2xl py-3 px-7 rounded-xl bg-gray-100 flex items-center justify-start mb-8">
 				<Backward
 					className="w-9 h-9 cursor-pointer fill-current text-mainPurple hover:text-mainPurpleHover active:text-mainPurpleActive"
@@ -128,7 +131,7 @@ const ProtocolAddForm = () => {
 
 			<form
 				onSubmit={formik.handleSubmit}
-				className="w-full grid grid-cols-2   gap-5"
+				className="w-full grid grid-cols-2 gap-5"
 			>
 				<div className=" w-full flex flex-col items-center xl:text-xl lg:text-lg font-bold text-mainPurple gap-8">
 					<div className="flex flex-col items-center w-full">
@@ -144,7 +147,9 @@ const ProtocolAddForm = () => {
 							onBlur={formik.handleBlur}
 						/>
 						{formik.touched.theme && formik.errors.theme ? (
-							<div className="text-red-500 text-sm">{formik.errors.theme}</div>
+							<div className="text-crimsonRed text-sm">
+								{formik.errors.theme}
+							</div>
 						) : null}
 					</div>
 					<div className="flex flex-col items-center w-full">
@@ -160,7 +165,9 @@ const ProtocolAddForm = () => {
 							onBlur={formik.handleBlur}
 						/>
 						{formik.touched.agenda && formik.errors.agenda ? (
-							<div className="text-red-500 text-sm">{formik.errors.agenda}</div>
+							<div className="text-crimsonRed text-sm">
+								{formik.errors.agenda}
+							</div>
 						) : null}
 					</div>
 					<div className="flex flex-col items-center w-full">
@@ -176,7 +183,7 @@ const ProtocolAddForm = () => {
 							readOnly
 						/>
 						{formik.touched.secretary_id && formik.errors.secretary_id ? (
-							<div className="text-red-500 text-sm">
+							<div className="text-crimsonRed text-sm">
 								{formik.errors.secretary_id}
 							</div>
 						) : null}
@@ -194,7 +201,7 @@ const ProtocolAddForm = () => {
 							readOnly
 						/>
 						{formik.touched.director_id && formik.errors.director_id ? (
-							<div className="text-red-500 text-sm">
+							<div className="text-crimsonRed text-sm">
 								{formik.errors.director_id}
 							</div>
 						) : null}
@@ -202,9 +209,7 @@ const ProtocolAddForm = () => {
 				</div>
 				<div className="flex flex-col gap-6 font-bold text-lg text-mainPurple text-center">
 					<div className="flex flex-col items-center w-full">
-						<label className="mb-2" htmlFor="eventDate">
-							Дата
-						</label>
+						<label htmlFor="eventDate">Дата</label>
 						<div className="max-w-lg rounded-xl p-4 flex justify-center items-center">
 							<Calendar
 								onChange={handleDateChange}
@@ -230,7 +235,9 @@ const ProtocolAddForm = () => {
 							}`}
 							onDragOver={(e) => handleDragOver(e, setIsDragging)}
 							onDragLeave={(e) => handleDragLeave(e, setIsDragging)}
-							onDrop={(e) => handleDrop(e, setFile, setIsDragging, setError)}
+							onDrop={(e) =>
+								handleDrop(e, setFile, setIsDragging, setFileError)
+							}
 						>
 							<FileUploadIcon className="w-10 h-10" />
 							<p className="text-xs text-start font-normal text-black">
@@ -242,6 +249,7 @@ const ProtocolAddForm = () => {
 							type="file"
 							className="hidden"
 							onChange={handleFileUploadChange}
+							accept={allowedFileTypes.join(",")}
 						/>
 
 						{file && (
@@ -252,20 +260,30 @@ const ProtocolAddForm = () => {
 						)}
 
 						{formik.touched.video && formik.errors.video ? (
-							<div className="text-red-500 text-sm">{formik.errors.video}</div>
+							<div className="text-crimsonRed text-sm">
+								{formik.errors.video}
+							</div>
 						) : null}
 
-						{error && <div className="mt-2 text-red-500 text-sm">{error}</div>}
+						{fileError && (
+							<div className="mt-2 text-crimsonRed text-sm">{fileError}</div>
+						)}
 					</div>
 				</div>
 				<div className="flex justify-center w-full">
 					<button
 						type="submit"
 						className=" px-10 text-lg  p-2 rounded-lg bg-mainPurple text-white font-bold hover:bg-mainPurpleHover active:bg-mainPurpleActive"
+						disabled={isLoading}
 					>
-						Создать протокол
+						{isLoading ? "Создание..." : "Создать протокол"}
 					</button>
 				</div>
+				{isError && (
+					<span className="block mx-auto mt-2 text-crimsonRed text-sm">
+						Произошла ошибка при создании протокола
+					</span>
+				)}
 			</form>
 
 			{isModalOpenUser && (
@@ -279,3 +297,19 @@ const ProtocolAddForm = () => {
 };
 
 export default ProtocolAddForm;
+
+const ProtocolLoadingView = () => {
+	return (
+		<Portal>
+			<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+				<div className="flex flex-col items-center justify-center bg-white p-5 rounded-lg shadow-custom text-center">
+					<Spinner className="w-10 h-10 mb-3 animate-spin" />
+					<p className="text-lg font-semibold mb-1">Загружается видео...</p>
+					<p className="text-sm text-gray-600">
+						Пожалуйста, подождите. Это может занять некоторое время.
+					</p>
+				</div>
+			</div>
+		</Portal>
+	);
+};

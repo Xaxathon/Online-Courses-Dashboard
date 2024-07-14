@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "./baseQuery";
+
 import {
 	Protocol,
 	ProtocolResponse,
@@ -7,6 +8,7 @@ import {
 	ProtocolTaskData,
 	ProtocolTasksResponse,
 	ProtocolMembersResponse,
+	CreateProtocolKeywordText,
 } from "../shared/interfaces/protocol";
 
 const protocolsApi = createApi({
@@ -24,7 +26,6 @@ const protocolsApi = createApi({
 			}),
 			transformResponse: (response: { data: ProtocolsListResponse }) => {
 				console.log("Full response:", response);
-
 				if (!Array.isArray(response.data.data)) {
 					throw new Error("Response data is not an array");
 				}
@@ -33,17 +34,18 @@ const protocolsApi = createApi({
 			providesTags: (result) =>
 				result
 					? [
-							...result.data.map(
-								({ id }) => ({ type: "Protocol", id } as const)
-							),
-							{ type: "Protocol", id: "LIST" },
+							...result.data.map(({ id }) => ({
+								type: "Protocol" as const,
+								id,
+							})),
+							{ type: "Protocol" as const, id: "LIST" },
 					  ]
-					: [{ type: "Protocol", id: "LIST" }],
+					: [{ type: "Protocol" as const, id: "LIST" }],
 		}),
 
 		getProtocol: builder.query<ProtocolResponse, number>({
 			query: (id) => `/api/protocols/${id}`,
-			providesTags: (result, error, id) => [{ type: "Protocol", id }],
+			//providesTags: (result, error, id) => [{ type: "Protocol", id }],
 		}),
 
 		createProtocol: builder.mutation<{ protocol: Protocol }, FormData>({
@@ -142,6 +144,46 @@ const protocolsApi = createApi({
 				method: "DELETE",
 			}),
 		}),
+
+		saveFinalProtocol: builder.mutation<
+			void,
+			{ id: number; data: CreateProtocolKeywordText }
+		>({
+			query: ({ id, data }) => ({
+				url: `/api/protocols/${id}/final`,
+				method: "POST",
+				body: data,
+			}),
+			invalidatesTags: (result, error, { id }) => [{ type: "Protocol", id }],
+		}),
+
+		generatePDF: builder.mutation<string, number>({
+			query: (id) => ({
+				url: `/api/protocols/${id}/documents/pdf`,
+				method: "GET",
+				responseHandler: async (response) => {
+					const blob = await response.blob();
+					return URL.createObjectURL(blob);
+				},
+			}),
+		}),
+
+		generateDOCX: builder.mutation<string, number>({
+			query: (id) => ({
+				url: `/api/protocols/${id}/documents/docx`,
+				method: "GET",
+				responseHandler: async (response) => {
+					const blob = await response.blob();
+					return URL.createObjectURL(blob);
+				},
+			}),
+		}),
+		processVideo: builder.mutation<void, number>({
+			query: (id) => ({
+				url: `/api/protocols/${id}/process-video`,
+				method: "POST",
+			}),
+		}),
 	}),
 });
 
@@ -158,6 +200,10 @@ export const {
 	useGetProtocolMembersQuery,
 	useAddProtocolMemberMutation,
 	useDeleteProtocolMemberMutation,
+	useSaveFinalProtocolMutation,
+	useGeneratePDFMutation,
+	useGenerateDOCXMutation,
+	useProcessVideoMutation,
 } = protocolsApi;
 
 export default protocolsApi;

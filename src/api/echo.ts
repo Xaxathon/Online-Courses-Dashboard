@@ -1,30 +1,58 @@
-// src/echo.ts
-
+import { Protocol } from "@/shared/interfaces/protocol";
 import Echo from "laravel-echo";
-import { io } from "socket.io-client";
+import io from "socket.io-client";
 
 declare global {
 	interface Window {
-		Echo: Echo;
 		io: typeof io;
 	}
 }
 
-const token = localStorage.getItem("token");
-
-// Настройка Echo
 window.io = io;
 
-const echo = new Echo({
-	broadcaster: "socket.io",
-	host: `${window.location.hostname}:5176`,
-	auth: {
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
-	},
-});
+class EchoService {
+	private echo: Echo | null = null;
 
-window.Echo = echo;
+	initialize() {
+		const token = localStorage.getItem("token");
+		this.echo = new Echo({
+			broadcaster: "socket.io",
+			host: "http://85.193.90.243:6001",
+			auth: {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			},
+		});
+	}
 
-export default echo;
+	listenToProtocolUpdates(
+		protocolId: number,
+		onUpdate: (protocol: any) => void
+	) {
+		if (!this.echo) {
+			this.initialize();
+		}
+
+		const channelName = `secretary_protocol.${protocolId}`;
+		this.echo
+			?.private(channelName)
+			.listen(".VideoProcessed", (e: { protocol: any }) => {
+				console.log("Received VideoProcessed event:", e);
+				onUpdate(e.protocol);
+			});
+
+		return () => {
+			this.echo?.leave(channelName);
+		};
+	}
+}
+
+export const echoService = new EchoService();
+
+export const listenToProtocolUpdates = (
+	protocolId: number,
+	onUpdate: (protocol: Protocol) => void
+) => {
+	return echoService.listenToProtocolUpdates(protocolId, onUpdate);
+};

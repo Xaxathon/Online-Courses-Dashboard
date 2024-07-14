@@ -1,5 +1,3 @@
-import React from "react";
-
 import { ProtocolMember } from "@/shared/interfaces/protocol";
 
 interface ProtocolParticipantItemProps {
@@ -7,13 +5,13 @@ interface ProtocolParticipantItemProps {
 	onDelete: (user: ProtocolMember) => void;
 }
 
-const ProtocolParticipantItem: React.FC<ProtocolParticipantItemProps> = ({
+const ProtocolParticipantItem = ({
 	user,
 	onDelete,
-}) => {
+}: ProtocolParticipantItemProps) => {
 	return (
 		<li
-			className="text-xs flex-shrink-0 p-3 bg-lightPurple text-mainPurple rounded-lg whitespace-nowrap cursor-pointer"
+			className="text-xs flex-shrink-0 p-3 bg-lightPurple text-mainPurple rounded-lg whitespace-nowrap cursor-pointer hover:bg-lightPurpleHover"
 			onClick={() => onDelete(user)}
 		>
 			{user.member.full_name}

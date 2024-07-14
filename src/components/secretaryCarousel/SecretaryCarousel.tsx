@@ -1,5 +1,4 @@
-import React from "react";
-
+import React, { useState, useMemo } from "react";
 import { ReactComponent as Left } from "@assets/icons/left-arrow.svg";
 import { ReactComponent as Right } from "@assets/icons/right-arrow.svg";
 import AvatarError from "@assets/img/avatar.jpg";
@@ -8,28 +7,60 @@ import StatWidget from "../statWidget/StatWidget";
 import Skeleton from "../skeleton/Skeleton";
 import KpiChart from "../kpiChart/KpiChart";
 
-import { useFetchEntityStatsQuery } from "@/api/statsApi";
+import {
+	useFetchEntityStatsQuery,
+	useFetchKpiTasksStatsQuery,
+} from "@/api/statsApi";
 import { BaseUser } from "@/shared/interfaces/user";
 
 interface SecretaryCarouselProps {
 	userData: BaseUser | undefined;
-	isLoading: boolean;
 	onLeftClick: () => void;
 	onRightClick: () => void;
 }
 
 const SecretaryCarousel = ({
 	userData,
-	isLoading,
 	onLeftClick,
 	onRightClick,
 }: SecretaryCarouselProps) => {
+	const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+
 	const { data: entityStats, isLoading: isLoadingEntityStats } =
 		useFetchEntityStatsQuery(userData?.id || 0, {
 			skip: !userData?.id,
 		});
 
-	if (isLoading || !userData) {
+	const formattedDate = useMemo(() => {
+		return currentMonth.toISOString().slice(0, 7); // format: "YYYY-MM"
+	}, [currentMonth]);
+
+	const { data: kpiStats, isLoading: isLoadingKpiStats } =
+		useFetchKpiTasksStatsQuery(
+			{
+				secretaryId: userData?.id || 0,
+				date: formattedDate,
+			},
+			{
+				skip: !userData?.id,
+			}
+		);
+
+	const formattedKpiData = useMemo(() => {
+		if (!kpiStats) return [];
+		return Object.entries(kpiStats).map(([week, data]) => ({
+			week: `${week} неделя`,
+			in_process: data.in_process,
+			success: data.success,
+			expired: data.expired,
+		}));
+	}, [kpiStats]);
+
+	const handleMonthChange = (newDate: Date) => {
+		setCurrentMonth(newDate);
+	};
+
+	if (!userData) {
 		return (
 			<div className="flex flex-col items-center justify-center bg-gray-100 rounded-lg p-5">
 				<Skeleton width="20" height="20" className="rounded-lg mb-4" />
@@ -64,7 +95,12 @@ const SecretaryCarousel = ({
 					onClick={onLeftClick}
 				/>
 				<div className="flex justify-center items-center">
-					{/* <KpiChart /> */}
+					<KpiChart
+						data={formattedKpiData}
+						isLoading={isLoadingKpiStats}
+						currentMonth={currentMonth}
+						onMonthChange={handleMonthChange}
+					/>
 				</div>
 				<Right
 					className="absolute -right-1 top-1/2 w-9 h-9 cursor-pointer"

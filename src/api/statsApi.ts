@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "./baseQuery";
-import { get } from "lodash";
+
 import {
 	EntityStatsData,
 	EntityStatsResponse,
@@ -43,7 +43,7 @@ export const statsApi = createApi({
 		}),
 
 		fetchKpiTasksStats: builder.query<
-			KpiTasksStatsData[],
+			KpiTasksStatsData,
 			{ secretaryId: number; date: string }
 		>({
 			query: ({ secretaryId, date }) => ({
@@ -53,8 +53,6 @@ export const statsApi = createApi({
 			}),
 			transformResponse: (response: KpiTasksStatsResponse) => response.data,
 		}),
-
-		// для fetchKpiTasksStats есть date и надо год и месяц передать в формате 2020-09
 	}),
 });
 

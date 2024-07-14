@@ -79,6 +79,8 @@ export interface FormValues {
 	password: string;
 	avatar?: File;
 	is_active?: boolean;
+	theme?: string;
+	link?: string;
 }
 
 export interface FetchUsersParams {

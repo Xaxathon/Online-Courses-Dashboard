@@ -3,16 +3,25 @@ export enum ProtocolStage {
 	SuccessVideoProcess = "success_video_process",
 	ErrorVideoProcess = "error_video_process",
 	Finish = "finish",
+	Final = "final",
 }
 
+export interface ProtocolKeywords {
+	key: string;
+	value: string;
+}
 export interface Protocol {
 	id: number;
+	protocol_number: number;
 	theme: string;
 	agenda: string;
 	secretary: { id: number; full_name: string };
 	director: { id: number; full_name: string };
 	event_date: string;
-	final_transcript: string;
+	final_transcript: ProtocolKeywords[];
+	city: string;
+	event_start_time: string;
+	location: string;
 	stage: ProtocolStage;
 	status: string;
 	transcript: string;
@@ -45,6 +54,7 @@ export interface ProtocolTask {
 	id: number;
 	protocol: {
 		id: number;
+		protocol_number: number;
 		director: {
 			full_name: string;
 		};
@@ -84,4 +94,15 @@ export interface ProtocolResponse {
 export interface ProtocolsListResponse {
 	data: Protocol[];
 	links: { next: string | null };
+}
+
+export interface ProtocolKeywordText {
+	key: string;
+	value: string;
+}
+export interface CreateProtocolKeywordText {
+	final_transcript: ProtocolKeywordText[];
+	location: string;
+	city: string;
+	event_start_time: string;
 }

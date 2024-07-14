@@ -1,55 +1,37 @@
-import { useCallback, useEffect, useState, useRef } from "react";
-
+import { useCallback, useEffect, useState, useRef, useMemo } from "react";
 import { ReactComponent as Search } from "@assets/icons/search.svg";
 import { ReactComponent as Spinner } from "@assets/icons/spinner.svg";
-
 import SecretaryList from "@components/secretaryList/SecretaryList";
 import SecretaryCarousel from "@components/secretaryCarousel/SecretaryCarousel";
 import Skeleton from "@components/skeleton/Skeleton";
-
 import {
 	getPreviousSecretaryId,
 	getNextSecretaryId,
 	filterInternalUsers,
 } from "@/utils/secretaryCarousel";
-
 import { useFetchManagerStatsQuery } from "@/api/statsApi";
 import {
 	useFetchUsersQuery,
-	useLazyFetchUserQuery,
-	useFetchUserByIdQuery,
+	useLazyFetchPersonalUserQuery,
 } from "@/api/authApi";
-
-import { BaseUser, User } from "@/shared/interfaces/user";
+import { InternalUser, User } from "@/shared/interfaces/user";
 
 const DEFAULT_LIMIT = 15;
-const MIN_SECRETARIES_TO_SHOW_MESSAGE = 15;
 const SEARCH_DELAY = 500;
 
 const Secretaries: React.FC = () => {
 	const [selectedSecretaryId, setSelectedSecretaryId] = useState<number | null>(
 		null
 	);
-	const [loading, setLoading] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [page, setPage] = useState(1);
 	const [allSecretaries, setAllSecretaries] = useState<User[]>([]);
-	const [initialLoadComplete, setInitialLoadComplete] = useState(false);
-	const [searchInput, setSearchInput] = useState("");
-
+	const searchInputRef = useRef<HTMLInputElement>(null);
 	const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 	const [fetchUser, { data: userData, isLoading: isUserLoading }] =
-		useLazyFetchUserQuery();
+		useLazyFetchPersonalUserQuery();
 	const { data: managerStats } = useFetchManagerStatsQuery();
-
-	const {
-		data: secretaryData,
-		isLoading: isSecretaryLoading,
-		refetch: refetchSecretary,
-	} = useFetchUserByIdQuery(selectedSecretaryId!, {
-		skip: selectedSecretaryId === null,
-	});
 
 	const {
 		data: secretariesData,
@@ -66,13 +48,6 @@ const Secretaries: React.FC = () => {
 	useEffect(() => {
 		fetchUser();
 	}, [fetchUser]);
-
-	useEffect(() => {
-		if (selectedSecretaryId !== null) {
-			setLoading(true);
-			refetchSecretary().finally(() => setLoading(false));
-		}
-	}, [selectedSecretaryId, refetchSecretary]);
 
 	useEffect(() => {
 		if (secretariesData?.data?.data) {
@@ -95,15 +70,9 @@ const Secretaries: React.FC = () => {
 		}
 	}, [secretariesData, page, searchTerm]);
 
-	useEffect(() => {
-		if (!isSecretariesLoading && !isFetching) {
-			setInitialLoadComplete(true);
-		}
-	}, [isSecretariesLoading, isFetching]);
-
-	const handleSecretarySelect = (id: number) => {
+	const handleSecretarySelect = useCallback((id: number) => {
 		setSelectedSecretaryId(id);
-	};
+	}, []);
 
 	const handleNavigation = useCallback(
 		(direction: "left" | "right") => {
@@ -124,18 +93,16 @@ const Secretaries: React.FC = () => {
 	const handleLeftClick = () => handleNavigation("left");
 	const handleRightClick = () => handleNavigation("right");
 
-	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value;
-		setSearchInput(value);
+	const handleSearchChange = useCallback(() => {
 		if (searchTimeoutRef.current) {
 			clearTimeout(searchTimeoutRef.current);
 		}
 
 		searchTimeoutRef.current = setTimeout(() => {
-			setSearchTerm(value);
+			setSearchTerm(searchInputRef.current?.value || "");
 			setPage(1);
 		}, SEARCH_DELAY);
-	};
+	}, []);
 
 	const lastSecretaryElementRef = useCallback(
 		(node: HTMLElement | null) => {
@@ -159,14 +126,12 @@ const Secretaries: React.FC = () => {
 		[isFetching, secretariesData, searchTerm]
 	);
 
-	const showNoMoreSecretariesMessage =
-		!isFetching &&
-		initialLoadComplete &&
-		allSecretaries.length >= MIN_SECRETARIES_TO_SHOW_MESSAGE &&
-		!searchTerm &&
-		(Array.isArray(secretariesData?.data?.data)
-			? secretariesData.data.data.length
-			: 0) < DEFAULT_LIMIT;
+	const selectedSecretary = useMemo(() => {
+		const secretary = allSecretaries.find(
+			(secretary) => secretary.id === selectedSecretaryId
+		);
+		return secretary as InternalUser;
+	}, [selectedSecretaryId, allSecretaries]);
 
 	return (
 		<div className="mx-4 mt-7 w-full">
@@ -190,8 +155,7 @@ const Secretaries: React.FC = () => {
 						</div>
 					) : (
 						<SecretaryCarousel
-							userData={secretaryData?.data as BaseUser | undefined}
-							isLoading={loading || isSecretaryLoading}
+							userData={selectedSecretary}
 							onLeftClick={handleLeftClick}
 							onRightClick={handleRightClick}
 						/>
@@ -203,10 +167,10 @@ const Secretaries: React.FC = () => {
 							className="bg-transparent p-2 w-full focus:outline-none"
 							type="text"
 							placeholder="Введите запрос"
-							value={searchInput}
+							ref={searchInputRef}
 							onChange={handleSearchChange}
 						/>
-						{isFetching && searchTerm === searchInput ? (
+						{isFetching && searchTerm ? (
 							<Spinner className="w-6 h-6 animate-spin" />
 						) : (
 							<Search className="w-6 h-6" />
@@ -219,11 +183,6 @@ const Secretaries: React.FC = () => {
 						isLoading={isSecretariesLoading || isFetching}
 						lastSecretaryElementRef={lastSecretaryElementRef}
 					/>
-					{showNoMoreSecretariesMessage && (
-						<div className="text-center mt-4 text-mainPurple">
-							Больше нет секретарей для загрузки
-						</div>
-					)}
 				</div>
 			</div>
 			<div className="flex justify-center font-bold text-lg gap-32 mb-4 ">

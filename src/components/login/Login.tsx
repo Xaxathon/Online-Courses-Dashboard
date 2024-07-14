@@ -1,22 +1,22 @@
 import { useState } from "react";
-
 import { Link, useNavigate } from "react-router-dom";
 
 import { useFormik, FormikHelpers } from "formik";
 import * as Yup from "yup";
+import classNames from "classnames";
 
 import { useDispatch } from "react-redux";
-
 import { AppDispatch } from "@/store/store";
 import { setToken, setRole, setUserId } from "@/store/slices/authSlice";
-import { useLoginMutation, useLazyFetchUserQuery } from "@/api/authApi";
+import { useLoginMutation, useLazyFetchPersonalUserQuery } from "@/api/authApi";
+
+import { LoginFormValues } from "@/shared/interfaces/auth";
 
 import { UserResponse } from "@/shared/interfaces/user";
-import { LoginFormValues } from "@/shared/interfaces/auth";
 
 const Login = () => {
 	const [login, { isLoading }] = useLoginMutation();
-	const [fetchUser] = useLazyFetchUserQuery();
+	const [fetchUser] = useLazyFetchPersonalUserQuery();
 	const dispatch = useDispatch<AppDispatch>();
 	const [showPassword, setShowPassword] = useState<boolean>(false);
 	const navigate = useNavigate();
@@ -79,11 +79,15 @@ const Login = () => {
 						E-mail
 					</label>
 					<input
-						className={`text-black text-base bg-white p-3 rounded-lg ring-2 focus:outline-none border-transparent ${
-							formik.touched.email && formik.errors.email
-								? "ring-crimsonRed"
-								: "ring-mainPurple focus:ring-gardenGreen"
-						}`}
+						className={classNames(
+							"text-black text-base bg-white p-3 rounded-lg ring-2 focus:outline-none border-transparent",
+							{
+								"ring-crimsonRed": formik.touched.email && formik.errors.email,
+								"ring-mainPurple focus:ring-gardenGreen": !(
+									formik.touched.email && formik.errors.email
+								),
+							}
+						)}
 						id="email"
 						type="text"
 						{...formik.getFieldProps("email")}
@@ -101,11 +105,16 @@ const Login = () => {
 					</label>
 					<div className="relative">
 						<input
-							className={`text-black text-base bg-white p-3 rounded-lg ring-2 focus:outline-none border-transparent w-full ${
-								formik.touched.password && formik.errors.password
-									? "ring-crimsonRed"
-									: "ring-mainPurple focus:ring-gardenGreen"
-							}`}
+							className={classNames(
+								"text-black text-base bg-white p-3 rounded-lg ring-2 focus:outline-none border-transparent w-full",
+								{
+									"ring-crimsonRed":
+										formik.touched.password && formik.errors.password,
+									"ring-mainPurple focus:ring-gardenGreen": !(
+										formik.touched.password && formik.errors.password
+									),
+								}
+							)}
 							id="password"
 							type={showPassword ? "text" : "password"}
 							{...formik.getFieldProps("password")}
@@ -133,11 +142,14 @@ const Login = () => {
 				<div className="w-full flex justify-center mt-4">
 					<button
 						type="submit"
-						className={`mt-2 rounded-xl px-14 py-2 text-xl font-bold ${
-							isLoading
-								? "bg-gray-500 text-gray-300 cursor-not-allowed"
-								: "bg-mainPurple text-white hover:bg-mainPurpleHover active:bg-mainPurpleActive"
-						}`}
+						className={classNames(
+							"mt-2 rounded-xl px-14 py-2 text-xl font-bold",
+							{
+								"bg-gray-500 text-gray-300 cursor-not-allowed": isLoading,
+								"bg-mainPurple text-white hover:bg-mainPurpleHover active:bg-mainPurpleActive":
+									!isLoading,
+							}
+						)}
 						disabled={isLoading}
 					>
 						{isLoading ? "Загрузка..." : "Войти"}
