@@ -68,8 +68,6 @@ const ProtocolList = () => {
 	const handleProcessVideo = async (id: number) => {
 		try {
 			await processVideo(id).unwrap();
-			console.log("Начата обработка видео для протокола", id);
-
 			const unsubscribe = listenToProtocolUpdates(id, updateProtocolInList);
 
 			setTimeout(() => {

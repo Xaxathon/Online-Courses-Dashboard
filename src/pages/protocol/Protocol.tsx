@@ -94,7 +94,7 @@ const Protocol = () => {
 		}),
 		onSubmit: async (values) => {
 			try {
-				const response = await updateProtocol({
+				await updateProtocol({
 					id: Number(id),
 					data: {
 						theme: values.theme,
@@ -103,7 +103,6 @@ const Protocol = () => {
 						director_id: values.director_id,
 					},
 				}).unwrap();
-				console.log("Success:", response);
 				setInitialValues(values);
 				setShouldFetchProtocol(true);
 			} catch (error) {

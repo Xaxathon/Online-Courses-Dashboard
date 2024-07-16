@@ -109,7 +109,6 @@ const ProtocolAddForm = () => {
 	};
 
 	const handleFileUploadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		console.log("File upload change");
 		handleFileChange(e, setFile, setFileError);
 		if (e.currentTarget.files && e.currentTarget.files[0]) {
 			formik.setFieldValue("video", e.currentTarget.files[0].name);
