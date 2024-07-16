@@ -281,6 +281,7 @@ const UserConfigurationForm = memo(
 														name="password"
 														type={showPassword ? "text" : "password"}
 														disabled={!isEditing || isFrozen}
+														autoComplete="off"
 													/>
 													<button
 														type="button"

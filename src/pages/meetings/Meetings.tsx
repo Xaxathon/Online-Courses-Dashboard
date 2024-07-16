@@ -62,7 +62,7 @@ const Meetings = () => {
 		);
 	}
 	return (
-		<div className="ml-3 grid grid-cols-[800px_minmax(470px,_470px)] gap-3 justify-between items-start mt-5 mr-6 w-full">
+		<div className="ml-3 grid grid-cols-[minmax(470px,_800px),_minmax(370px,_470px)] gap-3 justify-between items-start mt-5 mr-6 w-full">
 			<MeetingCalendar
 				onDateChange={handleDateChange}
 				onMonthChange={handleMonthChange}

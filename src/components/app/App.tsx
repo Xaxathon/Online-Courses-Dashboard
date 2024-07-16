@@ -51,7 +51,11 @@ const App = () => {
 					<Route path="/" element={<Navigate to="/login" />} />
 					<Route path="/login" element={<Login />} />
 					<Route path="/reset-password" element={<ForgotPassword />} />
-					<Route path="/reset-password/2" element={<ResetPassword />} />
+					<Route
+						path="/reset-password/:token"
+						element={<ResetPassword />}
+					/>{" "}
+					{/* TODO: Ждем почтовый клиент */}
 					<Route
 						path="/main/*"
 						element={

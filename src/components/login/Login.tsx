@@ -95,6 +95,7 @@ const Login = () => {
 						id="email"
 						type="text"
 						{...formik.getFieldProps("email")}
+						autoComplete="email"
 					/>
 					{formik.touched.email && formik.errors.email ? (
 						<span className="text-crimsonRed font-bold">
@@ -122,6 +123,7 @@ const Login = () => {
 							id="password"
 							type={showPassword ? "text" : "password"}
 							{...formik.getFieldProps("password")}
+							autoComplete="current-password"
 						/>
 						<button
 							type="button"

@@ -17,7 +17,7 @@ class EchoService {
 		const token = localStorage.getItem("token");
 		this.echo = new Echo({
 			broadcaster: "socket.io",
-			host: "http://85.193.90.243:6001",
+			host: "http://77.232.129.223:6001",
 			auth: {
 				headers: {
 					Authorization: `Bearer ${token}`,

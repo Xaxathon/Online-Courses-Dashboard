@@ -1,11 +1,8 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-
 import { ReactComponent as Backward } from "@assets/icons/backward.svg";
-
 import { useResetPasswordMutation } from "@/api/authApi";
 
 interface ApiError {
@@ -16,11 +13,20 @@ interface ApiError {
 
 const ResetPassword = () => {
 	const navigate = useNavigate();
+	const { token } = useParams<{ token: string }>();
 	const [resetPassword, { isLoading }] = useResetPasswordMutation();
 	const [formError, setFormError] = useState("");
 
+	useEffect(() => {
+		if (!token) {
+			navigate("/reset-password");
+		}
+	}, [token, navigate]);
+
 	const formik = useFormik({
 		initialValues: {
+			token: token || "",
+			email: "", // Оставляем email в initialValues
 			password: "",
 			password_confirmation: "",
 		},
@@ -40,9 +46,9 @@ const ResetPassword = () => {
 						message: "Пароль успешно сброшен. Пожалуйста, войдите в систему.",
 					},
 				});
-			} catch (err) {
-				if (typeof err === "object" && err !== null && "data" in err) {
-					const apiError = err as ApiError;
+			} catch (error) {
+				if (typeof error === "object" && error !== null && "data" in error) {
+					const apiError = error as ApiError;
 					setFormError(apiError.data?.message || "Ошибка при сбросе пароля");
 				} else {
 					setFormError("Эта ссылка не действительна");
@@ -76,7 +82,8 @@ const ResetPassword = () => {
 						id="password"
 						type="password"
 						{...formik.getFieldProps("password")}
-						className="w-full px-3 py-2 border-2 ring-mainPurple  rounded-md ring-2 focus:outline-none border-transparent focus:ring-gardenGreen"
+						autoComplete="new-password"
+						className="w-full px-3 py-2 border-2 ring-mainPurple rounded-md ring-2 focus:outline-none border-transparent focus:ring-gardenGreen"
 					/>
 					{formik.touched.password && formik.errors.password ? (
 						<div className="text-crimsonRed mt-1">{formik.errors.password}</div>
@@ -94,6 +101,7 @@ const ResetPassword = () => {
 						id="password_confirmation"
 						type="password"
 						{...formik.getFieldProps("password_confirmation")}
+						autoComplete="new-password"
 						className="w-full px-3 py-2 border-2 ring-mainPurple rounded-md ring-2 focus:outline-none border-transparent focus:ring-gardenGreen"
 					/>
 					{formik.touched.password_confirmation &&

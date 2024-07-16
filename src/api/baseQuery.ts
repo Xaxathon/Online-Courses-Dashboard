@@ -8,7 +8,7 @@ interface RefreshResponse {
 }
 
 const baseQuery = fetchBaseQuery({
-	baseUrl: "http://85.193.90.243",
+	baseUrl: "http://77.232.129.223",
 	prepareHeaders: (headers, { getState }) => {
 		const token = (getState() as RootState).auth.token;
 		if (token) {

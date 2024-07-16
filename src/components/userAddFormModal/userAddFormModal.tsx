@@ -148,6 +148,7 @@ const UserAddFormModal = ({
 								id="password"
 								name="password"
 								type={showPassword ? "text" : "password"}
+								autoComplete="off"
 							/>
 							<button
 								type="button"
