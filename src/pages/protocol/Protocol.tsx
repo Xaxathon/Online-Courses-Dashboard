@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, FocusEvent } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import { ReactComponent as Delete } from "@assets/icons/delete.svg";
@@ -8,6 +8,7 @@ import ProtocolTaskAddModal from "@components/protocolTaskAddModal/ProtocolTaskA
 import DeleteElementModal from "@components/deleteElementModal/DeleteElementModal";
 import ProtocolParticipantList from "@components/protocolParticipantList/ProtocolParticipantList";
 import ExternalUserAddModal from "@components/externalUserAddModal/ExternalUserAddModal";
+import ProtocolTextModal from "@/components/protocolTextModal/ProtocolTextModal";
 import Skeleton from "@components/skeleton/Skeleton";
 
 import { useFormik } from "formik";
@@ -28,26 +29,13 @@ import {
 } from "@/api/protocolsApi";
 
 import { ExternalUser, InternalUser } from "@/shared/interfaces/user";
-import ProtocolTextModal from "@/components/protocolTextModal/ProtocolTextModal";
+import { ProtocolStage } from "@/shared/interfaces/protocol";
 
 const Protocol = () => {
 	const { id } = useParams<{ id: string }>();
+	const navigate = useNavigate();
+
 	const [shouldFetchProtocol, setShouldFetchProtocol] = useState(true);
-	const {
-		data: protocol,
-		error,
-		isLoading,
-		refetch,
-	} = useGetProtocolQuery(Number(id), {
-		skip: !shouldFetchProtocol,
-		refetchOnMountOrArgChange: false,
-	});
-	const [updateProtocol] = useUpdateProtocolMutation();
-	const [deleteProtocol] = useDeleteProtocolMutation();
-
-	const [generatePDF] = useGeneratePDFMutation();
-	const [generateDOCX] = useGenerateDOCXMutation();
-
 	const [isModalOpenUser, setIsModalOpenUser] = useState<boolean>(false);
 	const [isModalOpenTask, setIsModalOpenTask] = useState<boolean>(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
@@ -68,7 +56,20 @@ const Protocol = () => {
 		status: "process",
 	});
 
-	const navigate = useNavigate();
+	const {
+		data: protocol,
+		error,
+		isLoading,
+	} = useGetProtocolQuery(Number(id), {
+		skip: !shouldFetchProtocol,
+		refetchOnMountOrArgChange: false,
+	});
+	const [updateProtocol] = useUpdateProtocolMutation();
+	const [deleteProtocol] = useDeleteProtocolMutation();
+
+	const [generatePDF] = useGeneratePDFMutation();
+	const [generateDOCX] = useGenerateDOCXMutation();
+
 	useEffect(() => {
 		if (protocol) {
 			setInitialValues({
@@ -111,21 +112,6 @@ const Protocol = () => {
 		},
 	});
 
-	const handleOpenModalUser = (field: "secretary" | "supervisor") => {
-		setIsSelectingFor(field);
-		setIsModalOpenUser(true);
-	};
-
-	const handleCloseModalUser = () => {
-		setIsModalOpenUser(false);
-		setIsSelectingFor(null);
-	};
-
-	const handleCloseTextModal = () => {
-		setIsModalOpenText(false);
-		setShouldFetchProtocol(true);
-	};
-
 	const handleUserSelect = (user: InternalUser | ExternalUser) => {
 		if (isSelectingFor === "secretary") {
 			formik.setFieldValue("secretary_id", user.id);
@@ -136,17 +122,6 @@ const Protocol = () => {
 		}
 		formik.submitForm();
 		handleCloseModalUser();
-	};
-
-	const handleBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
-		const { name } = e.target;
-		const currentValue = formik.values[name as keyof typeof formik.values];
-		const initialValue = initialValues[name as keyof typeof initialValues];
-
-		if (currentValue !== initialValue) {
-			formik.setFieldTouched(name, true, false);
-			await formik.submitForm();
-		}
 	};
 
 	const handleStatusToggle = async () => {
@@ -168,6 +143,17 @@ const Protocol = () => {
 		setIsUpdatingStatus(false);
 	};
 
+	const handleBlur = async (e: FocusEvent<HTMLInputElement>) => {
+		const { name } = e.target;
+		const currentValue = formik.values[name as keyof typeof formik.values];
+		const initialValue = initialValues[name as keyof typeof initialValues];
+
+		if (currentValue !== initialValue) {
+			formik.setFieldTouched(name, true, false);
+			await formik.submitForm();
+		}
+	};
+
 	const handleDelete = async () => {
 		try {
 			await deleteProtocol(Number(id)).unwrap();
@@ -177,17 +163,22 @@ const Protocol = () => {
 		}
 	};
 
-	if (isLoading)
-		return (
-			<div className="grid grid-cols-2 w-full my-10 gap-5 mx-5">
-				<div className="flex flex-col justify-center items-center bg-gray-100 rounded-2xl p-5 w-full gap-3">
-					<Skeleton width="full" height="full" className="rounded-lg mx-auto" />
-				</div>
-				<div className="flex flex-col justify-center items-center bg-gray-100 rounded-2xl p-5 w-full gap-3">
-					<Skeleton width="full" height="full" className="rounded-lg mx-auto" />
-				</div>
-			</div>
-		);
+	const handleOpenModalUser = (field: "secretary" | "supervisor") => {
+		setIsSelectingFor(field);
+		setIsModalOpenUser(true);
+	};
+
+	const handleCloseModalUser = () => {
+		setIsModalOpenUser(false);
+		setIsSelectingFor(null);
+	};
+
+	const handleCloseTextModal = () => {
+		setIsModalOpenText(false);
+		setShouldFetchProtocol(true);
+	};
+
+	if (isLoading) return <SkeletonProtocol />;
 	if (error)
 		return (
 			<div className="mt-5 text-mainPurple font-bold mx-auto">
@@ -196,7 +187,7 @@ const Protocol = () => {
 		);
 	if (!protocol)
 		return (
-			<div className="mt-5 text-mainPurple font-bold mx-auto">
+			<div className="mt-5 text-gardenGreen font-bold mx-auto">
 				Нет данных протокола
 			</div>
 		);
@@ -213,7 +204,7 @@ const Protocol = () => {
 				</h1>
 				<div className="flex gap-8 justify-center items-center">
 					<div className="flex gap-4">
-						{protocol?.data.stage === "final" && (
+						{protocol?.data.stage === ProtocolStage.Final && (
 							<div className="flex gap-4">
 								<button
 									className="text-base bg-mainPurple text-white px-4 py-1 rounded-lg hover:bg-mainPurpleHover active:bg-mainPurpleActive"
@@ -232,7 +223,7 @@ const Protocol = () => {
 					</div>
 
 					<Delete
-						className="w-7 h-7 fill-current text-crimsonRed hover:text-crimsonRed cursor-pointer"
+						className="w-7 h-7 fill-current text-gray-500 hover:text-crimsonRed cursor-pointer"
 						onClick={() => setIsDeleteModalOpen(true)}
 					/>
 				</div>
@@ -287,7 +278,7 @@ const Protocol = () => {
 								Повестка
 							</label>
 							<input
-								className="w-full px-3 py-4 bg-lightPurple rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
+								className="w-full px-3 py-4 bg-lightPurple rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent  "
 								id="agenda"
 								name="agenda"
 								type="text"
@@ -306,7 +297,7 @@ const Protocol = () => {
 								Секретарь
 							</label>
 							<input
-								className="w-full px-3 py-4 bg-lightPurple rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent cursor-pointer"
+								className="w-full px-3 py-4 bg-lightPurple rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent cursor-pointer  hover:bg-lightPurpleHover transition-colors duration-200 ease-in-out"
 								id="secretary"
 								name="secretaryName"
 								type="text"
@@ -320,7 +311,7 @@ const Protocol = () => {
 								Председатель
 							</label>
 							<input
-								className="w-full px-3 py-4 bg-lightPurple rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent cursor-pointer"
+								className="w-full px-3 py-4 bg-lightPurple rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent cursor-pointer  hover:bg-lightPurpleHover transition-colors duration-200 ease-in-out"
 								id="director"
 								name="directorName"
 								type="text"
@@ -407,3 +398,16 @@ const Protocol = () => {
 };
 
 export default Protocol;
+
+const SkeletonProtocol = () => {
+	return (
+		<div className="grid grid-cols-2 w-full my-10 gap-5 mx-5">
+			<div className="flex flex-col justify-center items-center bg-gray-100 rounded-2xl p-5 w-full gap-3">
+				<Skeleton width="full" height="full" className="rounded-lg mx-auto" />
+			</div>
+			<div className="flex flex-col justify-center items-center bg-gray-100 rounded-2xl p-5 w-full gap-3">
+				<Skeleton width="full" height="full" className="rounded-lg mx-auto" />
+			</div>
+		</div>
+	);
+};

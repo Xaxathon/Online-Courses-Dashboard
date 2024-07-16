@@ -1,10 +1,17 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, TextareaHTMLAttributes } from "react";
 
 import { ReactComponent as DragAndDropIcon } from "@assets/icons/drag-and-drop-icon.svg";
 
 import Modal from "../modal/Modal";
 
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import {
+	Formik,
+	Form,
+	Field,
+	ErrorMessage,
+	FieldInputProps,
+	FormikProps,
+} from "formik";
 import * as Yup from "yup";
 import classNames from "classnames";
 import dayjs from "dayjs";
@@ -36,6 +43,12 @@ interface ProtocolTextModalProps {
 	city: string;
 	event_start_time: string;
 	onClose: () => void;
+}
+
+interface AutoResizeTextAreaProps
+	extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "form"> {
+	field: FieldInputProps<string>;
+	form: FormikProps<FormValues>;
 }
 
 const ProtocolTextModal = ({
@@ -258,7 +271,11 @@ const ProtocolTextModal = ({
 
 export default ProtocolTextModal;
 
-const AutoResizeTextArea = ({ field, form, ...props }: any) => {
+const AutoResizeTextArea = ({
+	field,
+	form,
+	...props
+}: AutoResizeTextAreaProps) => {
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 	useEffect(() => {

@@ -19,43 +19,29 @@ import { UserRole } from "@/shared/interfaces/user";
 const UserSetting = () => {
 	const navigate = useNavigate();
 
+	const role = useSelector((state: RootState) => state.auth.role);
+
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
 	const [fetchUser, { data: userData, isLoading, isError }] =
 		useLazyFetchPersonalUserQuery();
-
-	const role = useSelector((state: RootState) => state.auth.role);
 
 	useEffect(() => {
 		fetchUser();
 	}, [fetchUser]);
 
-	const handleBack = () => {
-		navigate(-1);
-	};
-
-	const handleOpenModal = () => {
-		setIsModalOpen(true);
-	};
-
-	const handleCloseModal = () => {
-		setIsModalOpen(false);
-	};
-
-	const handleUserAdded = () => {
-		handleCloseModal();
-	};
 	return (
 		<div className="mt-7 w-full mr-4 mb-20">
 			<div className="flex items-center justify-between font-bold text-mainPurple xl:text-2xl text-xl rounded-xl bg-gray-100 py-2 px-7">
 				<Backward
 					className="w-9 h-9 cursor-pointer fill-current text-mainPurple hover:text-mainPurpleHover active:text-mainPurpleActive"
-					onClick={handleBack}
+					onClick={() => navigate(-1)}
 				/>
 				<h1 className="text-center w-full">Данные о пользователях</h1>
 				{role && [UserRole.Admin, UserRole.Manager].includes(role) && (
 					<AddUserIcon
 						className="w-10 h-10 cursor-pointer"
-						onClick={handleOpenModal}
+						onClick={() => setIsModalOpen(true)}
 					/>
 				)}
 			</div>
@@ -87,9 +73,9 @@ const UserSetting = () => {
 			</div>
 			{isModalOpen && role && role !== UserRole.Secretary && (
 				<UserAddFormModal
-					onClose={handleCloseModal}
+					onClose={() => setIsModalOpen(false)}
 					role={role}
-					onUserAdded={handleUserAdded}
+					onUserAdded={() => setIsModalOpen(false)}
 				/>
 			)}
 		</div>

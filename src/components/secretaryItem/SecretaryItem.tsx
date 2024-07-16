@@ -11,7 +11,6 @@ interface SecretaryItemProps {
 const SecretaryItem = memo(
 	forwardRef<HTMLLIElement, SecretaryItemProps>(
 		({ fullName, onClick, isActive }, ref) => {
-			console.log("Protocols item");
 			return (
 				<li
 					ref={ref}

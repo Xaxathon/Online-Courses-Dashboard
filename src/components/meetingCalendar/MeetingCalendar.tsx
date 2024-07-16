@@ -45,7 +45,7 @@ const MeetingCalendar = ({
 		}
 	}, [location.search]);
 
-	const handleDateChange: CalendarProps["onChange"] = (value: any) => {
+	const handleDateChange: CalendarProps["onChange"] = (value) => {
 		if (value instanceof Date) {
 			const newDate = dayjs(value).startOf("day").toDate();
 			setDate(newDate);
@@ -72,16 +72,16 @@ const MeetingCalendar = ({
 			const dayMeetings = meetings.filter((meeting) =>
 				dayjs(meeting.event_date).isSame(dayjs(tileDate), "day")
 			);
+			const visibleMeetings = dayMeetings.slice(0, 2);
+
 			return (
-				<div>
-					{dayMeetings.map((meeting) => (
-						<Event key={meeting.id}>
-							{meeting.theme && meeting.theme.length > 7
-								? `${meeting.theme.slice(0, 6)}...`
-								: meeting.theme}{" "}
+				<EventsContainer>
+					{visibleMeetings.map((meeting) => (
+						<Event key={meeting.id} title={meeting.theme}>
+							{meeting.theme}
 						</Event>
 					))}
-				</div>
+				</EventsContainer>
 			);
 		}
 		return null;
@@ -100,7 +100,7 @@ const MeetingCalendar = ({
 		return "";
 	};
 
-	const renderMonthLabel = (locale: string | undefined, date: Date) => {
+	const renderMonthLabel = (_: string | undefined, date: Date) => {
 		return dayjs(date).format("MMMM");
 	};
 
@@ -109,8 +109,16 @@ const MeetingCalendar = ({
 			<StyledCalendar
 				onChange={handleDateChange}
 				value={date}
-				prevLabel={<span>&lt;</span>}
-				nextLabel={<span>&gt;</span>}
+				prevLabel={
+					<span className="hover:text-mainPurpleHover active:text-mainPurpleActive">
+						&lt;
+					</span>
+				}
+				nextLabel={
+					<span className="hover:text-mainPurpleHover active:text-mainPurpleActive">
+						&gt;
+					</span>
+				}
 				prev2Label={null}
 				next2Label={null}
 				navigationLabel={({ date }) => renderMonthLabel("ru-RU", date)}
@@ -151,6 +159,7 @@ const StyledCalendar = styled(LibCalendar)`
 	& .react-calendar__navigation {
 		display: flex;
 		padding: 0 12.5rem;
+		margin: 1rem 0;
 		justify-content: center;
 		align-items: center;
 		font-size: 1.3rem;
@@ -174,11 +183,11 @@ const StyledCalendar = styled(LibCalendar)`
 
 	& .react-calendar__month-view__weekdays {
 		text-align: center;
-		font-size: 1.2rem;
+		font-size: 1.5rem;
 		font-weight: bold;
 		color: #779f7c;
 		text-decoration: none;
-		margin-bottom: 1.2rem;
+		margin-bottom: 0.5rem;
 
 		& .react-calendar__month-view__weekdays__weekday {
 			padding: 0.6rem 0;
@@ -201,6 +210,11 @@ const StyledCalendar = styled(LibCalendar)`
 		color: #3eb1b8;
 		flex-direction: column;
 		overflow-y: hidden;
+		transition: opacity 0.3s ease;
+
+		&:hover {
+			background-color: rgb(212, 251, 253);
+		}
 
 		&.react-calendar__tile--active {
 			background: #68a7f5;
@@ -218,13 +232,26 @@ const StyledCalendar = styled(LibCalendar)`
 	}
 `;
 
+const EventsContainer = styled.div`
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	overflow: hidden;
+`;
+
 const Event = styled.div`
-	background-color: #7130a3;
-	color: #fff;
-	padding: 0.4rem 0.8rem;
-	border-radius: 1.2rem;
-	margin: 0.2rem auto;
 	display: inline-block;
-	font-size: 1rem;
+	margin-bottom: 0 auto;
+	text-align: start;
+	background-color: #7130a3;
+	margin-bottom: 0.1rem;
+	color: #fff;
+	padding: 0.3rem 0.3rem;
+	border-radius: 1rem;
+	font-size: 0.7rem;
 	font-weight: 500;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 100%;
 `;

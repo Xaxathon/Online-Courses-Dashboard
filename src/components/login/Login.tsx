@@ -59,14 +59,18 @@ const Login = () => {
 				} else {
 					throw new Error("Token not found in response");
 				}
-			} catch (err: any) {
-				setErrors({
-					submit: err.data?.message || "Не удалось авторизоваться",
-				});
+			} catch (error) {
+				if (error && typeof error === "object" && "data" in error) {
+					const errorData = error as { data?: { message?: string } };
+					setErrors({
+						submit: errorData.data?.message,
+					});
+				}
 			}
 			setSubmitting(false);
 		},
 	});
+
 	return (
 		<div className="flex items-center justify-center min-h-screen top-0 left-0 w-full text-mainPurple">
 			<form

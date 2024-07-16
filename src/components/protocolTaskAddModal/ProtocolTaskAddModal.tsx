@@ -1,6 +1,14 @@
 import { useState, useRef } from "react";
 
-import { Formik, Form, Field, FieldArray, ErrorMessage } from "formik";
+import {
+	Formik,
+	Form,
+	Field,
+	FieldArray,
+	ErrorMessage,
+	FormikProps,
+	FormikHelpers,
+} from "formik";
 import * as Yup from "yup";
 
 import Modal from "../modal/Modal";
@@ -9,12 +17,25 @@ import ExternalUserAddModal from "../externalUserAddModal/ExternalUserAddModal";
 import { useCreateProtocolTaskMutation } from "@/api/protocolsApi";
 
 import { ExternalUser, InternalUser } from "@/shared/interfaces/user";
+import { Protocol, ProtocolTaskData } from "@/shared/interfaces/protocol";
 
 interface ProtocolTaskAddModalProps {
 	protocolId: number;
-	protocolData: any;
+	protocolData: Protocol;
 	onClose: () => void;
 }
+
+interface FormTaskData {
+	responsible_id: number;
+	responsible_name: string;
+	essence: string;
+}
+
+interface ProtocolTaskForm {
+	tasks: FormTaskData[];
+	deadline: string;
+}
+
 const validationSchema = Yup.object().shape({
 	tasks: Yup.array().of(
 		Yup.object().shape({
@@ -31,7 +52,7 @@ const ProtocolTaskAddModal = ({
 	protocolData,
 	onClose,
 }: ProtocolTaskAddModalProps) => {
-	const formRef = useRef<any>(null);
+	const formRef = useRef<FormikProps<ProtocolTaskForm>>(null);
 
 	const [isModalOpenUser, setIsModalOpenUser] = useState<boolean>(false);
 	const [currentTaskIndex, setCurrentTaskIndex] = useState<number | null>(null);
@@ -40,14 +61,25 @@ const ProtocolTaskAddModal = ({
 	const [createTask, { isError: isCreateError }] =
 		useCreateProtocolTaskMutation();
 
-	const handleSubmit = async (values: any, { setSubmitting }: any) => {
+	const handleSubmit = async (
+		values: ProtocolTaskForm,
+		{ setSubmitting }: FormikHelpers<ProtocolTaskForm>
+	) => {
 		setIsSaving(true);
 		try {
 			if (protocolData) {
 				for (const task of values.tasks) {
+					const taskData: ProtocolTaskData = {
+						...task,
+						deadline: values.deadline,
+						status: "",
+					};
+					{
+						/* бэк сам определяет статус */
+					}
 					await createTask({
 						protocolId,
-						data: { ...task, deadline: values.deadline },
+						data: taskData,
 					}).unwrap();
 				}
 				onClose();
@@ -128,7 +160,7 @@ const ProtocolTaskAddModal = ({
 												<div key={index}>
 													<Field
 														name={`tasks[${index}].responsible_name`}
-														className="w-full text-base bg-lightPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent cursor-pointer "
+														className="w-full text-base bg-lightPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent cursor-pointer hover:bg-lightPurpleHover"
 														onClick={() => handleOpenModalUser(index)}
 														readOnly
 													/>
@@ -152,8 +184,6 @@ const ProtocolTaskAddModal = ({
 									name="deadline"
 									type="date"
 									className="text-xl my-2 bg-lightPurple p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
-									placeholder="дд.мм.гггг"
-									pattern="\d{2}.\d{2}.\d{4}"
 								/>
 								<ErrorMessage
 									name="deadline"

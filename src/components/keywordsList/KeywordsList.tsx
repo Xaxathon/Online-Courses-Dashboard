@@ -30,7 +30,6 @@ const KeywordsList = () => {
 			</div>
 		);
 
-	console.log("render keywords list");
 	return (
 		<ul className="mt-10 max-w-6xl mx-auto">
 			{data && data.data.length > 0 ? (

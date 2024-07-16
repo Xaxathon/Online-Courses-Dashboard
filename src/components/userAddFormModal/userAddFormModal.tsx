@@ -19,14 +19,21 @@ interface UserAddFormModalProps {
 	onUserAdded: () => void;
 }
 
+interface ApiError {
+	data?: {
+		message?: string;
+		errors?: Record<string, string[]>;
+	};
+}
+
 const UserAddFormModal = ({
 	onClose,
 	role,
 	onUserAdded,
 }: UserAddFormModalProps) => {
-	const [createUser, { isLoading }] = useCreateUserMutation();
-	const [backendErrors, setBackendErrors] = useState<string | null>(null);
 	const [showPassword, setShowPassword] = useState<boolean>(false);
+
+	const [createUser, { isLoading, error }] = useCreateUserMutation();
 
 	const initialValues: Partial<Omit<InternalUser, "id">> & {
 		password: string;
@@ -66,16 +73,13 @@ const UserAddFormModal = ({
 			await createUser(values as CreateUserRequest).unwrap();
 			onUserAdded();
 			onClose();
-		} catch (err: any) {
-			const errors: any = {};
-			if (err.data?.errors) {
-				for (const key in err.data.errors) {
-					errors[key] = err.data.errors[key].join(", ");
+		} catch (error) {
+			const apiError = error as ApiError;
+			const errors: Record<string, string> = {};
+			if (apiError.data?.errors) {
+				for (const [key, messages] of Object.entries(apiError.data.errors)) {
+					errors[key] = messages.join(", ");
 				}
-			} else {
-				setBackendErrors(
-					err.data?.message || "Не удалось создать пользователя"
-				);
 			}
 			setErrors(errors);
 		}
@@ -160,10 +164,11 @@ const UserAddFormModal = ({
 						/>
 					</div>
 
-					{backendErrors && (
-						<div className="text-crimsonRed text-base mt-3 font-bold">
-							{backendErrors}
-						</div>
+					{error && (
+						<span className="block text-crimsonRed text-base mt-3 font-bold">
+							{(error as ApiError).data?.message ||
+								"Не удалось создать пользователя"}
+						</span>
 					)}
 
 					<button
@@ -171,7 +176,7 @@ const UserAddFormModal = ({
 						className="px-5 py-2 mx-auto text-white bg-mainPurple rounded-lg hover:bg-mainPurpleHover active:bg-mainPurpleActive"
 						disabled={isLoading}
 					>
-						{isLoading ? "Загрузка..." : "Добавить"}
+						{isLoading ? "Добавления..." : "Добавить"}
 					</button>
 				</Form>
 			</Formik>

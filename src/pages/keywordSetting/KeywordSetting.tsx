@@ -11,24 +11,12 @@ const KeywordSetting = () => {
 	const navigate = useNavigate();
 	const [isModalOpen, setModalOpen] = useState(false);
 
-	const handleBack = () => {
-		navigate(-1);
-	};
-
-	const handleOpenModal = () => {
-		setModalOpen(true);
-	};
-
-	const handleCloseModal = () => {
-		setModalOpen(false);
-	};
-
 	return (
 		<div className="mt-7 w-full mr-4">
 			<div className="min-w-full flex items-center justify-between py-2 px-10 font-bold text-mainPurple rounded-xl bg-gray-100">
 				<Backward
 					className="w-9 h-9 cursor-pointer fill-current text-mainPurple hover:text-mainPurpleHover active:text-mainPurpleActive"
-					onClick={handleBack}
+					onClick={() => navigate(-1)}
 				/>
 
 				<h1 className="text-center w-full lg:text-2xl text-xl">
@@ -37,7 +25,7 @@ const KeywordSetting = () => {
 
 				<AddKeywordIcon
 					className="w-9 h-9 cursor-pointer "
-					onClick={handleOpenModal}
+					onClick={() => setModalOpen(true)}
 				/>
 			</div>
 			<div className="max-w-6xl  grid grid-cols-2 items-center mt-10 gap-3 font-bold mx-auto text-mainPurple text-lg rounded-xl bg-gray-100 py-4 px-8">
@@ -45,7 +33,7 @@ const KeywordSetting = () => {
 				<h2>Фраза</h2>
 			</div>
 			<KeywordsList />
-			{isModalOpen && <KeywordAddModal onClose={handleCloseModal} />}
+			{isModalOpen && <KeywordAddModal onClose={() => setModalOpen(false)} />}
 		</div>
 	);
 };

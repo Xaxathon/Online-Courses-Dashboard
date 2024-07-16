@@ -15,14 +15,33 @@ import { logout } from "@/store/slices/authSlice";
 import { useLogoutMutation } from "@/api/authApi";
 
 import { UserRole } from "@/shared/interfaces/user";
+import classNames from "classnames";
 
-const Sidebar: React.FC = () => {
-	const [logoutApi] = useLogoutMutation();
-	const dispatch = useDispatch<AppDispatch>();
+const Sidebar = () => {
 	const navigate = useNavigate();
+	const dispatch = useDispatch<AppDispatch>();
 	const location = useLocation();
 
+	const [logoutApi, { isLoading: isLogoutLoading, isError: isLogoutError }] =
+		useLogoutMutation();
 	const role = useSelector((state: RootState) => state.auth.role);
+
+	useEffect(() => {
+		if (location.pathname === "/main" && role) {
+			navigate(getHomeRoute());
+		}
+	}, [role, navigate, location.pathname]);
+
+	const getLinkStyle = (path: string) => {
+		const baseStyle = "w-8 h-8 transition-all duration-200 ease-in-out";
+		const activeStyle = "text-white";
+		const inactiveStyle =
+			"text-white/40 hover:text-white/70 active:text-white/20";
+
+		return `${baseStyle} ${
+			location.pathname.includes(path) ? activeStyle : inactiveStyle
+		}`;
+	};
 
 	const handleLogout = async () => {
 		try {
@@ -45,23 +64,6 @@ const Sidebar: React.FC = () => {
 			default:
 				return "/main";
 		}
-	};
-
-	useEffect(() => {
-		if (location.pathname === "/main" && role) {
-			navigate(getHomeRoute());
-		}
-	}, [role, navigate, location.pathname]);
-
-	const getLinkStyle = (path: string) => {
-		const baseStyle = "w-8 h-8 transition-all duration-200 ease-in-out";
-		const activeStyle = "text-white";
-		const inactiveStyle =
-			"text-white/40 hover:text-white/70 active:text-white/20";
-
-		return `${baseStyle} ${
-			location.pathname.includes(path) ? activeStyle : inactiveStyle
-		}`;
 	};
 
 	return (
@@ -123,9 +125,17 @@ const Sidebar: React.FC = () => {
 							</li>
 						)}
 				</ul>
-				<button onClick={handleLogout} className="flex-shrink-0">
-					<Logout className="w-10 h-10 fill-current text-white hover:text-crimsonRed transition-colors duration-200 ease-in-out" />
-				</button>
+				<Logout
+					className={classNames(
+						"w-10 h-10 fill-current hover:text-crimsonRed transition-colors duration-200 ease-in-out flex-shrink-0",
+						{
+							"text-gray-400 cursor-not-allowed": isLogoutLoading,
+							"text-white cursor-pointer": !isLogoutLoading,
+							"text-crimsonRed": isLogoutError,
+						}
+					)}
+					onClick={handleLogout}
+				/>
 			</nav>
 		</aside>
 	);

@@ -9,11 +9,6 @@ const initialState: AuthState = {
 		id: localStorage.getItem("userId")
 			? parseInt(localStorage.getItem("userId")!, 10)
 			: undefined,
-		full_name: "",
-		email: "",
-		department: "",
-		is_active: false,
-		avatar: "",
 		role: undefined,
 	},
 };
@@ -38,10 +33,6 @@ const authSlice = createSlice({
 			}
 			localStorage.setItem("userId", action.payload.toString());
 		},
-		setUser(state, action: PayloadAction<AuthState["user"]>) {
-			state.user = action.payload;
-			localStorage.setItem("user", JSON.stringify(action.payload));
-		},
 		logout(state) {
 			state.token = null;
 			state.role = null;
@@ -54,7 +45,6 @@ const authSlice = createSlice({
 	},
 });
 
-export const { setToken, setRole, setUserId, setUser, logout } =
-	authSlice.actions;
+export const { setToken, setRole, setUserId, logout } = authSlice.actions;
 
 export default authSlice.reducer;

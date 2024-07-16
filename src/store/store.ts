@@ -1,5 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
+
 import notificationReducer from "./slices/notificationSlice";
+
 import { authApi } from "../api/authApi";
 import authReducer from "./slices/authSlice";
 import { keywordsApi } from "../api/keywordsApi";

@@ -232,7 +232,7 @@ const MeetingForm = ({
 							</span>
 							<button
 								type="button"
-								className="bg-gardenGreen font-bold text-xl rounded-md text-white p-2 leading-none"
+								className="bg-gardenGreen font-bold text-xl rounded-md text-white p-2 leading-none hover:bg-gardenGreenHover"
 								onClick={onOpenUserModal}
 								disabled={isSubmitting}
 							>
@@ -247,7 +247,7 @@ const MeetingForm = ({
 								>
 									<div className="flex items-center space-x-2">
 										<Delete
-											className="w-6 h-6 fill-current text-crimsonRed hover:text-crimsonRed cursor-pointer"
+											className="w-6 h-6 fill-current text-gray-400 hover:text-crimsonRed cursor-pointer"
 											onClick={() => handleDeleteMember(member.member_id)}
 										/>
 										<span className="text-[12px] font-bold text-mainPurple">
@@ -263,7 +263,10 @@ const MeetingForm = ({
 												type="checkbox"
 												name="checkbox"
 												id="checkbox"
-												className="w-7 h-7 border-2 cursor-pointer"
+												className={classNames("w-7 h-7 border-2", {
+													"cursor-not-allowed": member.email_sent,
+													"cursor-pointer": !member.email_sent,
+												})}
 												checked={!!member.should_notify}
 												onChange={() => handleCheckboxChange(member.member_id)}
 												disabled={member.email_sent}

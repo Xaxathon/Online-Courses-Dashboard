@@ -8,7 +8,7 @@ import Portal from "../portal/Portal";
 import { RootState, AppDispatch } from "../../store/store";
 import { hideNotification } from "../../store/slices/notificationSlice";
 
-const Notification = () => {
+const ProtocolNotification = () => {
 	const dispatch = useDispatch<AppDispatch>();
 	const navigate = useNavigate();
 	const { message, isVisible, protocolId } = useSelector(
@@ -46,4 +46,4 @@ const Notification = () => {
 	);
 };
 
-export default Notification;
+export default ProtocolNotification;

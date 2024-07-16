@@ -1,36 +1,45 @@
 import { useCallback, useEffect, useState, useRef, useMemo } from "react";
+
 import { ReactComponent as Search } from "@assets/icons/search.svg";
 import { ReactComponent as Spinner } from "@assets/icons/spinner.svg";
+
 import SecretaryList from "@components/secretaryList/SecretaryList";
 import SecretaryCarousel from "@components/secretaryCarousel/SecretaryCarousel";
 import Skeleton from "@components/skeleton/Skeleton";
+
 import {
 	getPreviousSecretaryId,
 	getNextSecretaryId,
 	filterInternalUsers,
 } from "@/utils/secretaryCarousel";
-import { useFetchManagerStatsQuery } from "@/api/statsApi";
+
 import {
 	useFetchUsersQuery,
 	useLazyFetchPersonalUserQuery,
 } from "@/api/authApi";
+import { useFetchManagerStatsQuery } from "@/api/statsApi";
+
 import { InternalUser, User } from "@/shared/interfaces/user";
 
 const DEFAULT_LIMIT = 15;
 const SEARCH_DELAY = 500;
 
-const Secretaries: React.FC = () => {
+const Secretaries = () => {
 	const [selectedSecretaryId, setSelectedSecretaryId] = useState<number | null>(
 		null
 	);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [page, setPage] = useState(1);
 	const [allSecretaries, setAllSecretaries] = useState<User[]>([]);
+
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-	const [fetchUser, { data: userData, isLoading: isUserLoading }] =
-		useLazyFetchPersonalUserQuery();
+	const [
+		fetchUser,
+		{ data: userData, isLoading: isUserLoading, isError: isUserError },
+	] = useLazyFetchPersonalUserQuery();
+
 	const { data: managerStats } = useFetchManagerStatsQuery();
 
 	const {
@@ -70,10 +79,6 @@ const Secretaries: React.FC = () => {
 		}
 	}, [secretariesData, page, searchTerm]);
 
-	const handleSecretarySelect = useCallback((id: number) => {
-		setSelectedSecretaryId(id);
-	}, []);
-
 	const handleNavigation = useCallback(
 		(direction: "left" | "right") => {
 			if (selectedSecretaryId !== null && allSecretaries.length > 0) {
@@ -89,20 +94,6 @@ const Secretaries: React.FC = () => {
 		},
 		[selectedSecretaryId, allSecretaries]
 	);
-
-	const handleLeftClick = () => handleNavigation("left");
-	const handleRightClick = () => handleNavigation("right");
-
-	const handleSearchChange = useCallback(() => {
-		if (searchTimeoutRef.current) {
-			clearTimeout(searchTimeoutRef.current);
-		}
-
-		searchTimeoutRef.current = setTimeout(() => {
-			setSearchTerm(searchInputRef.current?.value || "");
-			setPage(1);
-		}, SEARCH_DELAY);
-	}, []);
 
 	const lastSecretaryElementRef = useCallback(
 		(node: HTMLElement | null) => {
@@ -126,12 +117,27 @@ const Secretaries: React.FC = () => {
 		[isFetching, secretariesData, searchTerm]
 	);
 
+	const handleSearchChange = useCallback(() => {
+		if (searchTimeoutRef.current) {
+			clearTimeout(searchTimeoutRef.current);
+		}
+
+		searchTimeoutRef.current = setTimeout(() => {
+			setSearchTerm(searchInputRef.current?.value || "");
+			setPage(1);
+		}, SEARCH_DELAY);
+	}, []);
+
 	const selectedSecretary = useMemo(() => {
 		const secretary = allSecretaries.find(
 			(secretary) => secretary.id === selectedSecretaryId
 		);
 		return secretary as InternalUser;
 	}, [selectedSecretaryId, allSecretaries]);
+
+	const handleSecretarySelect = useCallback((id: number) => {
+		setSelectedSecretaryId(id);
+	}, []);
 
 	return (
 		<div className="mx-4 mt-7 w-full">
@@ -142,6 +148,11 @@ const Secretaries: React.FC = () => {
 							<span className="">Дашборд менеджера: </span>
 							{isUserLoading && (
 								<Skeleton width="1/2" height="6" className="rounded-lg" />
+							)}
+							{isUserError && (
+								<span className="font-bold text-crimsonRed">
+									Ошибка при загрузке данных
+								</span>
 							)}
 							<span className="font-bold">{userData?.data.full_name}</span>
 						</div>
@@ -156,8 +167,8 @@ const Secretaries: React.FC = () => {
 					) : (
 						<SecretaryCarousel
 							userData={selectedSecretary}
-							onLeftClick={handleLeftClick}
-							onRightClick={handleRightClick}
+							onLeftClick={() => handleNavigation("left")}
+							onRightClick={() => handleNavigation("right")}
 						/>
 					)}
 				</div>
@@ -190,10 +201,10 @@ const Secretaries: React.FC = () => {
 					<span className="text-center">Протоколы</span>
 					<div className="flex justify-center items-center mt-1 gap-3">
 						<span className="text-mainPurple">
-							{managerStats?.data.protocols.in_process}
+							{managerStats?.data.protocols.in_process || 0}
 						</span>
 						<span className="text-gardenGreen">
-							{managerStats?.data.protocols.success}
+							{managerStats?.data.protocols.success || 0}
 						</span>
 					</div>
 				</div>
@@ -201,13 +212,13 @@ const Secretaries: React.FC = () => {
 					<span className="text-center">Задачи</span>
 					<div className="flex justify-center items-center mt-1 gap-5">
 						<span className="text-mainPurple">
-							{managerStats?.data.tasks.process}
+							{managerStats?.data.tasks.process || 0}
 						</span>
 						<span className="text-crimsonRed">
-							{managerStats?.data.tasks.expired}
+							{managerStats?.data.tasks.expired || 0}
 						</span>
 						<span className="text-gardenGreen">
-							{managerStats?.data.tasks.success}
+							{managerStats?.data.tasks.success || 0}
 						</span>
 					</div>
 				</div>
@@ -215,10 +226,10 @@ const Secretaries: React.FC = () => {
 					<span className="text-center">Совещания</span>
 					<div className="flex justify-center items-center mt-1 gap-3">
 						<span className="text-mainPurple">
-							{managerStats?.data.meetings.in_process}
+							{managerStats?.data.meetings.in_process || 0}
 						</span>
 						<span className="text-gardenGreenHover">
-							{managerStats?.data.meetings.success}
+							{managerStats?.data.meetings.success || 0}
 						</span>
 					</div>
 				</div>

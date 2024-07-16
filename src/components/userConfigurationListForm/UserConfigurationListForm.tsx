@@ -27,6 +27,25 @@ const UserConfigurationListForm = () => {
 
 	const observer = useRef<IntersectionObserver | null>(null);
 
+	useEffect(() => {
+		if (data?.data?.data) {
+			setAllUsers((prevUsers) => {
+				const newUsers = Array.isArray(data.data.data)
+					? data.data.data
+					: [data.data.data];
+				if (page === 1) {
+					return newUsers;
+				} else {
+					const uniqueNewUsers = newUsers.filter(
+						(newUser) =>
+							!prevUsers.some((prevUser) => prevUser.id === newUser.id)
+					);
+					return [...prevUsers, ...uniqueNewUsers];
+				}
+			});
+		}
+	}, [data]);
+
 	const lastUserElementRef = useCallback(
 		(node: HTMLElement | null) => {
 			if (isFetching) return;
@@ -48,40 +67,6 @@ const UserConfigurationListForm = () => {
 		},
 		[isFetching, data]
 	);
-
-	useEffect(() => {
-		if (data?.data?.data) {
-			setAllUsers((prevUsers) => {
-				const newUsers = Array.isArray(data.data.data)
-					? data.data.data
-					: [data.data.data];
-				if (page === 1) {
-					return newUsers;
-				} else {
-					const uniqueNewUsers = newUsers.filter(
-						(newUser) =>
-							!prevUsers.some((prevUser) => prevUser.id === newUser.id)
-					);
-					return [...prevUsers, ...uniqueNewUsers];
-				}
-			});
-		}
-	}, [data]);
-
-	if (isError)
-		return (
-			<div className="flex flex-col justify-center items-center mt-10 gap-4">
-				<p className="text-center text-crimsonRed font-bold">
-					Ошибка при загрузке данных
-				</p>
-				<button
-					onClick={() => refetch()}
-					className=" bg-crimsonRed text-white px-10 text-base py-2 rounded-lg"
-				>
-					Обновить
-				</button>
-			</div>
-		);
 
 	return (
 		<div className="max-w-[66rem] mx-auto">
@@ -112,6 +97,19 @@ const UserConfigurationListForm = () => {
 			{isFetching && (
 				<div className="flex justify-center items-center mt-4">
 					<Spinner className="w-6 h-6 animate-spin" />
+				</div>
+			)}
+			{isError && (
+				<div className="flex flex-col justify-center items-center mt-10 gap-4">
+					<p className="text-center text-crimsonRed font-bold">
+						Ошибка при загрузке данных
+					</p>
+					<button
+						onClick={() => refetch()}
+						className=" bg-crimsonRed text-white px-10 text-base py-2 rounded-lg"
+					>
+						Обновить
+					</button>
 				</div>
 			)}
 		</div>

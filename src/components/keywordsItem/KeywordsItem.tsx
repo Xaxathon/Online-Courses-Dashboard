@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useState } from "react";
 
 import classNames from "classnames";
 
@@ -55,7 +55,6 @@ const KeywordsItem = memo(({ keyword, refetch }: KeywordsItemProps) => {
 		title: Yup.string().required("Название обязательно"),
 		phrase: Yup.string().required("Фраза обязательна"),
 	});
-	console.log("render keywords item");
 	return (
 		<li className="relative mb-5 mr-5 pr-10 text-gardenGreen text-base font-normal rounded-xl bg-gray-100 py-7 px-8 hover:bg-gray-200  transition-colors duration-200">
 			<Formik

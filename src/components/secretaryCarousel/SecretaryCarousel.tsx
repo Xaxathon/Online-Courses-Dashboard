@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
+
 import { ReactComponent as Left } from "@assets/icons/left-arrow.svg";
 import { ReactComponent as Right } from "@assets/icons/right-arrow.svg";
 import AvatarError from "@assets/img/avatar.jpg";
@@ -11,6 +12,7 @@ import {
 	useFetchEntityStatsQuery,
 	useFetchKpiTasksStatsQuery,
 } from "@/api/statsApi";
+
 import { BaseUser } from "@/shared/interfaces/user";
 
 interface SecretaryCarouselProps {
@@ -31,15 +33,11 @@ const SecretaryCarousel = ({
 			skip: !userData?.id,
 		});
 
-	const formattedDate = useMemo(() => {
-		return currentMonth.toISOString().slice(0, 7); // format: "YYYY-MM"
-	}, [currentMonth]);
-
 	const { data: kpiStats, isLoading: isLoadingKpiStats } =
 		useFetchKpiTasksStatsQuery(
 			{
 				secretaryId: userData?.id || 0,
-				date: formattedDate,
+				date: currentMonth.toISOString().slice(0, 7),
 			},
 			{
 				skip: !userData?.id,

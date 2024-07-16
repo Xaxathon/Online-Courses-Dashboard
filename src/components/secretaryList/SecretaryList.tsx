@@ -1,7 +1,9 @@
-import SecretaryItem from "../secretaryItem/SecretaryItem";
-import { User } from "../../shared/interfaces/user";
-import Skeleton from "../skeleton/Skeleton";
 import { memo } from "react";
+
+import SecretaryItem from "../secretaryItem/SecretaryItem";
+import Skeleton from "../skeleton/Skeleton";
+
+import { User } from "../../shared/interfaces/user";
 
 interface SecretaryListProps {
 	secretaries: User[];
@@ -19,26 +21,6 @@ const SecretaryList = memo(
 		isLoading,
 		lastSecretaryElementRef,
 	}: SecretaryListProps) => {
-		if (isLoading && secretaries.length === 0) {
-			return (
-				<div className="flex flex-col gap-3 overflow-y-auto h-[80vh]">
-					<Skeleton width="3/4" height="20" className="rounded-md mt-1" />
-					<Skeleton width="3/4" height="20" className="rounded-md mt-1" />
-					<Skeleton width="3/4" height="20" className="rounded-md mt-1" />
-					<Skeleton width="3/4" height="20" className="rounded-md mt-1" />
-				</div>
-			);
-		}
-
-		if (secretaries.length === 0) {
-			return (
-				<span className="flex items-center justify-center text-mainPurple">
-					Нет секретарей
-				</span>
-			);
-		}
-
-		console.log("Protocols:");
 		return (
 			<ul className="flex flex-col gap-3 overflow-y-auto h-[76vh]">
 				{secretaries.map((secretary, index) => (
@@ -52,6 +34,19 @@ const SecretaryList = memo(
 						}
 					/>
 				))}
+				{isLoading && (
+					<div className="flex flex-col gap-3 overflow-y-auto h-[80vh]">
+						<Skeleton width="3/4" height="20" className="rounded-md mt-1" />
+						<Skeleton width="3/4" height="20" className="rounded-md mt-1" />
+						<Skeleton width="3/4" height="20" className="rounded-md mt-1" />
+						<Skeleton width="3/4" height="20" className="rounded-md mt-1" />
+					</div>
+				)}
+				{secretaries.length === 0 && (
+					<span className="block mx-auto text-center text-gardenGreen font-bold">
+						На данный момент нет секретарей
+					</span>
+				)}
 			</ul>
 		);
 	}

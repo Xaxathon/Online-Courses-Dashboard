@@ -1,21 +1,33 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+
 import MeetingCalendar from "@components/meetingCalendar/MeetingCalendar";
 import MeetingTheme from "@components/meetingTheme/MeetingTheme";
 import Skeleton from "@components/skeleton/Skeleton";
+
 import { getStartOfMonth, getEndOfMonth } from "@/utils/dateUtils";
+
 import { useGetMeetingsQuery } from "@/api/meetingsApi";
+
 import { Meeting } from "@/shared/interfaces/meeting";
 
 const Meetings = () => {
 	const location = useLocation();
+
+	const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
+	const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 	const [selectedDate, setSelectedDate] = useState<Date>(() => {
 		const params = new URLSearchParams(location.search);
 		const dateParam = params.get("date");
 		return dateParam ? new Date(dateParam) : new Date();
 	});
-	const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
-	const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+
+	const { data, error, isLoading, refetch } = useGetMeetingsQuery({
+		start_date_at: getStartOfMonth(currentMonth),
+		end_date_at: getEndOfMonth(currentMonth),
+	});
+
+	const meetings = data?.data || [];
 
 	useEffect(() => {
 		const params = new URLSearchParams(location.search);
@@ -27,33 +39,28 @@ const Meetings = () => {
 		}
 	}, [location.search]);
 
-	const { data, error, isLoading, refetch } = useGetMeetingsQuery({
-		start_date_at: getStartOfMonth(currentMonth),
-		end_date_at: getEndOfMonth(currentMonth),
-	});
-
-	const meetings = data?.data || [];
-
-	const handleMonthChange = useCallback((month: Date) => {
+	const handleMonthChange = (month: Date) => {
 		setCurrentMonth(month);
-	}, []);
+	};
 
-	const handleDateChange = useCallback((date: Date) => {
+	const handleDateChange = (date: Date) => {
 		setSelectedDate(date);
-	}, []);
+	};
 
-	const refetchMeetings = useCallback(async () => {
+	const refetchMeetings = async () => {
 		await refetch();
-	}, [refetch]);
+	};
 
 	if (isLoading) {
 		return <LoadingSkeleton />;
 	}
-
 	if (error) {
-		return <div>Error loading meetings</div>;
+		return (
+			<span className="block mx-auto text-center font-bold text-xl mt-10 text-crimsonRed">
+				Ошибка загрузки данных
+			</span>
+		);
 	}
-
 	return (
 		<div className="ml-3 grid grid-cols-[800px_minmax(470px,_470px)] gap-3 justify-between items-start mt-5 mr-6 w-full">
 			<MeetingCalendar

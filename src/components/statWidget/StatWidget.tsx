@@ -1,5 +1,3 @@
-import React from "react";
-
 import {
 	CircularProgressbarWithChildren,
 	buildStyles,
@@ -13,11 +11,7 @@ interface StatWidgetProps {
 	success: number;
 }
 
-const StatWidget: React.FC<StatWidgetProps> = ({
-	title,
-	inProcess,
-	success,
-}) => {
+const StatWidget = ({ title, inProcess, success }: StatWidgetProps) => {
 	const total = inProcess + success;
 	const inProcessPercentage = total > 0 ? (inProcess / total) * 100 : 0;
 	const successPercentage = total > 0 ? (success / total) * 100 : 0;

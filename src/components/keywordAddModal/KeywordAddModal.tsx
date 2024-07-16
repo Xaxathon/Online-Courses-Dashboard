@@ -11,10 +11,7 @@ import {
 
 import { KeywordAdd } from "@/shared/interfaces/keyword";
 
-interface KeywordAddModalProps {
-	onClose: () => void;
-}
-const KeywordAddModal = ({ onClose }: KeywordAddModalProps) => {
+const KeywordAddModal = ({ onClose }: { onClose: () => void }) => {
 	const [createKeyword, { isError: isCreateError }] =
 		useCreateKeywordMutation();
 	const { refetch } = useFetchKeywordsQuery();

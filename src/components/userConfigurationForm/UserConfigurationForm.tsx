@@ -1,4 +1,4 @@
-import { useEffect, useState, forwardRef, memo } from "react";
+import { useEffect, useState, forwardRef, ChangeEvent, memo } from "react";
 
 import AvatarError from "@assets/img/avatar.jpg";
 
@@ -16,36 +16,30 @@ interface UserConfigurationFormProps {
 	user: BaseUser;
 }
 
+interface ApiError {
+	data?: {
+		message?: string;
+		errors?: Record<string, string[]>;
+	};
+}
+
 const UserConfigurationForm = memo(
 	forwardRef<HTMLFormElement, UserConfigurationFormProps>(({ user }, ref) => {
 		const [isExpanded, setIsExpanded] = useState(false);
 		const [isEditing, setIsEditing] = useState<boolean>(false);
 		const [imageUrl, setImageUrl] = useState(user.avatar || AvatarError);
 		const [showPassword, setShowPassword] = useState<boolean>(false);
-		const [backendErrors, setBackendErrors] = useState<string | null>(null);
 		const [isFrozen, setIsFrozen] = useState(user.is_active === false);
 		const [showFreezeModal, setShowFreezeModal] = useState(false);
-		const [updateUser] = useUpdateUserMutation();
+
+		const [updateUser, { error, isLoading: isUpdateLoading }] =
+			useUpdateUserMutation();
 
 		useEffect(() => {
 			if (user.avatar) {
 				setImageUrl(user.avatar);
 			}
 		}, [user.avatar]);
-
-		const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-			const file = event.target.files?.[0];
-
-			if (file) {
-				const reader = new FileReader();
-
-				reader.onload = (e: ProgressEvent<FileReader>) => {
-					setImageUrl(e.target?.result as string);
-				};
-
-				reader.readAsDataURL(file);
-			}
-		};
 
 		const validationSchema = Yup.object({
 			full_name: Yup.string()
@@ -65,15 +59,11 @@ const UserConfigurationForm = memo(
 				"Пароль должен содержать минимум 6 символов"
 			),
 		});
-		const toggleExpand = () => {
-			setIsExpanded(!isExpanded);
-		};
 
 		const handleSubmit = async (
 			values: FormValues,
 			{ setSubmitting, setErrors }: FormikHelpers<FormValues>
 		) => {
-			setBackendErrors(null);
 			const data = new FormData();
 			for (const key in values) {
 				if (values[key as keyof FormValues]) {
@@ -86,14 +76,13 @@ const UserConfigurationForm = memo(
 			const response = await updateUser({ id: user.id, data });
 
 			if ("error" in response && response.error) {
-				if ("data" in response.error && response.error.data) {
-					setErrors((response.error.data as any).errors || {});
-					setBackendErrors(
-						"Ошибка при обновлении данных: " +
-							(response.error.data as any).message
-					);
-				} else {
-					setBackendErrors("Ошибка при обновлении данных");
+				const apiError = response.error as ApiError;
+				if (apiError.data?.errors) {
+					const formattedErrors: Record<string, string> = {};
+					for (const [key, messages] of Object.entries(apiError.data.errors)) {
+						formattedErrors[key] = messages.join(", ");
+					}
+					setErrors(formattedErrors);
 				}
 			} else {
 				setIsEditing(false);
@@ -101,24 +90,27 @@ const UserConfigurationForm = memo(
 			setSubmitting(false);
 		};
 
-		const handleCancel = () => {
-			setIsEditing(false);
-		};
+		const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+			const file = event.target.files?.[0];
 
-		const handleFreeze = async () => {
-			setShowFreezeModal(true);
+			if (file) {
+				const reader = new FileReader();
+
+				reader.onload = (e: ProgressEvent<FileReader>) => {
+					setImageUrl(e.target?.result as string);
+				};
+
+				reader.readAsDataURL(file);
+			}
 		};
 
 		const confirmFreeze = async () => {
-			setBackendErrors(null);
 			const data = new FormData();
 			data.append("is_active", "0");
 
 			const response = await updateUser({ id: user.id, data });
 
-			if ("error" in response && response.error) {
-				setBackendErrors("Ошибка при заморозке пользователя");
-			} else {
+			if (!("error" in response)) {
 				setIsFrozen(true);
 				setIsEditing(false);
 			}
@@ -137,7 +129,7 @@ const UserConfigurationForm = memo(
 					validationSchema={validationSchema}
 					onSubmit={handleSubmit}
 				>
-					{({ isSubmitting, setFieldValue }) => (
+					{({ setFieldValue }) => (
 						<Form ref={ref} className="mt-6 bg-gray-100 px-6 py-4 rounded-lg">
 							<div className="flex gap-3  items-center justify-between">
 								<div
@@ -169,7 +161,7 @@ const UserConfigurationForm = memo(
 										<button
 											type="button"
 											className="rounded-xl px-5 py-2 bg-crimsonRed text-white text-xl hover:bg-crimsonRedHover active:bg-crimsonRedActive"
-											onClick={handleFreeze}
+											onClick={() => setShowFreezeModal(true)}
 										>
 											Заморозить
 										</button>
@@ -185,7 +177,7 @@ const UserConfigurationForm = memo(
 									)}
 									<button
 										className="rounded-xl px-5 py-2 bg-mainPurple text-white text-xl hover:bg-mainPurpleHover active:bg-mainPurpleActive"
-										onClick={toggleExpand}
+										onClick={() => setIsExpanded(!isExpanded)}
 										type="button"
 									>
 										{isExpanded ? "Скрыть" : "Показать"}
@@ -214,6 +206,7 @@ const UserConfigurationForm = memo(
 												<input
 													type="file"
 													id={`upload-photo_${user.id}`}
+													alt="avatar"
 													accept="image/*"
 													className="hidden"
 													onChange={(e) => {
@@ -306,10 +299,11 @@ const UserConfigurationForm = memo(
 											</div>
 										</div>
 									</div>
-									{backendErrors && (
-										<div className="mt-1 font-bold text-crimsonRed text-sm">
-											{backendErrors}
-										</div>
+									{error && (
+										<span className="block mt-1 font-bold text-crimsonRed text-sm">
+											{(error as ApiError).data?.message ||
+												"Ошибка при обновлении данных"}
+										</span>
 									)}
 									<div className="w-full flex justify-end mt-4">
 										{isEditing && !isFrozen ? (
@@ -319,11 +313,11 @@ const UserConfigurationForm = memo(
 													className={classNames(
 														"mt-4 rounded-xl px-14 py-2 bg-gray-500 text-white text-xl font-bold mr-2 hover:bg-gray-600 active:bg-gray-400",
 														{
-															"opacity-50 cursor-not-allowed": isSubmitting,
+															"opacity-50 cursor-not-allowed": isUpdateLoading,
 														}
 													)}
-													onClick={handleCancel}
-													disabled={isSubmitting}
+													onClick={() => setIsEditing(false)}
+													disabled={isUpdateLoading}
 												>
 													Отменить
 												</button>
@@ -332,10 +326,10 @@ const UserConfigurationForm = memo(
 													className={classNames(
 														"mt-4 rounded-xl px-14 py-2 bg-mainPurple text-white text-xl font-bold hover:bg-mainPurpleHover active:bg-mainPurpleActive",
 														{
-															"opacity-50 cursor-not-allowed": isSubmitting,
+															"opacity-50 cursor-not-allowed": isUpdateLoading,
 														}
 													)}
-													disabled={isSubmitting}
+													disabled={isUpdateLoading}
 												>
 													Сохранить
 												</button>
@@ -346,11 +340,11 @@ const UserConfigurationForm = memo(
 												className={classNames(
 													"mt-4 rounded-xl px-14 py-2 bg-mainPurple text-white text-xl font-bold hover:bg-mainPurpleHover active:bg-mainPurpleActive",
 													{
-														"opacity-50 cursor-not-allowed": isSubmitting,
+														"opacity-50 cursor-not-allowed": isUpdateLoading,
 													}
 												)}
 												onClick={() => setIsEditing(true)}
-												disabled={isSubmitting}
+												disabled={isUpdateLoading}
 											>
 												Изменить
 											</button>

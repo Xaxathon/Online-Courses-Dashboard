@@ -77,7 +77,7 @@ const ProtocolAddForm = () => {
 			try {
 				await createProtocol(formData).unwrap();
 				navigate("/main/protocols");
-			} catch (error: any) {
+			} catch (error) {
 				console.error("Ошибка:", error);
 			}
 		},
@@ -175,7 +175,7 @@ const ProtocolAddForm = () => {
 							Секретарь
 						</label>
 						<input
-							className="w-full px-3 py-4 bg-lightPurple rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent cursor-pointer"
+							className="w-full px-3 py-4 bg-lightPurple rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent cursor-pointer hover:bg-lightPurpleHover transition-colors duration-200 ease-in-out"
 							id="secretary"
 							type="text"
 							value={formik.values.secretaryName}
@@ -193,7 +193,7 @@ const ProtocolAddForm = () => {
 							Председатель
 						</label>
 						<input
-							className="w-full px-3 py-4 bg-lightPurple rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
+							className="w-full px-3 py-4 bg-lightPurple rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent hover:bg-lightPurpleHover transition-colors duration-200 ease-in-out"
 							id="director"
 							type="text"
 							value={formik.values.directorName}
@@ -230,7 +230,7 @@ const ProtocolAddForm = () => {
 						</h2>
 						<label
 							htmlFor="file-upload"
-							className={`flex flex-shrink-0 flex-grow bg-custom-gradient cursor-pointer justify-center gap-4 items-center py-3 px-3 border rounded-lg border-mainPurple ${
+							className={`flex flex-shrink-0 flex-grow bg-custom-gradient cursor-pointer justify-center gap-4 items-center py-3 px-3 border rounded-lg border-mainPurple hover:border-gardenGreen ${
 								isDragging ? "bg-gray-200" : ""
 							}`}
 							onDragOver={(e) => handleDragOver(e, setIsDragging)}

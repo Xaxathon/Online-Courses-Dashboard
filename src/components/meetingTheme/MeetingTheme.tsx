@@ -148,7 +148,7 @@ const MeetingTheme = ({
 				</span>
 				{selectedMeeting && (
 					<Delete
-						className="w-6 h-6 fill-current text-crimsonRed hover:text-crimsonRed cursor-pointer absolute right-0"
+						className="w-6 h-6 fill-current text-gray-400 hover:text-crimsonRed cursor-pointer absolute right-0"
 						onClick={() => setIsDeleteModalOpen(true)}
 					/>
 				)}
@@ -170,8 +170,9 @@ const MeetingTheme = ({
 								className={classNames(
 									"flex flex-grow items-center border px-2 flex-shrink-0 w-1/4 justify-center border-mainPurple rounded-lg py-2 cursor-pointer",
 									{
-										"bg-white": selectedMeeting?.id !== meeting.id,
-										"bg-lightPurpleHover": selectedMeeting?.id === meeting.id,
+										"bg-white hover:bg-gray-100":
+											selectedMeeting?.id !== meeting.id,
+										"bg-lightPurpleHover ": selectedMeeting?.id === meeting.id,
 									}
 								)}
 								onClick={() => handleMeetingSelect(meeting)}
@@ -183,7 +184,7 @@ const MeetingTheme = ({
 						))
 					)}
 					<div
-						className="absolute right-0 flex items-center justify-center font-bold text-lg text-white bg-mainPurple py-2 px-3 rounded-md cursor-pointer"
+						className="absolute right-0 flex items-center justify-center font-bold text-lg text-white bg-mainPurple py-2 px-3 rounded-md cursor-pointer hover:bg-mainPurpleHover active:bg-mainPurpleActive"
 						onClick={() => setIsModalOpenTime(true)}
 					>
 						+

@@ -8,7 +8,7 @@ import {
 	Tooltip,
 	ResponsiveContainer,
 } from "recharts";
-import Select from "react-select";
+import Select, { StylesConfig } from "react-select";
 import styled from "styled-components";
 import CustomBar from "./CustomBar";
 import Skeleton from "../skeleton/Skeleton";
@@ -25,6 +25,11 @@ interface KpiChartProps {
 	onMonthChange: (date: Date) => void;
 }
 
+interface MonthOption {
+	value: string;
+	label: string;
+}
+
 const KpiChart = ({
 	data,
 	isLoading,
@@ -38,31 +43,33 @@ const KpiChart = ({
 		error(...args);
 	};
 
-	const handleMonthChange = (selectedOption: any) => {
-		const newDate = new Date(currentMonth);
-		newDate.setMonth(parseInt(selectedOption.value) - 1);
-		onMonthChange(newDate);
+	const handleMonthChange = (selectedOption: MonthOption | null) => {
+		if (selectedOption) {
+			const newDate = new Date(currentMonth);
+			newDate.setMonth(parseInt(selectedOption.value) - 1);
+			onMonthChange(newDate);
+		}
 	};
 
-	const customStyles = {
-		control: (provided: any) => ({
+	const customStyles: StylesConfig<MonthOption, false> = {
+		control: (provided) => ({
 			...provided,
 			border: "none",
 			boxShadow: "none",
 			cursor: "pointer",
 		}),
-		dropdownIndicator: (provided: any) => ({
+		dropdownIndicator: (provided) => ({
 			...provided,
 			color: "#19161D",
 			marginLeft: "-4.69rem",
 			cursor: "pointer",
 		}),
-		indicatorSeparator: (provided: any) => ({
+		indicatorSeparator: (provided) => ({
 			...provided,
 			display: "none",
 			cursor: "pointer",
 		}),
-		menu: (provided: any) => ({
+		menu: (provided) => ({
 			...provided,
 			border: "none",
 			boxShadow: "none",
@@ -122,12 +129,12 @@ const KpiChart = ({
 				<Title>KPI</Title>
 				<LegendContainer>
 					<LegendItem>
-						<LegendCircle color="#A1BBA4" />
-						<span className="xl:text-sm text-xs">Готово</span>
-					</LegendItem>
-					<LegendItem>
 						<LegendCircle color="#A964D3" />
 						<span className="xl:text-sm text-xs">В процессе</span>
+					</LegendItem>
+					<LegendItem>
+						<LegendCircle color="#A1BBA4" />
+						<span className="xl:text-sm text-xs">Готово</span>
 					</LegendItem>
 					<LegendItem>
 						<LegendCircle color="#D46666" />
@@ -136,7 +143,7 @@ const KpiChart = ({
 				</LegendContainer>
 			</Header>
 
-			<SelectWrapper
+			<SelectWrapper<MonthOption, false>
 				value={months[currentMonth.getMonth()]}
 				options={months}
 				onChange={handleMonthChange}
@@ -163,7 +170,7 @@ const KpiChart = ({
 							dataKey="success"
 							fill="#A1BBA4"
 							shape={<CustomBar radius={[6, 6, 0, 0]} width={20} />}
-							name="Завершено"
+							name="Готово"
 						/>
 						<Bar
 							dataKey="expired"
@@ -180,7 +187,7 @@ const KpiChart = ({
 
 export default KpiChart;
 
-const months = [
+const months: MonthOption[] = [
 	{ value: "01", label: "Январь" },
 	{ value: "02", label: "Февраль" },
 	{ value: "03", label: "Март" },
@@ -278,4 +285,4 @@ const SelectWrapper = styled(Select)`
 	width: 10rem;
 	border: none;
 	margin-bottom: 0.31rem;
-`;
+` as typeof Select;

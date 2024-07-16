@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback } from "react";
 import { Calendar as DateCalendar, CalendarProps } from "react-calendar";
 
 import styled from "styled-components";
-import "react-calendar/dist/Calendar.css";
 import dayjs from "dayjs";
 
 interface CustomCalendarProps {
@@ -71,6 +70,10 @@ const Calendar = ({
 				value={date}
 				tileContent={tileContent}
 				onActiveStartDateChange={handleActiveStartDateChange}
+				prevLabel={<span className=" text-mainPurple">&lt;</span>}
+				nextLabel={<span className=" text-mainPurple">&gt;</span>}
+				prev2Label={null}
+				next2Label={null}
 			/>
 		</CalendarContainer>
 	);
@@ -80,7 +83,7 @@ export default Calendar;
 
 const CalendarContainer = styled.div`
 	border-radius: 1rem;
-	padding: 0.2rem 0;
+	padding: 0.2rem;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -100,12 +103,13 @@ const StyledCalendar = styled(DateCalendar)`
 	font-family: "Poppins", sans-serif;
 
 	& .react-calendar__navigation {
+		margin-top: 0.5rem;
 		display: flex;
-		padding: 0 1rem;
+		padding: 0 3rem;
 		justify-content: center;
 		align-items: center;
 		font-size: 1.2rem;
-		font-weight: 600;
+		font-weight: 800;
 		color: #7130a3;
 		background: none;
 		border: none;
@@ -124,7 +128,7 @@ const StyledCalendar = styled(DateCalendar)`
 
 	& .react-calendar__month-view__weekdays {
 		text-align: center;
-		font-size: 1rem;
+		font-size: 1.2rem;
 		font-weight: 400;
 		color: #779f7c;
 
@@ -145,8 +149,10 @@ const StyledCalendar = styled(DateCalendar)`
 		align-items: center;
 		justify-content: center;
 		position: relative;
-		font-size: 1.2rem;
+		font-size: 1rem;
+		padding: 0.5rem;
 		font-weight: bold;
+
 		color: #3eb1b8;
 		flex-direction: column;
 		overflow-y: hidden;

@@ -14,34 +14,27 @@ interface UserSettingPersonalFormProps {
 	userData: BaseUser;
 }
 
+interface ApiError {
+	data?: {
+		message?: string;
+		errors?: Record<string, string[]>;
+	};
+}
+
 const UserSettingPersonalForm = ({
 	userData,
 }: UserSettingPersonalFormProps) => {
 	const [isEditing, setIsEditing] = useState<boolean>(false);
 	const [imageUrl, setImageUrl] = useState(userData.avatar || AvatarError);
 	const [showPassword, setShowPassword] = useState<boolean>(false);
-	const [backendErrors, setBackendErrors] = useState<string | null>(null);
-	const [updateUser] = useUpdateUserMutation();
+	const [updateUser, { error, isLoading: isUpdateLoading }] =
+		useUpdateUserMutation();
 
 	useEffect(() => {
 		if (userData.avatar) {
 			setImageUrl(userData.avatar);
 		}
 	}, [userData.avatar]);
-
-	const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const file = event.target.files?.[0];
-
-		if (file) {
-			const reader = new FileReader();
-
-			reader.onload = (e: ProgressEvent<FileReader>) => {
-				setImageUrl(e.target?.result as string);
-			};
-
-			reader.readAsDataURL(file);
-		}
-	};
 
 	const validationSchema = Yup.object({
 		full_name: Yup.string()
@@ -62,7 +55,6 @@ const UserSettingPersonalForm = ({
 		values: FormValues,
 		{ setSubmitting, setErrors }: FormikHelpers<FormValues>
 	) => {
-		setBackendErrors(null);
 		const data = new FormData();
 		for (const key in values) {
 			if (values[key as keyof FormValues]) {
@@ -78,16 +70,13 @@ const UserSettingPersonalForm = ({
 		const response = await updateUser({ id: userData.id, data });
 
 		if ("error" in response && response.error) {
-			if ("data" in response.error && response.error.data) {
-				setErrors((response.error.data as any).errors || {});
-				setBackendErrors(
-					"Ошибка при обновлении данных: " +
-						(response.error.data as any).message
-				);
-			} else {
-				setBackendErrors(
-					"Ошибка при обновлении данных. Пожалуйста, попробуйте еще раз."
-				);
+			const apiError = response.error as ApiError;
+			if (apiError.data?.errors) {
+				const formattedErrors: Record<string, string> = {};
+				for (const [key, messages] of Object.entries(apiError.data.errors)) {
+					formattedErrors[key] = messages.join(", ");
+				}
+				setErrors(formattedErrors);
 			}
 		} else {
 			setIsEditing(false);
@@ -95,8 +84,18 @@ const UserSettingPersonalForm = ({
 		setSubmitting(false);
 	};
 
-	const handleCancel = () => {
-		setIsEditing(false);
+	const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0];
+
+		if (file) {
+			const reader = new FileReader();
+
+			reader.onload = (e: ProgressEvent<FileReader>) => {
+				setImageUrl(e.target?.result as string);
+			};
+
+			reader.readAsDataURL(file);
+		}
 	};
 
 	return (
@@ -110,7 +109,7 @@ const UserSettingPersonalForm = ({
 			validationSchema={validationSchema}
 			onSubmit={handleSubmit}
 		>
-			{({ isSubmitting, setFieldValue }) => (
+			{({ setFieldValue }) => (
 				<Form>
 					<div
 						className={classNames("flex items-center gap-3", {
@@ -154,6 +153,7 @@ const UserSettingPersonalForm = ({
 									type="file"
 									id="upload-photo"
 									accept="image/*"
+									alt="avatar"
 									className="hidden"
 									onChange={(e) => {
 										handleImageChange(e);
@@ -245,9 +245,10 @@ const UserSettingPersonalForm = ({
 							</div>
 						</div>
 					</div>
-					{backendErrors && (
+					{error && (
 						<div className="mt-1 font-bold text-crimsonRed text-sm">
-							{backendErrors}
+							{(error as ApiError).data?.message ||
+								"Ошибка при обновлении данных. Пожалуйста, попробуйте еще раз."}
 						</div>
 					)}
 					<div className="w-full flex justify-end mt-4">
@@ -258,11 +259,11 @@ const UserSettingPersonalForm = ({
 									className={classNames(
 										"mt-4 rounded-xl px-14 py-2 bg-gray-500 text-white text-xl font-bold mr-2 hover:bg-gray-600 active:bg-gray-400",
 										{
-											"opacity-50 cursor-not-allowed": isSubmitting,
+											"opacity-50 cursor-not-allowed": isUpdateLoading,
 										}
 									)}
-									onClick={handleCancel}
-									disabled={isSubmitting}
+									onClick={() => setIsEditing(false)}
+									disabled={isUpdateLoading}
 								>
 									Отменить
 								</button>
@@ -271,10 +272,10 @@ const UserSettingPersonalForm = ({
 									className={classNames(
 										"mt-4 rounded-xl px-14 py-2 bg-mainPurple text-white text-xl font-bold hover:bg-mainPurpleHover active:bg-mainPurpleActive",
 										{
-											"opacity-50 cursor-not-allowed": isSubmitting,
+											"opacity-50 cursor-not-allowed": isUpdateLoading,
 										}
 									)}
-									disabled={isSubmitting}
+									disabled={isUpdateLoading}
 								>
 									Сохранить
 								</button>
@@ -285,11 +286,11 @@ const UserSettingPersonalForm = ({
 								className={classNames(
 									"mt-4 rounded-xl px-14 py-2 bg-mainPurple text-white text-xl font-bold hover:bg-mainPurpleHover active:bg-mainPurpleActive",
 									{
-										"opacity-50 cursor-not-allowed": isSubmitting,
+										"opacity-50 cursor-not-allowed": isUpdateLoading,
 									}
 								)}
 								onClick={() => setIsEditing(true)}
-								disabled={isSubmitting}
+								disabled={isUpdateLoading}
 							>
 								Изменить
 							</button>

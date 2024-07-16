@@ -1,6 +1,4 @@
-
-
-export default = {
+export default {
 	content: ["./src/**/*.{js,ts,jsx,tsx}"],
 	theme: {
 		extend: {
@@ -20,6 +18,8 @@ export default = {
 					"linear-gradient(180deg, rgba(208, 156, 250, 0.17) 0%, rgba(141, 244, 154, 0.14) 100%)",
 				"time-gradient":
 					"linear-gradient(180deg, rgba(208, 156, 250, 0.49) 0%, rgba(231, 249, 255, 0.61) 100%)",
+				"add-gradient":
+					"linear-gradient(180deg, rgba(153, 55, 231, 1) 0%, rgba(78, 190, 197, 1) 100%)",
 			},
 			minHeight: {
 				dynamic: "clamp(500px, calc(100vh - 60px), 100vh)",
@@ -59,4 +59,3 @@ export default = {
 	},
 	plugins: [],
 };
-

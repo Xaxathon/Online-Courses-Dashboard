@@ -45,7 +45,6 @@ const protocolsApi = createApi({
 
 		getProtocol: builder.query<ProtocolResponse, number>({
 			query: (id) => `/api/protocols/${id}`,
-			//providesTags: (result, error, id) => [{ type: "Protocol", id }],
 		}),
 
 		createProtocol: builder.mutation<{ protocol: Protocol }, FormData>({
@@ -66,7 +65,6 @@ const protocolsApi = createApi({
 				method: "PUT",
 				body: data,
 			}),
-			invalidatesTags: (result, error, { id }) => [{ type: "Protocol", id }],
 		}),
 
 		deleteProtocol: builder.mutation<void, number>({
@@ -74,7 +72,6 @@ const protocolsApi = createApi({
 				url: `/api/protocols/${id}`,
 				method: "DELETE",
 			}),
-			invalidatesTags: (result, error, id) => [{ type: "Protocol", id }],
 		}),
 
 		createProtocolTask: builder.mutation<
@@ -86,9 +83,6 @@ const protocolsApi = createApi({
 				method: "POST",
 				body: data,
 			}),
-			invalidatesTags: (result, error, { protocolId }) => [
-				{ type: "Protocol", id: protocolId },
-			],
 		}),
 
 		getProtocolTasks: builder.query<
@@ -154,7 +148,6 @@ const protocolsApi = createApi({
 				method: "POST",
 				body: data,
 			}),
-			invalidatesTags: (result, error, { id }) => [{ type: "Protocol", id }],
 		}),
 
 		generatePDF: builder.mutation<string, number>({

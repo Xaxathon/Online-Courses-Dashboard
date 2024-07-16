@@ -32,10 +32,13 @@ const ForgotPassword = () => {
 				setSuccessMessage(
 					"Инструкции по сбросу пароля отправлены на ваш e-mail."
 				);
-			} catch (err: any) {
-				setErrors({
-					email: err.data?.message || "Не удалось отправить инструкции",
-				});
+			} catch (error) {
+				if (error && typeof error === "object" && "data" in error) {
+					const errorData = error as { data?: { message?: string } };
+					setErrors({
+						email: errorData.data?.message || "Не удалось отправить инструкции",
+					});
+				}
 			}
 			setSubmitting(false);
 		},

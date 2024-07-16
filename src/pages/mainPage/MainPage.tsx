@@ -21,13 +21,13 @@ import {
 	useFetchKpiTasksStatsQuery,
 	useFetchMeetingStatsQuery,
 } from "@/api/statsApi";
-import { KpiTasksStatsData } from "@/shared/interfaces/stats";
 
 const DEBOUNCE_DELAY = 1000;
 
 const MainPage = () => {
 	const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 	const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+	const [kpiMonth, setKpiMonth] = useState<Date>(new Date());
 	const [searchTerm, setSearchTerm] = useState("");
 	const [isSearching, setIsSearching] = useState(false);
 
@@ -40,19 +40,17 @@ const MainPage = () => {
 		skip: !userId,
 	});
 
-	const formattedDate = dayjs(currentMonth).format("YYYY-MM");
-
 	const { data: kpiStats, isLoading: isKpiLoading } =
 		useFetchKpiTasksStatsQuery(
 			{
 				secretaryId: userId || 0,
-				date: formattedDate,
+				date: dayjs(kpiMonth).format("YYYY-MM"),
 			},
 			{
 				skip: !userId,
 			}
 		);
-	console.log(kpiStats);
+
 	const { data: meetingStats, refetch: refetchMeetingStats } =
 		useFetchMeetingStatsQuery(
 			{
@@ -63,6 +61,20 @@ const MainPage = () => {
 				skip: !userId,
 			}
 		);
+
+	useEffect(() => {
+		refetchMeetingStats();
+	}, [currentMonth, refetchMeetingStats]);
+
+	const formattedKpiData = useMemo(() => {
+		if (!kpiStats) return [];
+		return Object.entries(kpiStats).map(([week, data]) => ({
+			week: `${week} неделя`,
+			in_process: data.in_process,
+			success: data.success,
+			expired: data.expired,
+		}));
+	}, [kpiStats]);
 
 	const debouncedSearch = useCallback(
 		debounce((term: string) => {
@@ -82,29 +94,17 @@ const MainPage = () => {
 		setSelectedDate(date);
 	};
 
-	const handleMonthChange = useCallback((date: Date) => {
+	const handleMonthChange = (date: Date) => {
 		setCurrentMonth(date);
-	}, []);
+	};
 
-	useEffect(() => {
-		refetchMeetingStats();
-	}, [currentMonth, refetchMeetingStats]);
+	const handleKpiMonthChange = (date: Date) => {
+		setKpiMonth(date);
+	};
 
 	const meetingDates = meetingStats
 		? meetingStats.map((meeting) => new Date(meeting.event_date))
 		: [];
-
-	const formattedKpiData = useMemo(() => {
-		if (!kpiStats) return [];
-		return Object.entries(kpiStats).map(([week, data]) => ({
-			week: `${week} неделя`,
-			in_process: data.in_process,
-			success: data.success,
-			expired: data.expired,
-		}));
-	}, [kpiStats]);
-
-	console.log("Formatted KPI Data:", formattedKpiData);
 
 	return (
 		<div className="grid grid-cols-[minmax(20rem,_30rem)_minmax(30rem,_70rem)] gap-6 px-4 mt-7">
@@ -121,8 +121,8 @@ const MainPage = () => {
 				<KpiChart
 					data={formattedKpiData}
 					isLoading={isKpiLoading}
-					currentMonth={currentMonth}
-					onMonthChange={handleMonthChange}
+					currentMonth={kpiMonth}
+					onMonthChange={handleKpiMonthChange}
 				/>
 				<div className="flex gap-5 items-center justify-center">
 					{entityStats && (

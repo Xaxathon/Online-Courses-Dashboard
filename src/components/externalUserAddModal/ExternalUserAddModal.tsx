@@ -7,7 +7,7 @@ import { ReactComponent as CloseIcon } from "@assets/icons/сlose-icon.svg";
 
 import Modal from "../modal/Modal";
 
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
 
 import { useFetchUsersQuery, useCreateUserMutation } from "@/api/authApi";
@@ -132,25 +132,30 @@ const ExternalUserAddModal = ({
 
 	const handleCreateUser = async (
 		values: ExternalUser,
-		{
-			setSubmitting,
-			setErrors,
-		}: {
-			setSubmitting: (isSubmitting: boolean) => void;
-			setErrors: (errors: any) => void;
-		}
+		{ setSubmitting, setErrors }: FormikHelpers<ExternalUser>
 	) => {
 		try {
+			{
+				/* Не смог убрать тип any в этом месте, там должно возвращаться ExternalUser */
+			}
 			const createdUser: any = await createUser(values).unwrap();
+
 			setSelectedUser(createdUser);
 			setIsCreating(false);
 			setSearchTerm("");
 			refetch();
 			setSubmitting(false);
-		} catch (error: any) {
+		} catch (error) {
 			setSubmitting(false);
-			if (error.data && error.data.errors) {
-				setErrors(error.data.errors);
+			if (
+				error &&
+				typeof error === "object" &&
+				"data" in error &&
+				error.data &&
+				typeof error.data === "object" &&
+				"errors" in error.data
+			) {
+				setErrors(error.data.errors as Record<string, string>);
 			}
 		}
 	};

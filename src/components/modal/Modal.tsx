@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
-
 import { ReactComponent as CloseModal } from "@assets/icons/сlose-icon.svg";
-
 import classNames from "classnames";
-
 import Portal from "../portal/Portal";
 
 interface ModalProps {
@@ -15,7 +12,7 @@ const Modal = ({ children, onClose }: ModalProps) => {
 	const [isVisible, setIsVisible] = useState(false);
 
 	useEffect(() => {
-		document.body.classList.add("overflow-hidden");
+		document.body.style.overflow = "hidden";
 		const handleEsc = (event: KeyboardEvent) => {
 			if (event.key === "Escape") {
 				handleClose();
@@ -26,7 +23,7 @@ const Modal = ({ children, onClose }: ModalProps) => {
 		setTimeout(() => setIsVisible(true), 10);
 
 		return () => {
-			document.body.classList.remove("overflow-hidden");
+			document.body.style.overflow = "";
 			window.removeEventListener("keydown", handleEsc);
 		};
 	}, []);
@@ -40,12 +37,12 @@ const Modal = ({ children, onClose }: ModalProps) => {
 		<Portal>
 			<div
 				className={classNames(
-					"fixed inset-0 flex justify-center items-center bg-black transition-opacity duration-200 ease-in-out",
+					"fixed inset-0 flex justify-center items-center bg-black transition-opacity duration-200 ease-in-out z-50",
 					{
 						"bg-opacity-50": isVisible,
 						"bg-opacity-0": !isVisible,
-						visible: isVisible,
-						invisible: !isVisible,
+						"pointer-events-auto": isVisible,
+						"pointer-events-none": !isVisible,
 					}
 				)}
 				role="dialog"
