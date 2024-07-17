@@ -29,7 +29,8 @@ const KeywordsItem = memo(({ keyword, refetch }: KeywordsItemProps) => {
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
 	const [updateKeyword, { isLoading: isUpdating, error: updateError }] =
 		useUpdateKeywordMutation();
-	const [deleteKeyword, { error: deleteError }] = useDeleteKeywordMutation();
+	const [deleteKeyword, { error: deleteError, isLoading: isDeleteLoading }] =
+		useDeleteKeywordMutation();
 
 	const handleSave = async (values: { title: string; phrase: string }) => {
 		try {
@@ -154,6 +155,7 @@ const KeywordsItem = memo(({ keyword, refetch }: KeywordsItemProps) => {
 					description={`${keyword.title.slice(0, 10)} (ID: ${keyword.id})`}
 					onClose={() => setIsDeleteModalOpen(false)}
 					onDelete={handleDelete}
+					isLoading={isDeleteLoading}
 				/>
 			)}
 		</li>

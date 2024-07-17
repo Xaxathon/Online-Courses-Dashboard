@@ -8,7 +8,7 @@ import * as Yup from "yup";
 
 import { useUpdateUserMutation } from "@/api/authApi";
 
-import { BaseUser, FormValues } from "@/shared/interfaces/user";
+import { BaseUser } from "@/shared/interfaces/user";
 
 interface UserSettingPersonalFormProps {
 	userData: BaseUser;
@@ -19,6 +19,15 @@ interface ApiError {
 		message?: string;
 		errors?: Record<string, string[]>;
 	};
+}
+
+export interface FormValues {
+	full_name: string;
+	department: string;
+	email: string;
+	password: string;
+	avatar?: File;
+	is_active?: boolean;
 }
 
 const UserSettingPersonalForm = ({

@@ -21,9 +21,6 @@ import { useFetchManagerStatsQuery } from "@/api/statsApi";
 
 import { InternalUser, User } from "@/shared/interfaces/user";
 
-const DEFAULT_LIMIT = 15;
-const SEARCH_DELAY = 500;
-
 const Secretaries = () => {
 	const [selectedSecretaryId, setSelectedSecretaryId] = useState<number | null>(
 		null
@@ -47,7 +44,9 @@ const Secretaries = () => {
 		isLoading: isSecretariesLoading,
 		isFetching,
 	} = useFetchUsersQuery({
-		limit: searchTerm ? undefined : DEFAULT_LIMIT,
+		limit: searchTerm
+			? undefined
+			: Number(import.meta.env.VITE_DEFAULT_PAGINATION_LIMIT) || 15,
 		page: searchTerm ? undefined : page,
 		search: searchTerm,
 	});
@@ -106,7 +105,8 @@ const Secretaries = () => {
 					!isFetching &&
 					!searchTerm &&
 					Array.isArray(secretariesData?.data?.data) &&
-					secretariesData.data.data.length === DEFAULT_LIMIT
+					secretariesData.data.data.length ===
+						(Number(import.meta.env.VITE_DEFAULT_PAGINATION_LIMIT) || 15)
 				) {
 					setPage((prevPage) => prevPage + 1);
 				}
@@ -125,7 +125,7 @@ const Secretaries = () => {
 		searchTimeoutRef.current = setTimeout(() => {
 			setSearchTerm(searchInputRef.current?.value || "");
 			setPage(1);
-		}, SEARCH_DELAY);
+		}, Number(import.meta.env.VITE_SEARCH_DELAY) || 1000);
 	}, []);
 
 	const selectedSecretary = useMemo(() => {

@@ -25,7 +25,6 @@ const protocolsApi = createApi({
 				params: { limit, page },
 			}),
 			transformResponse: (response: { data: ProtocolsListResponse }) => {
-				console.log("Full response:", response);
 				if (!Array.isArray(response.data.data)) {
 					throw new Error("Response data is not an array");
 				}

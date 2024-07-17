@@ -5,14 +5,16 @@ import ProtocolTaskItem from "../protocolTaskItem/ProtocolTaskItem";
 import { useGetProtocolTasksQuery } from "@/api/protocolsApi";
 import { ProtocolTask } from "@/shared/interfaces/protocol";
 
-const DEFAULT_LIMIT = 15;
-
 const ProtocolTaskList = ({ searchTerm }: { searchTerm: string }) => {
 	const [page, setPage] = useState(1);
 	const [allTasks, setAllTasks] = useState<ProtocolTask[]>([]);
 
 	const { data, error, isLoading, isFetching } = useGetProtocolTasksQuery(
-		{ limit: DEFAULT_LIMIT, page, search: searchTerm },
+		{
+			limit: Number(import.meta.env.VITE_DEFAULT_PAGINATION_LIMIT) || 15,
+			page,
+			search: searchTerm,
+		},
 		{ skip: false }
 	);
 
@@ -38,7 +40,8 @@ const ProtocolTaskList = ({ searchTerm }: { searchTerm: string }) => {
 			observer.current = new IntersectionObserver((entries) => {
 				if (
 					entries[0].isIntersecting &&
-					data?.data?.data.length === DEFAULT_LIMIT
+					data?.data?.data.length ===
+						(Number(import.meta.env.VITE_DEFAULT_PAGINATION_LIMIT) || 15)
 				) {
 					setPage((prevPage) => prevPage + 1);
 				}

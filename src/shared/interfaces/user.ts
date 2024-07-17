@@ -72,17 +72,6 @@ export interface FetchUsersResponse {
 
 export type CreateUserRequest = ExternalUser | InternalUser;
 
-export interface FormValues {
-	full_name: string;
-	department: string;
-	email: string;
-	password: string;
-	avatar?: File;
-	is_active?: boolean;
-	theme?: string;
-	link?: string;
-}
-
 export interface FetchUsersParams {
 	limit?: number;
 	page?: number;

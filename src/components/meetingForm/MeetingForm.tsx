@@ -3,10 +3,10 @@ import { useState, useEffect, ChangeEvent } from "react";
 import { ReactComponent as Delete } from "@assets/icons/delete.svg";
 import { ReactComponent as Mp4Icon } from "@assets/icons/mp4-icon.svg";
 
-import dayjs from "dayjs";
-import classNames from "classnames";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
+import dayjs from "dayjs";
+import classNames from "classnames";
 
 import {
 	useCreateMeetingMutation,
@@ -18,13 +18,13 @@ import {
 	Meeting,
 	UpdateMeetingMember,
 } from "@/shared/interfaces/meeting";
-import { FormValues } from "@/shared/interfaces/user";
 
 interface ExtendedUpdateMeetingMember extends UpdateMeetingMember {
 	full_name: string;
 	email: string;
 	email_sent: boolean;
 }
+
 interface MeetingFormProps {
 	meeting: Meeting | null;
 	selectedDate: Date | null;
@@ -34,11 +34,24 @@ interface MeetingFormProps {
 	onOpenUserModal: () => void;
 }
 
+interface FormValues {
+	theme: string;
+	link: string;
+	file: {
+		name: string | null;
+		url: string | null;
+	};
+}
+
 const validationSchema = Yup.object({
 	theme: Yup.string().required("Тема обязательна для заполнения"),
 	link: Yup.string()
 		.url("Некорректная ссылка")
 		.required("Ссылка обязательна для заполнения"),
+	file: Yup.object({
+		name: Yup.string().nullable(),
+		url: Yup.string().nullable(),
+	}),
 });
 
 const MeetingForm = ({
@@ -50,8 +63,6 @@ const MeetingForm = ({
 	onOpenUserModal,
 }: MeetingFormProps) => {
 	const [members, setMembers] = useState<ExtendedUpdateMeetingMember[]>([]);
-	const [fileName, setFileName] = useState<string | null>(null);
-	const [fileURL, setFileURL] = useState<string | null>(null);
 
 	const [createMeeting, { isLoading: isCreating, error: createError }] =
 		useCreateMeetingMutation();
@@ -61,9 +72,15 @@ const MeetingForm = ({
 	const isSubmitting = isCreating || isUpdating;
 	const error = createError || updateError;
 
-	const initialValues: Pick<FormValues, "theme" | "link"> = {
+	const initialValues: FormValues = {
 		theme: meeting?.theme || "",
 		link: meeting?.link || "",
+		file: {
+			name: meeting?.document_url
+				? meeting.document_url.split("/").pop() || null
+				: null,
+			url: meeting?.document_url || null,
+		},
 	};
 
 	useEffect(() => {
@@ -77,28 +94,18 @@ const MeetingForm = ({
 					email_sent: m.email_sent ?? false,
 				})) || []
 			);
-			if (meeting.document_url) {
-				setFileURL(meeting.document_url);
-				const fileNameParts = meeting.document_url.split("/");
-				setFileName(fileNameParts[fileNameParts.length - 1]);
-			} else {
-				setFileURL(null);
-				setFileName(null);
-			}
 		} else {
 			setMembers([]);
-			setFileURL(null);
-			setFileName(null);
 		}
 	}, [meeting]);
 
 	const handleSubmit = async (
-		values: Pick<FormValues, "theme" | "link">,
-		{ setSubmitting }: FormikHelpers<Pick<FormValues, "theme" | "link">>
+		values: FormValues,
+		{ setSubmitting }: FormikHelpers<FormValues>
 	) => {
 		const data = new FormData();
 		Object.entries(values).forEach(([key, value]) => {
-			if (value) data.append(key, value as string);
+			if (value && key !== "file") data.append(key, value as string);
 		});
 
 		data.append("event_date", dayjs(selectedDate).format("YYYY-MM-DD"));
@@ -113,31 +120,11 @@ const MeetingForm = ({
 			);
 		});
 
-		if (fileURL) {
-			const response = await fetch(fileURL);
+		if (values.file.url) {
+			const response = await fetch(values.file.url);
 			const blob = await response.blob();
-			data.append("document", blob, fileName || "document");
+			data.append("document", blob, values.file.name || "document");
 		}
-
-		const newMeeting: CreateMeeting = {
-			theme: values.theme || "",
-			link: values.link || "",
-			event_date: dayjs(selectedDate).format("YYYY-MM-DD"),
-			event_start_time: startTime || "",
-			event_end_time: endTime || "",
-			members:
-				members.length > 0
-					? members.map(
-							({ member_id, should_notify, full_name, email, email_sent }) => ({
-								id: member_id,
-								member: { id: member_id, full_name, email },
-								email_sent,
-								should_notify: should_notify ?? false,
-							})
-					  )
-					: [],
-			document: fileURL || undefined,
-		};
 
 		try {
 			if (meeting?.id) {
@@ -146,7 +133,7 @@ const MeetingForm = ({
 			} else {
 				await createMeeting({ data }).unwrap();
 			}
-			onSave(newMeeting);
+			onSave(values as unknown as CreateMeeting);
 		} catch (error: unknown) {
 			console.error("Failed to save meeting: ", error);
 		} finally {
@@ -154,12 +141,19 @@ const MeetingForm = ({
 		}
 	};
 
-	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+	const handleFileChange = (
+		event: ChangeEvent<HTMLInputElement>,
+		setFieldValue: (field: string, value: any) => void
+	) => {
 		const file = event.target.files?.[0];
 		if (file) {
-			setFileName(file.name);
 			const fileReader = new FileReader();
-			fileReader.onload = (e) => setFileURL(e.target?.result as string);
+			fileReader.onload = (e) => {
+				setFieldValue("file", {
+					name: file.name,
+					url: e.target?.result as string,
+				});
+			};
 			fileReader.readAsDataURL(file);
 		}
 	};
@@ -187,7 +181,7 @@ const MeetingForm = ({
 			onSubmit={handleSubmit}
 			enableReinitialize
 		>
-			{({ setFieldValue }) => (
+			{({ values, setFieldValue }) => (
 				<Form>
 					<div className="flex flex-col gap-3 mt-5">
 						<div className="flex flex-col gap-2">
@@ -281,40 +275,43 @@ const MeetingForm = ({
 						<div className="flex flex-col items-start">
 							<label
 								htmlFor="document"
-								className="bg-gardenGreen text-white font-bold text-xs rounded-md px-5 py-2 cursor-pointer hover:bg-gardenGreenHover"
+								className={classNames(
+									"text-white font-bold text-xs rounded-md px-5 py-2 cursor-pointer",
+									{
+										"bg-gardenGreen hover:bg-gardenGreenHover":
+											!values.file || !values.file.name,
+										"bg-gardenGreenHover": values.file && values.file.name,
+									}
+								)}
 							>
-								Загрузить документ
+								{values.file && values.file.name
+									? "Документ загружен"
+									: "Загрузить документ"}
 								<input
 									id="document"
 									name="document"
 									type="file"
 									accept=".pdf,.doc,.docx"
 									className="hidden"
-									onChange={(event) => {
-										handleFileChange(event);
-										const file = event.target.files?.[0];
-										if (file) {
-											setFieldValue("document", file);
-										}
-									}}
+									onChange={(event) => handleFileChange(event, setFieldValue)}
 									disabled={isSubmitting}
 								/>
 							</label>
-							{fileName && (
+							{values.file.name && (
 								<div className="mt-2 flex flex-wrap items-center text-gray-400 gap-2 font-normal text-xs px-2">
 									<Mp4Icon className="w-5 h-5" />
 									<a
-										href={fileURL ?? "#"}
+										href={values.file.url ?? "#"}
 										target="_blank"
 										rel="noopener noreferrer"
 										className="text-black hover:underline"
 									>
-										{fileName}
+										{values.file.name}
 									</a>
 								</div>
 							)}
 							<ErrorMessage
-								name="document"
+								name="file"
 								component="div"
 								className="text-crimsonRed text-sm mt-2"
 							/>

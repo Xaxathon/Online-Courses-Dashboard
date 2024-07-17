@@ -11,8 +11,6 @@ import { useFetchUsersQuery } from "@/api/authApi";
 
 import { InternalUser, UserRole } from "@/shared/interfaces/user";
 
-const DEFAULT_LIMIT = 10;
-
 const UserConfigurationListForm = () => {
 	const [page, setPage] = useState(1);
 	const [allUsers, setAllUsers] = useState<InternalUser[]>([]);
@@ -20,7 +18,7 @@ const UserConfigurationListForm = () => {
 	const role = useSelector((state: RootState) => state.auth.role);
 
 	const { data, isLoading, isError, isFetching, refetch } = useFetchUsersQuery({
-		limit: DEFAULT_LIMIT,
+		limit: Number(import.meta.env.VITE_DEFAULT_PAGINATION_LIMIT) || 15,
 		page: page,
 		with_blocked: "1",
 	});
@@ -56,7 +54,8 @@ const UserConfigurationListForm = () => {
 				const hasMoreData =
 					data?.data?.data &&
 					Array.isArray(data.data.data) &&
-					data.data.data.length === DEFAULT_LIMIT;
+					data.data.data.length ===
+						(Number(import.meta.env.VITE_DEFAULT_PAGINATION_LIMIT) || 15);
 
 				if (entries[0].isIntersecting && !isFetching && hasMoreData) {
 					setPage((prevPage) => prevPage + 1);

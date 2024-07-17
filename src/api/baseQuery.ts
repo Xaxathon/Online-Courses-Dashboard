@@ -8,7 +8,7 @@ interface RefreshResponse {
 }
 
 const baseQuery = fetchBaseQuery({
-	baseUrl: "http://77.232.129.223",
+	baseUrl: import.meta.env.VITE_API_BASE_URL,
 	prepareHeaders: (headers, { getState }) => {
 		const token = (getState() as RootState).auth.token;
 		if (token) {

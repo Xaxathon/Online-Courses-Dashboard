@@ -17,7 +17,9 @@ class EchoService {
 		const token = localStorage.getItem("token");
 		this.echo = new Echo({
 			broadcaster: "socket.io",
-			host: "http://77.232.129.223:6001",
+			host: `${import.meta.env.VITE_API_BASE_URL}:${
+				import.meta.env.VITE_API_BASE_PORT
+			}`,
 			auth: {
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -38,7 +40,6 @@ class EchoService {
 		this.echo
 			?.private(channelName)
 			.listen(".VideoProcessed", (e: { protocol: any }) => {
-				console.log("Received VideoProcessed event:", e);
 				onUpdate(e.protocol);
 			});
 

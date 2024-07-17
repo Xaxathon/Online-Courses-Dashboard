@@ -15,8 +15,6 @@ import {
 
 import { Protocol, ProtocolStage } from "@/shared/interfaces/protocol";
 
-const DEFAULT_LIMIT = 10;
-
 const ProtocolList = () => {
 	const dispatch = useDispatch();
 
@@ -25,7 +23,7 @@ const ProtocolList = () => {
 
 	const { data, error, isLoading, isFetching } = useGetProtocolsQuery(
 		{
-			limit: DEFAULT_LIMIT,
+			limit: Number(import.meta.env.VITE_DEFAULT_PAGINATION_LIMIT) || 15,
 			page: page,
 		},
 		{
@@ -89,7 +87,8 @@ const ProtocolList = () => {
 					entries[0].isIntersecting &&
 					!isFetching &&
 					data?.data &&
-					data.data.length === DEFAULT_LIMIT
+					data.data.length ===
+						(Number(import.meta.env.VITE_DEFAULT_PAGINATION_LIMIT) || 15)
 				) {
 					setPage((prevPage) => prevPage + 1);
 				}

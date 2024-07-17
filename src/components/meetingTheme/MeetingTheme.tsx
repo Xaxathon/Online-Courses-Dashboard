@@ -17,8 +17,8 @@ import {
 } from "@/utils/meetingUtils";
 
 import { useDeleteMeetingMutation } from "@/api/meetingsApi";
-
 import { Meeting, CreateMeeting, Member } from "@/shared/interfaces/meeting";
+
 import { User } from "@/shared/interfaces/user";
 
 interface MeetingThemeProps {
@@ -43,15 +43,19 @@ const MeetingTheme = ({
 	const [startTime, setStartTime] = useState<string | null>(null);
 	const [endTime, setEndTime] = useState<string | null>(null);
 
-	const [newMeetings, setNewMeetings] = useState<CreateMeeting[]>([]);
+	const [newFrontendMeeting, setNewFrontendMeeting] =
+		useState<CreateMeeting | null>(null);
 	const [filteredMeetings, setFilteredMeetings] = useState<Meeting[]>([]);
 
-	const [deleteMeeting] = useDeleteMeetingMutation();
+	const [deleteMeeting, { isLoading: isDeleteLoading }] =
+		useDeleteMeetingMutation();
 
 	useEffect(() => {
 		if (selectedDate && Array.isArray(meetings)) {
 			const dateMeetings = filterMeetingsByDate(meetings, selectedDate);
-			const allMeetings = [...dateMeetings, ...newMeetings];
+			const allMeetings = newFrontendMeeting
+				? [...dateMeetings, newFrontendMeeting]
+				: dateMeetings;
 			const sortedMeetings = sortMeetingsByStartTime(allMeetings);
 			setFilteredMeetings(sortedMeetings);
 
@@ -66,7 +70,7 @@ const MeetingTheme = ({
 				setEndTime(null);
 			}
 		}
-	}, [selectedDate, meetings, newMeetings, onMeetingSelect]);
+	}, [selectedDate, meetings, newFrontendMeeting, onMeetingSelect]);
 
 	const handleTimeSubmit = (start: string, end: string) => {
 		if (!selectedDate) return;
@@ -80,7 +84,7 @@ const MeetingTheme = ({
 			members: [],
 		};
 
-		setNewMeetings((prevMeetings) => [...prevMeetings, newMeeting]);
+		setNewFrontendMeeting(newMeeting);
 		setIsModalOpenTime(false);
 	};
 
@@ -92,20 +96,20 @@ const MeetingTheme = ({
 
 	const handleDelete = async (id: number | undefined) => {
 		if (id === undefined) {
-			console.error("Meeting ID is undefined");
-			return;
+			setNewFrontendMeeting(null);
+			onMeetingSelect(null);
+		} else {
+			try {
+				await deleteMeeting(id).unwrap();
+				setFilteredMeetings((prevMeetings) =>
+					prevMeetings.filter((meeting) => meeting.id !== id)
+				);
+				refetchMeetings();
+			} catch (error: unknown) {
+				console.error("Failed to delete meeting: ", error);
+			}
 		}
-
-		try {
-			await deleteMeeting(id).unwrap();
-			setFilteredMeetings((prevMeetings) =>
-				prevMeetings.filter((meeting) => meeting.id !== id)
-			);
-			refetchMeetings();
-			setIsDeleteModalOpen(false);
-		} catch (error: unknown) {
-			console.error("Failed to delete meeting: ", error);
-		}
+		setIsDeleteModalOpen(false);
 	};
 
 	const handleUserSelect = (user: Member | User) => {
@@ -134,11 +138,13 @@ const MeetingTheme = ({
 			setFilteredMeetings((prevMeetings) =>
 				prevMeetings.map((m) => (m.id === savedMeeting.id ? savedMeeting : m))
 			);
-			setNewMeetings([]);
+			setNewFrontendMeeting(null);
 			refetchMeetings();
 		},
 		[refetchMeetings]
 	);
+
+	const isAddButtonDisabled = newFrontendMeeting !== null;
 
 	return (
 		<div className="min-h-dynamic border-effect border bg-white shadow-effect px-3 py-5 rounded-lg">
@@ -146,7 +152,7 @@ const MeetingTheme = ({
 				<span className="font-bold text-2xl text-center text-gardenGreen w-full">
 					Тема совещания
 				</span>
-				{selectedMeeting && (
+				{(selectedMeeting || newFrontendMeeting) && (
 					<Delete
 						className="w-6 h-6 fill-current text-gray-400 hover:text-crimsonRed cursor-pointer absolute right-0"
 						onClick={() => setIsDeleteModalOpen(true)}
@@ -166,7 +172,7 @@ const MeetingTheme = ({
 					) : (
 						filteredMeetings.map((meeting) => (
 							<li
-								key={meeting.id || meeting.event_start_time}
+								key={`${meeting.id}-${meeting.event_start_time}`}
 								className={classNames(
 									"flex flex-grow items-center border px-2 flex-shrink-0 w-1/4 justify-center border-mainPurple rounded-lg py-2 cursor-pointer",
 									{
@@ -184,8 +190,15 @@ const MeetingTheme = ({
 						))
 					)}
 					<div
-						className="absolute right-0 flex items-center justify-center font-bold text-lg text-white bg-mainPurple py-2 px-3 rounded-md cursor-pointer hover:bg-mainPurpleHover active:bg-mainPurpleActive"
-						onClick={() => setIsModalOpenTime(true)}
+						className={classNames(
+							"absolute right-0 flex items-center justify-center font-bold text-lg text-white py-2 px-3 rounded-md",
+							{
+								"bg-mainPurple hover:bg-mainPurpleHover active:bg-mainPurpleActive cursor-pointer":
+									!isAddButtonDisabled,
+								"bg-gray-400 cursor-not-allowed": isAddButtonDisabled,
+							}
+						)}
+						onClick={() => !isAddButtonDisabled && setIsModalOpenTime(true)}
 					>
 						+
 					</div>
@@ -238,14 +251,19 @@ const MeetingTheme = ({
 					onUserSelect={handleUserSelect}
 				/>
 			)}
-			{isDeleteModalOpen && selectedMeeting && (
+			{isDeleteModalOpen && (selectedMeeting || newFrontendMeeting) && (
 				<DeleteElementModal
 					title="Удаление совещания"
-					description={`${selectedMeeting.theme.slice(0, 10)} (ID: ${
-						selectedMeeting.id
-					})`}
+					description={
+						selectedMeeting
+							? `${selectedMeeting.theme.slice(0, 10)} (ID: ${
+									selectedMeeting.id
+							  })`
+							: "Несохраненное совещание"
+					}
 					onClose={() => setIsDeleteModalOpen(false)}
-					onDelete={() => handleDelete(selectedMeeting.id)}
+					onDelete={() => handleDelete(selectedMeeting?.id)}
+					isLoading={isDeleteLoading}
 				/>
 			)}
 		</div>

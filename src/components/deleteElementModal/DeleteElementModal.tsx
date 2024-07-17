@@ -1,8 +1,11 @@
 import Modal from "../modal/Modal";
 
+import classNames from "classnames";
+
 interface DeleteElementModalProps {
 	onClose: () => void;
 	onDelete: () => void;
+	isLoading: boolean;
 	title: string;
 	description: string | number;
 }
@@ -11,6 +14,7 @@ const DeleteElementModal = ({
 	onClose,
 	onDelete,
 	title,
+	isLoading,
 	description,
 }: DeleteElementModalProps) => {
 	return (
@@ -31,8 +35,16 @@ const DeleteElementModal = ({
 					</button>
 					<button
 						type="button"
-						className="mt-4 rounded-xl px-14 py-2 bg-crimsonRed text-white text-xl font-bold hover:bg-crimsonRedHover active:bg-crimsonRedActive"
+						className={classNames(
+							"mt-4 rounded-xl px-14 py-2 text-white text-xl font-bold",
+							{
+								"bg-crimsonRed hover:bg-crimsonRedHover cursor-pointer":
+									!isLoading,
+								"bg-gray-500 cursor-not-allowed": isLoading,
+							}
+						)}
 						onClick={onDelete}
+						disabled={isLoading}
 					>
 						Удалить
 					</button>

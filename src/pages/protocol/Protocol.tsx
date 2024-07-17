@@ -65,7 +65,8 @@ const Protocol = () => {
 		refetchOnMountOrArgChange: false,
 	});
 	const [updateProtocol] = useUpdateProtocolMutation();
-	const [deleteProtocol] = useDeleteProtocolMutation();
+	const [deleteProtocol, { isLoading: isDeleteLoading }] =
+		useDeleteProtocolMutation();
 
 	const [generatePDF] = useGeneratePDFMutation();
 	const [generateDOCX] = useGenerateDOCXMutation();
@@ -390,6 +391,7 @@ const Protocol = () => {
 					description={`Протокол №${protocol.data.protocol_number}`}
 					onClose={handleCloseTextModal}
 					onDelete={handleDelete}
+					isLoading={isDeleteLoading}
 				/>
 			)}
 		</div>

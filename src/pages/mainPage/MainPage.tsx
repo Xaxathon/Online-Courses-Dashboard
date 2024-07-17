@@ -22,8 +22,6 @@ import {
 	useFetchMeetingStatsQuery,
 } from "@/api/statsApi";
 
-const DEBOUNCE_DELAY = 1000;
-
 const MainPage = () => {
 	const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 	const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -80,7 +78,7 @@ const MainPage = () => {
 		debounce((term: string) => {
 			setSearchTerm(term);
 			setIsSearching(false);
-		}, DEBOUNCE_DELAY),
+		}, import.meta.env.VITE_SEARCH_DELAY),
 		[]
 	);
 

@@ -14,7 +14,6 @@ import { useFetchUsersQuery, useCreateUserMutation } from "@/api/authApi";
 
 import { InternalUser, ExternalUser, UserRole } from "@/shared/interfaces/user";
 
-// Добавил данный интерфейс для того, чтобы получить список пользователей
 interface ApiResponse {
 	data: {
 		data: (InternalUser | ExternalUser)[];
@@ -38,9 +37,6 @@ const UserSchema = Yup.object().shape({
 	email: Yup.string().email("Неверный формат email"),
 });
 
-const DEFAULT_LIMIT = 15;
-const SEARCH_DELAY = 500;
-
 const ExternalUserAddModal = ({
 	onClose,
 	onUserSelect,
@@ -58,7 +54,9 @@ const ExternalUserAddModal = ({
 
 	const { data, isLoading, isError, isFetching, refetch } = useFetchUsersQuery(
 		{
-			limit: searchTerm ? undefined : DEFAULT_LIMIT,
+			limit: searchTerm
+				? undefined
+				: Number(import.meta.env.VITE_DEFAULT_PAGINATION_LIMIT) || 15,
 			page: searchTerm ? undefined : page,
 			search: searchTerm,
 		},
@@ -86,7 +84,8 @@ const ExternalUserAddModal = ({
 				entries[0].isIntersecting &&
 				!isFetching &&
 				!searchTerm &&
-				data?.data.data.length === DEFAULT_LIMIT
+				data?.data.data.length ===
+					(Number(import.meta.env.VITE_DEFAULT_PAGINATION_LIMIT) || 15)
 			) {
 				setPage((prevPage) => prevPage + 1);
 			}
@@ -120,7 +119,7 @@ const ExternalUserAddModal = ({
 		if (searchInput !== searchTerm) {
 			searchTimeoutRef.current = setTimeout(() => {
 				setSearchTerm(searchInput);
-			}, SEARCH_DELAY);
+			}, Number(import.meta.env.VITE_SEARCH_DELAY) || 1000);
 		}
 
 		return () => {
@@ -136,7 +135,7 @@ const ExternalUserAddModal = ({
 	) => {
 		try {
 			{
-				/* Не смог убрать тип any в этом месте, там должно возвращаться ExternalUser */
+				/* Не смог убрать тип any в этом месте, там должно создаваться ExternalUser */
 			}
 			const createdUser: any = await createUser(values).unwrap();
 

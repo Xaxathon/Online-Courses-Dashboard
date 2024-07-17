@@ -41,7 +41,8 @@ const ProtocolTaskItem = memo(
 		const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 		const [currentStatus, setCurrentStatus] = useState(task.status);
 
-		const [deleteProtocolTask] = useDeleteProtocolTaskMutation();
+		const [deleteProtocolTask, { isLoading: isDeleteLoading }] =
+			useDeleteProtocolTaskMutation();
 		const [updateProtocolTask, { isLoading: isUpdateTaskLoading }] =
 			useUpdateProtocolTaskMutation();
 
@@ -158,6 +159,7 @@ const ProtocolTaskItem = memo(
 						description={`Задача: ${task.essence.slice(0, 10)} для протокола №${
 							task.protocol.id
 						}`}
+						isLoading={isDeleteLoading}
 					/>
 				)}
 			</>

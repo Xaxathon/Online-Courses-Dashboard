@@ -34,8 +34,10 @@ const ProtocolParticipantList = () => {
 
 	const [addMember, { isError: isAddingError }] =
 		useAddProtocolMemberMutation();
-	const [deleteMember, { isError: isDeletingError }] =
-		useDeleteProtocolMemberMutation();
+	const [
+		deleteMember,
+		{ isError: isDeletingError, isLoading: isDeleteLoading },
+	] = useDeleteProtocolMemberMutation();
 
 	const [selectedUser, setSelectedUser] = useState<{
 		id: number;
@@ -132,6 +134,7 @@ const ProtocolParticipantList = () => {
 					onDelete={handleDeleteUser}
 					title="Удаление участника"
 					description={selectedUser.member.full_name}
+					isLoading={isDeleteLoading}
 				/>
 			)}
 		</>

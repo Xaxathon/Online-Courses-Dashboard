@@ -19,7 +19,7 @@ const ProtocolNotification = () => {
 		if (isVisible) {
 			const timer = setTimeout(() => {
 				dispatch(hideNotification());
-			}, 7000);
+			}, Number(import.meta.env.VITE_NOTIFICATION_TIMEOUT) || 7000);
 
 			return () => clearTimeout(timer);
 		}

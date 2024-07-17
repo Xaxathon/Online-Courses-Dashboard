@@ -10,7 +10,7 @@ import classNames from "classnames";
 
 import { useUpdateUserMutation } from "@/api/authApi";
 
-import { BaseUser, FormValues, UserRole } from "@/shared/interfaces/user";
+import { BaseUser, UserRole } from "@/shared/interfaces/user";
 
 interface UserConfigurationFormProps {
 	user: BaseUser;
@@ -21,6 +21,15 @@ interface ApiError {
 		message?: string;
 		errors?: Record<string, string[]>;
 	};
+}
+
+export interface FormValues {
+	full_name: string;
+	department: string;
+	email: string;
+	password: string;
+	avatar?: File;
+	is_active?: boolean;
 }
 
 const UserConfigurationForm = memo(
