@@ -103,7 +103,9 @@ const getStatus = (protocol: Protocol) => {
 	switch (protocol.stage) {
 		case ProtocolStage.VideoProcess:
 			return "Обработка видео";
-		case ProtocolStage.SuccessVideoProcess:
+		case ProtocolStage.ErrorVideoProcess:
+			return "Ошибка при обработке видео";
+		default:
 			if (protocol.status === "success") {
 				return "Готово";
 			} else if (protocol.status === "process") {
@@ -111,7 +113,5 @@ const getStatus = (protocol: Protocol) => {
 			} else {
 				return "Неизвестный статус";
 			}
-		case ProtocolStage.ErrorVideoProcess:
-			return "Ошибка при обработке видео";
 	}
 };

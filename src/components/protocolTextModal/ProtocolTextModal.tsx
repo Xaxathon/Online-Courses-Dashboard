@@ -1,4 +1,4 @@
-import { useRef, useEffect, TextareaHTMLAttributes } from "react";
+import { useRef, useEffect, DragEvent, TextareaHTMLAttributes } from "react";
 
 import { ReactComponent as DragAndDropIcon } from "@assets/icons/drag-and-drop-icon.svg";
 
@@ -15,12 +15,6 @@ import {
 import * as Yup from "yup";
 import classNames from "classnames";
 import dayjs from "dayjs";
-import {
-	DragDropContext,
-	Droppable,
-	Draggable,
-	DropResult,
-} from "react-beautiful-dnd";
 
 import { useSaveFinalProtocolMutation } from "@/api/protocolsApi";
 
@@ -69,7 +63,7 @@ const ProtocolTextModal = ({
 		event_start_time: event_start_time ? formatTime(event_start_time) : "",
 		city: city || "",
 		location: location || "",
-		keywords: final_transcript,
+		keywords: final_transcript.filter((keyword) => keyword.key.trim() !== ""),
 	};
 
 	const validationSchema = Yup.object({
@@ -81,12 +75,6 @@ const ProtocolTextModal = ({
 			.required("Обязательное поле"),
 		city: Yup.string().required("Обязательное поле"),
 		location: Yup.string().required("Обязательное поле"),
-		keywords: Yup.array().of(
-			Yup.object().shape({
-				key: Yup.string().required(),
-				value: Yup.string().required("Обязательное поле"),
-			})
-		),
 	});
 
 	const handleSubmit = async (
@@ -114,14 +102,6 @@ const ProtocolTextModal = ({
 		}
 	};
 
-	// Я убрал ошибку в консоли, потому что она внутри самой библиотеки
-
-	const error = console.error;
-	console.error = (...args: any) => {
-		if (/defaultProps/.test(args[0])) return;
-		error(...args);
-	};
-
 	return (
 		<Modal onClose={onClose}>
 			<Formik
@@ -129,147 +109,155 @@ const ProtocolTextModal = ({
 				validationSchema={validationSchema}
 				onSubmit={handleSubmit}
 			>
-				{({ values, setFieldValue, isSubmitting }) => (
-					<Form className="w-[35rem] flex flex-col gap-2 mt-6 text-base font-bold text-mainPurple">
-						<h2 className="text-center mb-2 text-xl">Текст протокола</h2>
-						<div className="h-[30rem] w-full p-1 overflow-y-auto">
-							<DragDropContext
-								onDragEnd={(result: DropResult) => {
-									if (!result.destination) return;
-									const items = Array.from(values.keywords);
-									const [reorderedItem] = items.splice(result.source.index, 1);
-									items.splice(result.destination.index, 0, reorderedItem);
-									setFieldValue("keywords", items);
-								}}
-							>
-								<Droppable droppableId="keywords">
-									{(provided) => (
-										<div
-											{...provided.droppableProps}
-											ref={provided.innerRef}
-											className="flex flex-col items-center gap-2 p-1"
-										>
-											{values.keywords.map((keyword, index) => (
-												<Draggable
-													key={keyword.key}
-													draggableId={keyword.key}
-													index={index}
-												>
-													{(provided, snapshot) => (
-														<div
-															ref={provided.innerRef}
-															{...provided.draggableProps}
-															className={classNames(
-																"flex flex-col gap-1 w-full p-2 rounded-lg transition-all duration-200",
-																{
-																	"bg-lightPurple shadow-lg":
-																		snapshot.isDragging,
-																	"bg-white": !snapshot.isDragging,
-																}
-															)}
-														>
-															<div className="flex items-center gap-2">
-																<div {...provided.dragHandleProps}>
-																	<DragAndDropIcon className="h-5 w-5 fill-current text-gray-400 hover:text-gray-700 active:text-mainPurple cursor-move" />
-																</div>
-																<label
-																	htmlFor={`keywords.${index}.value`}
-																	className="flex-grow"
-																>
-																	{keyword.key}
-																</label>
-															</div>
-															<Field
-																component={AutoResizeTextArea}
-																id={`keywords.${index}.value`}
-																name={`keywords.${index}.value`}
-																className="min-h-7 max-h-28"
-															/>
-															<ErrorMessage
-																name={`keywords.${index}.value`}
-																component="div"
-																className="text-crimsonRed"
-															/>
-														</div>
-													)}
-												</Draggable>
-											))}
-											{provided.placeholder}
-										</div>
-									)}
-								</Droppable>
-							</DragDropContext>
+				{({ values, setFieldValue, isSubmitting }) => {
+					const onDragStart = (e: DragEvent<HTMLDivElement>, index: number) => {
+						e.dataTransfer.setData("text/plain", index.toString());
+					};
 
-							<div className="flex gap-4 mt-4">
-								<div className="flex flex-col gap-1 flex-1">
-									<label htmlFor="event_start_time">Время начала</label>
-									<Field
-										type="time"
-										id="event_start_time"
-										name="event_start_time"
-										className="text-mainPurple bg-lightPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
+					const onDragOver = (e: DragEvent<HTMLDivElement>) => {
+						e.preventDefault();
+					};
+
+					const onDrop = (e: DragEvent<HTMLDivElement>, dropIndex: number) => {
+						e.preventDefault();
+						const dragIndex = parseInt(
+							e.dataTransfer.getData("text/plain"),
+							10
+						);
+						if (dragIndex === dropIndex) return;
+
+						const newKeywords = [...values.keywords];
+						const [removed] = newKeywords.splice(dragIndex, 1);
+						newKeywords.splice(dropIndex, 0, removed);
+
+						setFieldValue("keywords", newKeywords);
+					};
+
+					return (
+						<Form className="w-[35rem] flex flex-col gap-2 mt-6 text-base font-bold text-mainPurple">
+							<h2 className="text-center mb-2 text-xl">Текст протокола</h2>
+							<div className="h-[30rem] w-full p-1 overflow-y-auto">
+								{values.keywords.map((keyword, index) => (
+									<DraggableKeyword
+										key={`${keyword.key}-${index}`}
+										keyword={keyword}
+										index={index}
+										onDragStart={onDragStart}
+										onDragOver={onDragOver}
+										onDrop={onDrop}
 									/>
-									<ErrorMessage
-										name="event_start_time"
-										component="div"
-										className="text-crimsonRed"
-									/>
+								))}
+
+								<div className="flex gap-4 mt-4">
+									<div className="flex flex-col gap-1 flex-1">
+										<label htmlFor="event_start_time">Время начала</label>
+										<Field
+											type="time"
+											id="event_start_time"
+											name="event_start_time"
+											className="text-mainPurple bg-lightPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
+										/>
+										<ErrorMessage
+											name="event_start_time"
+											component="div"
+											className="text-crimsonRed"
+										/>
+									</div>
+
+									<div className="flex flex-col gap-1 flex-1">
+										<label htmlFor="city">Город</label>
+										<Field
+											type="text"
+											id="city"
+											name="city"
+											className="text-mainPurple bg-lightPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
+										/>
+										<ErrorMessage
+											name="city"
+											component="div"
+											className="text-crimsonRed"
+										/>
+									</div>
 								</div>
 
-								<div className="flex flex-col gap-1 flex-1">
-									<label htmlFor="city">Город</label>
+								<div className="flex flex-col gap-1 mt-4">
+									<label htmlFor="location">Место проведения</label>
 									<Field
 										type="text"
-										id="city"
-										name="city"
+										id="location"
+										name="location"
 										className="text-mainPurple bg-lightPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
 									/>
 									<ErrorMessage
-										name="city"
+										name="location"
 										component="div"
 										className="text-crimsonRed"
 									/>
 								</div>
 							</div>
 
-							<div className="flex flex-col gap-1 mt-4">
-								<label htmlFor="location">Место проведения</label>
-								<Field
-									type="text"
-									id="location"
-									name="location"
-									className="text-mainPurple bg-lightPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
-								/>
-								<ErrorMessage
-									name="location"
-									component="div"
-									className="text-crimsonRed"
-								/>
-							</div>
-						</div>
-
-						<button
-							className={classNames(
-								"px-20 mt-5 py-2 mx-auto text-white rounded-lg text-base",
-								{
-									"bg-gray-500 cursor-not-allowed": isSubmitting,
-									"bg-mainPurple hover:bg-mainPurpleHover active:bg-mainPurpleActive":
-										!isSubmitting,
-								}
-							)}
-							type="submit"
-							disabled={isSubmitting}
-						>
-							Сохранить
-						</button>
-					</Form>
-				)}
+							<button
+								className={classNames(
+									"px-20 mt-5 py-2 mx-auto text-white rounded-lg text-base",
+									{
+										"bg-gray-500 cursor-not-allowed": isSubmitting,
+										"bg-mainPurple hover:bg-mainPurpleHover active:bg-mainPurpleActive":
+											!isSubmitting,
+									}
+								)}
+								type="submit"
+								disabled={isSubmitting}
+							>
+								Сохранить
+							</button>
+						</Form>
+					);
+				}}
 			</Formik>
 		</Modal>
 	);
 };
 
 export default ProtocolTextModal;
+
+const DraggableKeyword = ({
+	keyword,
+	index,
+	onDragStart,
+	onDragOver,
+	onDrop,
+}: {
+	keyword: ProtocolKeyword;
+	index: number;
+	onDragStart: (e: DragEvent<HTMLDivElement>, index: number) => void;
+	onDragOver: (e: DragEvent<HTMLDivElement>) => void;
+	onDrop: (e: DragEvent<HTMLDivElement>, index: number) => void;
+}) => {
+	return (
+		<div
+			draggable
+			onDragStart={(e) => onDragStart(e, index)}
+			onDragOver={onDragOver}
+			onDrop={(e) => onDrop(e, index)}
+			className="mb-2 cursor-move"
+		>
+			<div className="flex flex-col gap-1 w-full p-2 rounded-lg bg-white">
+				<div className="flex items-center gap-2">
+					<DragAndDropIcon className="h-5 w-5 fill-current text-gray-400 hover:text-gray-700 active:text-mainPurple" />
+					<label htmlFor={`keywords.${index}.value`} className="flex-grow">
+						{keyword.key}
+					</label>
+				</div>
+				<Field
+					component={AutoResizeTextArea}
+					id={`keywords.${index}.value`}
+					name={`keywords.${index}.value`}
+					className="min-h-7 max-h-28"
+				/>
+			</div>
+		</div>
+	);
+};
 
 const AutoResizeTextArea = ({
 	field,
@@ -296,6 +284,7 @@ const AutoResizeTextArea = ({
 		<textarea
 			{...field}
 			{...props}
+			value={field.value || ""}
 			ref={textareaRef}
 			className={`text-mainPurple bg-lightPurple p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent resize-none ${props.className}`}
 		/>

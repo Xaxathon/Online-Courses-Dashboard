@@ -207,18 +207,12 @@ const MeetingTheme = ({
 
 			{filteredMeetings.length === 0 ? (
 				<div className="flex flex-col items-center justify-center bg-gray-100 rounded-lg p-5 mt-5">
-					<Skeleton width="20" height="20" className="rounded-lg mb-4" />
-					<Skeleton width="3/4" height="6" className="mb-2" />
-					<Skeleton width="1/2" height="4" className="mb-2" />
-					<Skeleton width="3/4" height="6" className="mb-2" />
-					<Skeleton width="1/2" height="4" className="mb-2" />
-					<Skeleton width="3/4" height="6" className="mb-2" />
-					<Skeleton width="1/2" height="4" className="mb-2" />
-					<Skeleton width="3/4" height="6" className="mb-2" />
-					<Skeleton width="1/2" height="4" className="mb-2" />
-					<Skeleton width="3/4" height="6" className="mb-2" />
-					<Skeleton width="1/2" height="4" className="mb-2" />
-					<Skeleton width="1/2" height="4" />
+					<Skeleton width="full" height="20" className="rounded-lg mb-5" />
+					<Skeleton width="20" height="10" className="rounded-lg mb-10" />
+					<Skeleton width="full" height="5" className="rounded-lg mb-4" />
+					<Skeleton width="full" height="5" className="rounded-lg mb-4" />
+					<Skeleton width="full" height="5" className="rounded-lg mb-4" />
+					<Skeleton width="full" height="5" className="rounded-lg mb-4" />
 				</div>
 			) : (
 				<>
