@@ -43,7 +43,7 @@ export const statsApi = createApi({
 		}),
 
 		fetchKpiTasksStats: builder.query<
-			KpiTasksStatsData,
+			KpiTasksStatsData[],
 			{ secretaryId: number; date: string }
 		>({
 			query: ({ secretaryId, date }) => ({

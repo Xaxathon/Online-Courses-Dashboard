@@ -5,9 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { ReactComponent as Backward } from "@assets/icons/backward.svg";
 import { ReactComponent as AddUserIcon } from "@assets/icons/add-icon.svg";
 
+import UserAddFormModal from "@components/userAddFormModal/UserAddFormModal";
 import UserConfigurationListForm from "@components/userConfigurationListForm/UserConfigurationListForm";
 import UserSettingPersonalForm from "@components/userSettingPersonalForm/UserSettingPersonalForm";
-import UserAddFormModal from "@components/userAddFormModal/UserAddFormModal";
 import Skeleton from "@components/skeleton/Skeleton";
 
 import { useSelector } from "react-redux";
