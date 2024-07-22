@@ -14,13 +14,13 @@ const KeywordSetting = lazy(
 	() => import("@/pages/keywordSetting/KeywordSetting")
 );
 
-const ProtocolAddForm = lazy(
-	() => import("../protocolAddForm/protocolAddForm")
-);
 const Secretaries = lazy(() => import("@pages/secretaries/Secretaries"));
 const Protocols = lazy(() => import("@pages/protocols/Protocols"));
 const Protocol = lazy(() => import("@pages/protocol/Protocol"));
 const Meetings = lazy(() => import("@pages/meetings/Meetings"));
+const ProtocolAddForm = lazy(
+	() => import("@components/protocolAddForm/ProtocolAddForm")
+);
 
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
