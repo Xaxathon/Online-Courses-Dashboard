@@ -27,11 +27,13 @@ interface ExtendedUpdateMeetingMember extends UpdateMeetingMember {
 
 interface MeetingFormProps {
 	meeting: Meeting | null;
+	errorAddMember: string | null;
 	selectedDate: Date | null;
 	startTime: string | null;
 	endTime: string | null;
 	onSave: (meeting: CreateMeeting) => void;
 	onOpenUserModal: () => void;
+	onUpdateMeeting: (updatedMeeting: Meeting) => void;
 }
 
 interface FormValues {
@@ -44,10 +46,10 @@ interface FormValues {
 }
 
 const validationSchema = Yup.object({
-	theme: Yup.string().required("Тема обязательна для заполнения"),
+	theme: Yup.string().required("Поле обязательно для заполнения"),
 	link: Yup.string()
 		.url("Некорректная ссылка")
-		.required("Ссылка обязательна для заполнения"),
+		.required("Поле обязательно для заполнения"),
 	file: Yup.object({
 		name: Yup.string().nullable(),
 		url: Yup.string().nullable(),
@@ -56,11 +58,13 @@ const validationSchema = Yup.object({
 
 const MeetingForm = ({
 	meeting,
+	errorAddMember,
 	selectedDate,
 	startTime,
 	endTime,
 	onSave,
 	onOpenUserModal,
+	onUpdateMeeting,
 }: MeetingFormProps) => {
 	const [members, setMembers] = useState<ExtendedUpdateMeetingMember[]>([]);
 
@@ -169,9 +173,13 @@ const MeetingForm = ({
 	};
 
 	const handleDeleteMember = (id: number) => {
-		setMembers((prevMembers) =>
-			prevMembers.filter((member) => member.member_id !== id)
-		);
+		if (meeting && meeting.members) {
+			const updatedMembers = meeting.members.filter(
+				(member) => member.member.id !== id
+			);
+			const updatedMeeting = { ...meeting, members: updatedMembers };
+			onUpdateMeeting(updatedMeeting);
+		}
 	};
 
 	return (
@@ -234,6 +242,11 @@ const MeetingForm = ({
 							</button>
 						</div>
 						<ul className="flex flex-col gap-1 mt-2 max-h-[9rem] overflow-y-auto">
+							{errorAddMember && (
+								<li className="bg-red-100 border border-red-400 text-crimsonRed text-xs rounded-sm px-3 py-1 flex items-center justify-between gap-2">
+									{errorAddMember}
+								</li>
+							)}
 							{members.map((member) => (
 								<li
 									key={member.member_id}

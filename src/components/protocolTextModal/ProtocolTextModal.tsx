@@ -72,9 +72,9 @@ const ProtocolTextModal = ({
 				/^([01]\d|2[0-3]):([0-5]\d)$/,
 				"Время должно быть в формате ЧЧ:ММ"
 			)
-			.required("Обязательное поле"),
-		city: Yup.string().required("Обязательное поле"),
-		location: Yup.string().required("Обязательное поле"),
+			.required("Поле обязательно для заполнения"),
+		city: Yup.string().required("Поле обязательно для заполнения"),
+		location: Yup.string().required("Поле обязательно для заполнения"),
 	});
 
 	const handleSubmit = async (

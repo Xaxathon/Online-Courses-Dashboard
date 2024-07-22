@@ -53,11 +53,11 @@ const ProtocolAddForm = () => {
 			video: "",
 		},
 		validationSchema: Yup.object({
-			theme: Yup.string().required("Обязательное поле"),
-			agenda: Yup.string().required("Обязательное поле"),
-			secretary_id: Yup.number().required("Обязательное поле"),
-			director_id: Yup.number().required("Обязательное поле"),
-			eventDate: Yup.string().required("Обязательное поле"),
+			theme: Yup.string().required("Поле обязательно для заполнения"),
+			agenda: Yup.string().required("Поле обязательно для заполнения"),
+			secretary_id: Yup.number().required("Поле обязательно для заполнения"),
+			director_id: Yup.number().required("Поле обязательно для заполнения"),
+			eventDate: Yup.string().required("Поле обязательно для заполнения"),
 		}),
 		onSubmit: async (values) => {
 			const formData = new FormData();

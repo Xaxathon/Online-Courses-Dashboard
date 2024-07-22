@@ -1,8 +1,6 @@
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { ReactComponent as Backward } from "@assets/icons/backward.svg";
-
-import { useNavigate } from "react-router-dom";
 
 import { useFormik, FormikHelpers } from "formik";
 import * as Yup from "yup";
@@ -11,8 +9,8 @@ import { useForgotPasswordMutation } from "@/api/authApi";
 
 const ForgotPassword = () => {
 	const navigate = useNavigate();
-	const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
-	const [successMessage, setSuccessMessage] = useState<string | null>(null);
+	const [forgotPassword, { isLoading, isSuccess }] =
+		useForgotPasswordMutation();
 
 	const formik = useFormik({
 		initialValues: {
@@ -21,7 +19,7 @@ const ForgotPassword = () => {
 		validationSchema: Yup.object({
 			email: Yup.string()
 				.email("Неверный формат e-mail")
-				.required("Обязательное поле"),
+				.required("Поле обязательно для заполнения"),
 		}),
 		onSubmit: async (
 			values,
@@ -29,9 +27,6 @@ const ForgotPassword = () => {
 		) => {
 			try {
 				await forgotPassword(values).unwrap();
-				setSuccessMessage(
-					"Инструкции по сбросу пароля отправлены на ваш e-mail."
-				);
 			} catch (error) {
 				if (error && typeof error === "object" && "data" in error) {
 					const errorData = error as { data?: { message?: string } };
@@ -59,11 +54,6 @@ const ForgotPassword = () => {
 				</div>
 
 				<h2 className="text-xl text-center font-bold mb-5">Сброс пароля</h2>
-				{successMessage && (
-					<div className="text-gardenGreen font-bold mb-5">
-						{successMessage}
-					</div>
-				)}
 				<div className="flex flex-col gap-1">
 					<label className="text-lg" htmlFor="email">
 						E-mail
@@ -83,15 +73,21 @@ const ForgotPassword = () => {
 							{formik.errors.email}
 						</span>
 					) : null}
+					{isSuccess && (
+						<div className="text-gardenGreen font-bold">
+							Инструкции по сбросу пароля отправлены на ваш email.
+						</div>
+					)}
 				</div>
 
 				<div className="w-full flex justify-center mt-10">
 					<button
 						type="submit"
 						className="rounded-md px-10 py-2 bg-mainPurple text-white text-base font-bold"
-						disabled={isLoading}
+						disabled={isLoading || isSuccess}
 					>
 						{isLoading ? "Отправка..." : "Отправить ссылку для сброса пароля"}
+						{isSuccess && "Отправлено"}
 					</button>
 				</div>
 			</form>

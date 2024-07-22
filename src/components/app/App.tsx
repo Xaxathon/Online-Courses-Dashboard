@@ -50,9 +50,9 @@ const App = () => {
 				<Routes>
 					<Route path="/" element={<Navigate to="/login" />} />
 					<Route path="/login" element={<Login />} />
-					<Route path="/reset-password" element={<ForgotPassword />} />
+					<Route path="/change-password" element={<ForgotPassword />} />
 					<Route
-						path="/reset-password/:token"
+						path="/change-password/:token"
 						element={<ResetPassword />}
 					/>{" "}
 					{/* TODO: Ждем почтовый клиент */}

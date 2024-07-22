@@ -13,10 +13,8 @@ const MeetingTimeAddFormModal = ({
 	onTimeSubmit,
 }: MeetingTimeAddFormModalProps) => {
 	const validationSchema = Yup.object({
-		startTime: Yup.string().required("Время начала обязательно для заполнения"),
-		endTime: Yup.string().required(
-			"Время окончания обязательно для заполнения"
-		),
+		startTime: Yup.string().required("Поле обязательно для заполнения"),
+		endTime: Yup.string().required("Поле обязательно для заполнения"),
 	});
 
 	return (
@@ -43,7 +41,7 @@ const MeetingTimeAddFormModal = ({
 									<ErrorMessage
 										name="startTime"
 										component="div"
-										className="text-crimsonRed text-sm mt-1"
+										className="text-crimsonRed text-sm mt-1 bg-white p-1 rounded-md"
 									/>
 								</div>
 								<span className="text-white">&rarr;</span>
@@ -56,7 +54,7 @@ const MeetingTimeAddFormModal = ({
 									<ErrorMessage
 										name="endTime"
 										component="div"
-										className="text-crimsonRed text-sm mt-1"
+										className="text-crimsonRed text-sm mt-1 bg-white p-1 rounded-md"
 									/>
 								</div>
 							</div>

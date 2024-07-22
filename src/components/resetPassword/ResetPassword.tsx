@@ -1,62 +1,52 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { ReactComponent as Backward } from "@assets/icons/backward.svg";
+
 import { useResetPasswordMutation } from "@/api/authApi";
 
-interface ApiError {
-	data?: {
-		message?: string;
-	};
-}
-
 const ResetPassword = () => {
+	const location = useLocation();
 	const navigate = useNavigate();
-	const { token } = useParams<{ token: string }>();
-	const [resetPassword, { isLoading }] = useResetPasswordMutation();
-	const [formError, setFormError] = useState("");
 
-	useEffect(() => {
-		if (!token) {
-			navigate("/reset-password");
-		}
-	}, [token, navigate]);
+	const [resetPassword, { isLoading, error }] = useResetPasswordMutation();
+
+	const searchParams = new URLSearchParams(location.search);
+
+	const token = searchParams.get("token");
+	const email = searchParams.get("email");
 
 	const formik = useFormik({
 		initialValues: {
 			token: token || "",
-			email: "", // Оставляем email в initialValues
+			email: email || "",
 			password: "",
 			password_confirmation: "",
 		},
 		validationSchema: Yup.object({
 			password: Yup.string()
 				.min(6, "Пароль должен содержать минимум 6 символов")
-				.required("Обязательное поле"),
+				.required("Поле обязательно для заполнения"),
 			password_confirmation: Yup.string()
 				.oneOf([Yup.ref("password")], "Пароли должны совпадать")
-				.required("Обязательное поле"),
+				.required("Поле обязательно для заполнения"),
 		}),
 		onSubmit: async (values, { setSubmitting }) => {
 			try {
 				await resetPassword(values).unwrap();
-				navigate("/login", {
-					state: {
-						message: "Пароль успешно сброшен. Пожалуйста, войдите в систему.",
-					},
-				});
+				navigate("/login");
 			} catch (error) {
-				if (typeof error === "object" && error !== null && "data" in error) {
-					const apiError = error as ApiError;
-					setFormError(apiError.data?.message || "Ошибка при сбросе пароля");
-				} else {
-					setFormError("Эта ссылка не действительна");
-				}
+				console.error("Ошибка при сбросе пароля:", error);
 			}
 			setSubmitting(false);
 		},
 	});
+
+	const errorMessage = error
+		? "data" in error && (error.data as any)?.message
+			? (error.data as any).message
+			: "Эта ссылка не действительна"
+		: "";
 
 	return (
 		<div className="flex items-center justify-center min-h-screen top-0 left-0 w-full text-mainPurple">
@@ -64,67 +54,84 @@ const ResetPassword = () => {
 				onSubmit={formik.handleSubmit}
 				className="border-effect border bg-white shadow-effect px-5 py-5 rounded-2xl w-[30rem] min-h-[15rem]"
 			>
-				<div
-					className="flex items-center gap-1 text-mainPurple hover:text-gardenGreen active:text-mainPurpleActive cursor-pointer"
-					onClick={() => navigate(-1)}
-				>
-					<Backward className="w-6 h-6 fill-current" />
-					<span>Назад</span>
-				</div>
-
 				<h2 className="text-xl text-center font-bold mb-5">Сброс пароля</h2>
 
-				<div className="mb-4">
-					<label htmlFor="password" className="block mb-2 font-bold">
-						Новый пароль
-					</label>
-					<input
-						id="password"
-						type="password"
-						{...formik.getFieldProps("password")}
-						autoComplete="new-password"
-						className="w-full px-3 py-2 border-2 ring-mainPurple rounded-md ring-2 focus:outline-none border-transparent focus:ring-gardenGreen"
-					/>
-					{formik.touched.password && formik.errors.password ? (
-						<div className="text-crimsonRed mt-1">{formik.errors.password}</div>
-					) : null}
-				</div>
-
-				<div className="mb-4">
-					<label
-						htmlFor="password_confirmation"
-						className="block mb-2 font-bold"
-					>
-						Подтвердите новый пароль
-					</label>
-					<input
-						id="password_confirmation"
-						type="password"
-						{...formik.getFieldProps("password_confirmation")}
-						autoComplete="new-password"
-						className="w-full px-3 py-2 border-2 ring-mainPurple rounded-md ring-2 focus:outline-none border-transparent focus:ring-gardenGreen"
-					/>
-					{formik.touched.password_confirmation &&
-					formik.errors.password_confirmation ? (
-						<div className="text-crimsonRed mt-1">
-							{formik.errors.password_confirmation}
+				{!error && (
+					<>
+						<input
+							type="text"
+							name="email"
+							autoComplete="email"
+							value={email || ""}
+							style={{ display: "none" }}
+							readOnly
+						/>
+						<div className="mb-4">
+							<label htmlFor="password" className="block mb-2 font-bold">
+								Новый пароль
+							</label>
+							<input
+								id="password"
+								type="password"
+								{...formik.getFieldProps("password")}
+								autoComplete="new-password"
+								className="w-full px-3 py-2 border-2 ring-mainPurple rounded-md ring-2 focus:outline-none border-transparent focus:ring-gardenGreen"
+							/>
+							{formik.touched.password && formik.errors.password ? (
+								<div className="text-crimsonRed mt-1">
+									{formik.errors.password}
+								</div>
+							) : null}
 						</div>
-					) : null}
-				</div>
 
-				{formError && (
-					<div className="text-crimsonRed font-bold mb-4">{formError}</div>
+						<div className="mb-4">
+							<label
+								htmlFor="password_confirmation"
+								className="block mb-2 font-bold"
+							>
+								Подтвердите новый пароль
+							</label>
+							<input
+								id="password_confirmation"
+								type="password"
+								{...formik.getFieldProps("password_confirmation")}
+								autoComplete="confirm-password"
+								className="w-full px-3 py-2 border-2 ring-mainPurple rounded-md ring-2 focus:outline-none border-transparent focus:ring-gardenGreen"
+							/>
+							{formik.touched.password_confirmation &&
+							formik.errors.password_confirmation ? (
+								<div className="text-crimsonRed mt-1">
+									{formik.errors.password_confirmation}
+								</div>
+							) : null}
+						</div>
+
+						<div className="w-full flex justify-center mt-6">
+							<button
+								type="submit"
+								className="rounded-md px-10 py-2 bg-mainPurple text-white text-base font-bold"
+								disabled={isLoading}
+							>
+								{isLoading ? "Загрузка..." : "Сбросить пароль"}
+							</button>
+						</div>
+					</>
 				)}
 
-				<div className="w-full flex justify-center mt-6">
-					<button
-						type="submit"
-						className="rounded-md px-10 py-2 bg-mainPurple text-white text-base font-bold"
-						disabled={isLoading}
-					>
-						Сбросить пароль
-					</button>
-				</div>
+				{error && (
+					<div className="flex flex-col items-center justify-center mt-4">
+						<span className=" text-center text-crimsonRed font-bold mb-10">
+							{errorMessage}
+						</span>
+
+						<Link
+							className="text-white bg-mainPurple p-2 rounded-lg hover:bg-mainPurpleHover active:bg-mainPurpleActive "
+							to="/login"
+						>
+							Вернуться на главную страницу
+						</Link>
+					</div>
+				)}
 			</form>
 		</div>
 	);

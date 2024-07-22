@@ -40,6 +40,8 @@ const MeetingTheme = ({
 	const [isModalOpenUser, setIsModalOpenUser] = useState(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+	const [errorAddMember, setErrorAddMember] = useState<string | null>(null);
+
 	const [startTime, setStartTime] = useState<string | null>(null);
 	const [endTime, setEndTime] = useState<string | null>(null);
 
@@ -114,23 +116,41 @@ const MeetingTheme = ({
 
 	const handleUserSelect = (user: Member | User) => {
 		if (selectedMeeting) {
-			const updatedMeeting = {
-				...selectedMeeting,
-				members: [
-					...(selectedMeeting.members || []),
-					{
-						id: selectedMeeting.members
-							? selectedMeeting.members.length + 1
-							: 1,
-						member: { ...user, email: user.email || "" },
-						email_sent: false,
-						should_notify: false,
-					},
-				],
-			};
-			onMeetingSelect(updatedMeeting);
+			const isUserAlreadyAdded = selectedMeeting.members?.some(
+				(member) => member.member.id === user.id
+			);
+
+			if (isUserAlreadyAdded) {
+				setErrorAddMember(
+					"Не удалось добавить участника, либо он уже в списке"
+				);
+			} else {
+				const updatedMeeting = {
+					...selectedMeeting,
+					members: [
+						...(selectedMeeting.members || []),
+						{
+							id: selectedMeeting.members
+								? selectedMeeting.members.length + 1
+								: 1,
+							member: { ...user, email: user.email || "" },
+							email_sent: false,
+							should_notify: false,
+						},
+					],
+				};
+				onMeetingSelect(updatedMeeting);
+				setErrorAddMember(null);
+			}
 		}
 		setIsModalOpenUser(false);
+	};
+
+	const handleUpdateMeeting = (updatedMeeting: Meeting) => {
+		onMeetingSelect(updatedMeeting);
+		setFilteredMeetings((prevMeetings) =>
+			prevMeetings.map((m) => (m.id === updatedMeeting.id ? updatedMeeting : m))
+		);
 	};
 
 	const handleSave = useCallback(
@@ -225,11 +245,13 @@ const MeetingTheme = ({
 					)}
 					<MeetingForm
 						meeting={selectedMeeting}
+						errorAddMember={errorAddMember}
 						selectedDate={selectedDate}
 						startTime={startTime}
 						endTime={endTime}
 						onSave={handleSave}
 						onOpenUserModal={() => setIsModalOpenUser(true)}
+						onUpdateMeeting={handleUpdateMeeting}
 					/>
 				</>
 			)}

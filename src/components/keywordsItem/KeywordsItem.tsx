@@ -53,8 +53,8 @@ const KeywordsItem = memo(({ keyword, refetch }: KeywordsItemProps) => {
 	};
 
 	const validationSchema = Yup.object({
-		title: Yup.string().required("Название обязательно"),
-		phrase: Yup.string().required("Фраза обязательна"),
+		title: Yup.string().required("Поле обязательно для заполнения"),
+		phrase: Yup.string().required("Поле обязательно для заполнения"),
 	});
 	return (
 		<li className="relative mb-5 mr-5 pr-10 text-gardenGreen text-base font-normal rounded-xl bg-gray-100 py-7 px-8 hover:bg-gray-200  transition-colors duration-200">

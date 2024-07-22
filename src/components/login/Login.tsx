@@ -29,8 +29,8 @@ const Login = () => {
 		validationSchema: Yup.object({
 			email: Yup.string()
 				.email("Неверный формат e-mail")
-				.required("Обязательное поле"),
-			password: Yup.string().required("Обязательное поле"),
+				.required("Поле обязательно для заполнения"),
+			password: Yup.string().required("Поле обязательно для заполнения"),
 		}),
 		onSubmit: async (
 			values,
@@ -139,7 +139,7 @@ const Login = () => {
 						</span>
 					) : null}
 					<Link
-						to="/reset-password"
+						to="/change-password"
 						className="flex justify-end mt-1 hover:text-gardenGreen"
 					>
 						Забыли пароль?
