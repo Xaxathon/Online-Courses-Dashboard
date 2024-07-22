@@ -15,7 +15,7 @@ const KeywordSetting = lazy(
 );
 
 const ProtocolAddForm = lazy(
-	() => import("@components/protocolAddForm/protocolAddForm")
+	() => import("../protocolAddForm/protocolAddForm")
 );
 const Secretaries = lazy(() => import("@pages/secretaries/Secretaries"));
 const Protocols = lazy(() => import("@pages/protocols/Protocols"));
