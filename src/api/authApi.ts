@@ -7,10 +7,12 @@ import {
 	FetchUsersResponse,
 	FetchUsersParams,
 } from "../shared/interfaces/user";
+import { logout } from "../store/slices/authSlice";
 
 export const authApi = createApi({
 	reducerPath: "authApi",
 	baseQuery: baseQueryWithReauth,
+	tagTypes: ["User"],
 	endpoints: (builder) => ({
 		login: builder.mutation<LoginResponse, LoginRequest>({
 			query: (credentials) => ({
@@ -27,6 +29,14 @@ export const authApi = createApi({
 				url: "/api/logout",
 				method: "POST",
 			}),
+			async onQueryStarted(_, { dispatch, queryFulfilled }) {
+				try {
+					await queryFulfilled;
+					dispatch(logout());
+				} catch {
+					console.error("Failed to logout");
+				}
+			},
 		}),
 		forgotPassword: builder.mutation<void, { email: string }>({
 			query: (data) => ({
@@ -38,7 +48,6 @@ export const authApi = createApi({
 				},
 			}),
 		}),
-
 		resetPassword: builder.mutation({
 			query: (data) => ({
 				url: "/api/change-password/reset",
@@ -49,7 +58,6 @@ export const authApi = createApi({
 				},
 			}),
 		}),
-
 		fetchPersonalUser: builder.query<UserResponse, void>({
 			query: () => ({
 				url: "/api/me",
@@ -81,6 +89,7 @@ export const authApi = createApi({
 					body: data,
 				};
 			},
+			invalidatesTags: ["User"],
 		}),
 		createUser: builder.mutation<{ user: UserResponse }, CreateUserRequest>({
 			query: (data) => ({
@@ -88,6 +97,7 @@ export const authApi = createApi({
 				method: "POST",
 				body: data,
 			}),
+			invalidatesTags: ["User"],
 		}),
 		fetchUsers: builder.query<FetchUsersResponse, FetchUsersParams>({
 			query: (params) => ({
@@ -100,6 +110,7 @@ export const authApi = createApi({
 					with_blocked: params?.with_blocked ? "1" : undefined,
 				},
 			}),
+			providesTags: ["User"],
 		}),
 	}),
 });

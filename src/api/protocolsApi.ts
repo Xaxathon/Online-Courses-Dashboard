@@ -14,7 +14,7 @@ import {
 const protocolsApi = createApi({
 	reducerPath: "protocolsApi",
 	baseQuery: baseQueryWithReauth,
-	tagTypes: ["Protocol"],
+	tagTypes: ["Protocol", "ProtocolTasks"],
 	endpoints: (builder) => ({
 		getProtocols: builder.query<
 			ProtocolsListResponse,
@@ -71,6 +71,7 @@ const protocolsApi = createApi({
 				url: `/api/protocols/${id}`,
 				method: "DELETE",
 			}),
+			invalidatesTags: (_, __, id) => [{ type: "Protocol", id }],
 		}),
 
 		createProtocolTask: builder.mutation<
@@ -82,6 +83,7 @@ const protocolsApi = createApi({
 				method: "POST",
 				body: data,
 			}),
+			invalidatesTags: [{ type: "ProtocolTasks", id: "LIST" }],
 		}),
 
 		getProtocolTasks: builder.query<
@@ -93,7 +95,18 @@ const protocolsApi = createApi({
 				params: { limit, page, search },
 			}),
 			transformResponse: (response: ProtocolTasksResponse) => response,
+			providesTags: (result) =>
+				result
+					? [
+							...result.data.data.map(({ id }) => ({
+								type: "ProtocolTasks" as const,
+								id,
+							})),
+							{ type: "ProtocolTasks", id: "LIST" },
+					  ]
+					: [{ type: "ProtocolTasks", id: "LIST" }],
 		}),
+
 		updateProtocolTask: builder.mutation<
 			ProtocolTaskData,
 			{ taskId: number; status: string }

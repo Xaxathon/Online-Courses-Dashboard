@@ -41,13 +41,15 @@ const ProtocolList = () => {
 				if (page === 1) {
 					return newProtocols;
 				} else {
-					const uniqueNewProtocols = newProtocols.filter(
-						(newProtocol) =>
-							!prevProtocols.some(
-								(prevProtocol) => prevProtocol.id === newProtocol.id
-							)
-					);
-					return [...prevProtocols, ...uniqueNewProtocols];
+					return [
+						...prevProtocols,
+						...newProtocols.filter(
+							(newProtocol) =>
+								!prevProtocols.some(
+									(prevProtocol) => prevProtocol.id === newProtocol.id
+								)
+						),
+					];
 				}
 			});
 		}

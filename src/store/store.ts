@@ -1,7 +1,5 @@
-import { configureStore } from "@reduxjs/toolkit";
-
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import notificationReducer from "./slices/notificationSlice";
-
 import { authApi } from "../api/authApi";
 import authReducer from "./slices/authSlice";
 import { keywordsApi } from "../api/keywordsApi";
@@ -9,17 +7,25 @@ import meetingsApi from "../api/meetingsApi";
 import protocolsApi from "../api/protocolsApi";
 import { statsApi } from "../api/statsApi";
 
-export const store = configureStore({
-	reducer: {
-		auth: authReducer,
-		notification: notificationReducer,
-		[authApi.reducerPath]: authApi.reducer,
-		[keywordsApi.reducerPath]: keywordsApi.reducer,
-		[meetingsApi.reducerPath]: meetingsApi.reducer,
-		[protocolsApi.reducerPath]: protocolsApi.reducer,
-		[statsApi.reducerPath]: statsApi.reducer,
-	},
+const rootReducer = combineReducers({
+	auth: authReducer,
+	notification: notificationReducer,
+	[authApi.reducerPath]: authApi.reducer,
+	[keywordsApi.reducerPath]: keywordsApi.reducer,
+	[meetingsApi.reducerPath]: meetingsApi.reducer,
+	[protocolsApi.reducerPath]: protocolsApi.reducer,
+	[statsApi.reducerPath]: statsApi.reducer,
+});
 
+const reducer = (state, action) => {
+	if (action.type === "auth/logout") {
+		state = undefined;
+	}
+	return rootReducer(state, action);
+};
+
+export const store = configureStore({
+	reducer,
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware({
 			serializableCheck: {
