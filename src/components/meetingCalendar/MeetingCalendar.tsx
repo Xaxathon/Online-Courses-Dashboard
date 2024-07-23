@@ -146,6 +146,12 @@ const CalendarContainer = styled.div`
 		rgba(234, 207, 255, 0.63) 0.55%,
 		rgba(231, 249, 255, 0.54) 100%
 	);
+	padding: 1rem;
+
+	@media (max-width: 1024px) {
+		height: auto;
+		min-height: 70vh;
+	}
 `;
 
 const StyledCalendar = styled(LibCalendar)`
@@ -158,11 +164,11 @@ const StyledCalendar = styled(LibCalendar)`
 
 	& .react-calendar__navigation {
 		display: flex;
-		padding: 0 12.5rem;
+		padding: 0 5%;
 		margin: 1rem 0;
-		justify-content: center;
+		justify-content: space-between;
 		align-items: center;
-		font-size: 1.3rem;
+		font-size: clamp(1rem, 2vw, 1.3rem);
 		font-weight: 600;
 		color: #7130a3;
 		background: none;
@@ -183,14 +189,14 @@ const StyledCalendar = styled(LibCalendar)`
 
 	& .react-calendar__month-view__weekdays {
 		text-align: center;
-		font-size: 1.5rem;
+		font-size: clamp(0.8rem, 1.5vw, 1.5rem);
 		font-weight: bold;
 		color: #779f7c;
 		text-decoration: none;
 		margin-bottom: 0.5rem;
 
 		& .react-calendar__month-view__weekdays__weekday {
-			padding: 0.6rem 0;
+			padding: 0.2rem 0;
 
 			abbr {
 				text-decoration: none;
@@ -199,13 +205,13 @@ const StyledCalendar = styled(LibCalendar)`
 	}
 
 	& .react-calendar__tile {
-		height: 6.2rem;
+		height: clamp(4rem, 10vw, 6.2rem);
 		display: flex;
 		align-items: flex-start;
 		justify-content: flex-start;
 		position: relative;
-		padding: 0.6rem;
-		font-size: 1.2rem;
+		padding: 0.3rem;
+		font-size: clamp(0.8rem, 1.2vw, 1.2rem);
 		font-weight: bold;
 		color: #3eb1b8;
 		flex-direction: column;
@@ -230,6 +236,17 @@ const StyledCalendar = styled(LibCalendar)`
 			opacity: 0.3;
 		}
 	}
+
+	@media (max-width: 768px) {
+		& .react-calendar__navigation {
+			padding: 0 2%;
+		}
+
+		& .react-calendar__tile {
+			height: clamp(2rem, 8vw, 5rem);
+			padding: 0.2rem;
+		}
+	}
 `;
 
 const EventsContainer = styled.div`
@@ -246,9 +263,9 @@ const Event = styled.div`
 	background-color: #7130a3;
 	margin-bottom: 0.1rem;
 	color: #fff;
-	padding: 0.3rem 0.3rem;
-	border-radius: 1rem;
-	font-size: 0.7rem;
+	padding: 0.2rem;
+	border-radius: 0.5rem;
+	font-size: clamp(0.6rem, 1vw, 0.7rem);
 	font-weight: 500;
 	white-space: nowrap;
 	overflow: hidden;

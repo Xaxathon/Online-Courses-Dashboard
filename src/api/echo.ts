@@ -12,6 +12,10 @@ window.io = io;
 
 class EchoService {
 	private echo: Echo | null = null;
+	private listeners: Map<
+		number,
+		{ unsubscribe: () => void; listener: (e: { protocol: Protocol }) => void }
+	> = new Map();
 
 	initialize() {
 		const token = localStorage.getItem("token");
@@ -30,22 +34,40 @@ class EchoService {
 
 	listenToProtocolUpdates(
 		protocolId: number,
-		onUpdate: (protocol: any) => void
+		onUpdate: (protocol: Protocol) => void
 	) {
-		if (!this.echo) {
-			this.initialize();
-		}
+		this.initialize();
 
-		const channelName = `secretary_protocol.${protocolId}`;
-		this.echo
-			?.private(channelName)
-			.listen(".VideoProcessed", (e: { protocol: any }) => {
-				onUpdate(e.protocol);
-			});
-
-		return () => {
-			this.echo?.leave(channelName);
+		const channel = this.echo?.private(`secretary_protocol.${protocolId}`);
+		const listener = (e: { protocol: Protocol }) => {
+			onUpdate(e.protocol);
 		};
+
+		channel?.listen(".VideoProcessed", listener);
+
+		const unsubscribe = () => {
+			channel?.stopListening(".VideoProcessed", listener);
+			this.listeners.delete(protocolId);
+		};
+
+		this.listeners.set(protocolId, { unsubscribe, listener });
+
+		return unsubscribe;
+	}
+
+	stopListeningToProtocol(protocolId: number) {
+		const listenerInfo = this.listeners.get(protocolId);
+		if (listenerInfo) {
+			listenerInfo.unsubscribe();
+			this.listeners.delete(protocolId);
+		}
+	}
+
+	stopListeningToAllProtocols() {
+		this.listeners.forEach(({ unsubscribe }) => {
+			unsubscribe();
+		});
+		this.listeners.clear();
 	}
 }
 

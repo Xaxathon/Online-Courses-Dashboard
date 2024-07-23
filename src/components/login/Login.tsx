@@ -138,13 +138,13 @@ const Login = () => {
 							{formik.errors.password}
 						</span>
 					) : null}
-					<Link
-						to="/change-password"
-						className="flex justify-end mt-1 hover:text-gardenGreen"
-					>
+				</div>
+				<div className="flex justify-end mt-1">
+					<Link to="/change-password" className="mt-1 hover:text-gardenGreen">
 						Забыли пароль?
 					</Link>
 				</div>
+
 				<div className="w-full flex justify-center mt-4">
 					<button
 						type="submit"

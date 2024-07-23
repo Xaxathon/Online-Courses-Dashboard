@@ -14,7 +14,7 @@ import {
 const protocolsApi = createApi({
 	reducerPath: "protocolsApi",
 	baseQuery: baseQueryWithReauth,
-	tagTypes: ["Protocol", "ProtocolTasks"],
+	tagTypes: ["Protocol", "ProtocolTasks", "FinalProtocol"],
 	endpoints: (builder) => ({
 		getProtocols: builder.query<
 			ProtocolsListResponse,
@@ -44,6 +44,10 @@ const protocolsApi = createApi({
 
 		getProtocol: builder.query<ProtocolResponse, number>({
 			query: (id) => `/api/protocols/${id}`,
+			providesTags: (_, __, id) => [
+				{ type: "Protocol", id },
+				{ type: "FinalProtocol", id },
+			],
 		}),
 
 		createProtocol: builder.mutation<{ protocol: Protocol }, FormData>({
@@ -160,6 +164,7 @@ const protocolsApi = createApi({
 				method: "POST",
 				body: data,
 			}),
+			invalidatesTags: (_, __, { id }) => [{ type: "FinalProtocol", id }],
 		}),
 
 		generatePDF: builder.mutation<string, number>({

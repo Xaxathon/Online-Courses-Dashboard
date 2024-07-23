@@ -17,7 +17,7 @@ const rootReducer = combineReducers({
 	[statsApi.reducerPath]: statsApi.reducer,
 });
 
-const reducer = (state, action) => {
+const reducer = (state: any, action: any) => {
 	if (action.type === "auth/logout") {
 		state = undefined;
 	}

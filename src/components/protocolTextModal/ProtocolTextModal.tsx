@@ -37,6 +37,7 @@ interface ProtocolTextModalProps {
 	city: string;
 	event_start_time: string;
 	onClose: () => void;
+	onUpdate: () => void;
 }
 
 interface AutoResizeTextAreaProps
@@ -52,6 +53,7 @@ const ProtocolTextModal = ({
 	location,
 	city,
 	event_start_time,
+	onUpdate,
 }: ProtocolTextModalProps) => {
 	const [saveFinalProtocol] = useSaveFinalProtocolMutation();
 
@@ -94,6 +96,7 @@ const ProtocolTextModal = ({
 				},
 			}).unwrap();
 
+			onUpdate();
 			onClose();
 		} catch (error) {
 			console.error("Failed to save final protocol:", error);
@@ -104,116 +107,130 @@ const ProtocolTextModal = ({
 
 	return (
 		<Modal onClose={onClose}>
-			<Formik
-				initialValues={initialValues}
-				validationSchema={validationSchema}
-				onSubmit={handleSubmit}
-			>
-				{({ values, setFieldValue, isSubmitting }) => {
-					const onDragStart = (e: DragEvent<HTMLDivElement>, index: number) => {
-						e.dataTransfer.setData("text/plain", index.toString());
-					};
+			{final_transcript.length === 0 ? (
+				<div className=" flex flex-col items-center justify-center p-5 h-20 mt-10">
+					<h2 className="text-center text-xl text-mainPurple font-bold">
+						У вас нет ключевых слов
+					</h2>
+				</div>
+			) : (
+				<Formik
+					initialValues={initialValues}
+					validationSchema={validationSchema}
+					onSubmit={handleSubmit}
+				>
+					{({ values, setFieldValue, isSubmitting }) => {
+						const onDragStart = (
+							e: DragEvent<HTMLDivElement>,
+							index: number
+						) => {
+							e.dataTransfer.setData("text/plain", index.toString());
+						};
 
-					const onDragOver = (e: DragEvent<HTMLDivElement>) => {
-						e.preventDefault();
-					};
+						const onDragOver = (e: DragEvent<HTMLDivElement>) => {
+							e.preventDefault();
+						};
 
-					const onDrop = (e: DragEvent<HTMLDivElement>, dropIndex: number) => {
-						e.preventDefault();
-						const dragIndex = parseInt(
-							e.dataTransfer.getData("text/plain"),
-							10
-						);
-						if (dragIndex === dropIndex) return;
+						const onDrop = (
+							e: DragEvent<HTMLDivElement>,
+							dropIndex: number
+						) => {
+							e.preventDefault();
+							const dragIndex = parseInt(
+								e.dataTransfer.getData("text/plain"),
+								10
+							);
+							if (dragIndex === dropIndex) return;
 
-						const newKeywords = [...values.keywords];
-						const [removed] = newKeywords.splice(dragIndex, 1);
-						newKeywords.splice(dropIndex, 0, removed);
+							const newKeywords = [...values.keywords];
+							const [removed] = newKeywords.splice(dragIndex, 1);
+							newKeywords.splice(dropIndex, 0, removed);
 
-						setFieldValue("keywords", newKeywords);
-					};
+							setFieldValue("keywords", newKeywords);
+						};
 
-					return (
-						<Form className="w-[35rem] flex flex-col gap-2 mt-6 text-base font-bold text-mainPurple">
-							<h2 className="text-center mb-2 text-xl">Текст протокола</h2>
-							<div className="h-[30rem] w-full p-1 overflow-y-auto">
-								{values.keywords.map((keyword, index) => (
-									<DraggableKeyword
-										key={`${keyword.key}-${index}`}
-										keyword={keyword}
-										index={index}
-										onDragStart={onDragStart}
-										onDragOver={onDragOver}
-										onDrop={onDrop}
-									/>
-								))}
-
-								<div className="flex gap-4 mt-4">
-									<div className="flex flex-col gap-1 flex-1">
-										<label htmlFor="event_start_time">Время начала</label>
-										<Field
-											type="time"
-											id="event_start_time"
-											name="event_start_time"
-											className="text-mainPurple bg-lightPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
+						return (
+							<Form className="w-[35rem] flex flex-col gap-2 mt-6 text-base font-bold text-mainPurple">
+								<h2 className="text-center mb-2 text-xl">Текст протокола</h2>
+								<div className="h-[30rem] w-full p-1 overflow-y-auto">
+									{values.keywords.map((keyword, index) => (
+										<DraggableKeyword
+											key={`${keyword.key}-${index}`}
+											keyword={keyword}
+											index={index}
+											onDragStart={onDragStart}
+											onDragOver={onDragOver}
+											onDrop={onDrop}
 										/>
-										<ErrorMessage
-											name="event_start_time"
-											component="div"
-											className="text-crimsonRed"
-										/>
+									))}
+
+									<div className="flex gap-4 mt-4">
+										<div className="flex flex-col gap-1 flex-1">
+											<label htmlFor="event_start_time">Время начала</label>
+											<Field
+												type="time"
+												id="event_start_time"
+												name="event_start_time"
+												className="text-mainPurple bg-lightPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
+											/>
+											<ErrorMessage
+												name="event_start_time"
+												component="div"
+												className="text-crimsonRed"
+											/>
+										</div>
+
+										<div className="flex flex-col gap-1 flex-1">
+											<label htmlFor="city">Город</label>
+											<Field
+												type="text"
+												id="city"
+												name="city"
+												className="text-mainPurple bg-lightPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
+											/>
+											<ErrorMessage
+												name="city"
+												component="div"
+												className="text-crimsonRed"
+											/>
+										</div>
 									</div>
 
-									<div className="flex flex-col gap-1 flex-1">
-										<label htmlFor="city">Город</label>
+									<div className="flex flex-col gap-1 mt-4">
+										<label htmlFor="location">Место проведения</label>
 										<Field
 											type="text"
-											id="city"
-											name="city"
+											id="location"
+											name="location"
 											className="text-mainPurple bg-lightPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
 										/>
 										<ErrorMessage
-											name="city"
+											name="location"
 											component="div"
 											className="text-crimsonRed"
 										/>
 									</div>
 								</div>
 
-								<div className="flex flex-col gap-1 mt-4">
-									<label htmlFor="location">Место проведения</label>
-									<Field
-										type="text"
-										id="location"
-										name="location"
-										className="text-mainPurple bg-lightPurple p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-mainPurple focus:border-transparent"
-									/>
-									<ErrorMessage
-										name="location"
-										component="div"
-										className="text-crimsonRed"
-									/>
-								</div>
-							</div>
-
-							<button
-								className={classNames(
-									"px-20 mt-5 py-2 mx-auto text-white rounded-lg text-base",
-									{
-										"bg-gray-500 cursor-not-allowed": isSubmitting,
-										"bg-mainPurple hover:bg-mainPurpleHover active:bg-mainPurpleActive":
-											!isSubmitting,
-									}
-								)}
-								type="submit"
-								disabled={isSubmitting}
-							>
-								Сохранить
-							</button>
-						</Form>
-					);
-				}}
-			</Formik>
+								<button
+									className={classNames(
+										"px-20 mt-5 py-2 mx-auto text-white rounded-lg text-base",
+										{
+											"bg-gray-500 cursor-not-allowed": isSubmitting,
+											"bg-mainPurple hover:bg-mainPurpleHover active:bg-mainPurpleActive":
+												!isSubmitting,
+										}
+									)}
+									type="submit"
+									disabled={isSubmitting}
+								>
+									Сохранить
+								</button>
+							</Form>
+						);
+					}}
+				</Formik>
+			)}
 		</Modal>
 	);
 };

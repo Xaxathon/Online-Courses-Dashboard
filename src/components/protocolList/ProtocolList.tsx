@@ -7,7 +7,7 @@ import Skeleton from "../skeleton/Skeleton";
 
 import { useDispatch } from "react-redux";
 
-import { listenToProtocolUpdates } from "@/api/echo";
+import { echoService } from "@/api/echo";
 import {
 	useGetProtocolsQuery,
 	useProcessVideoMutation,
@@ -52,6 +52,12 @@ const ProtocolList = () => {
 					];
 				}
 			});
+
+			data.data.forEach((protocol) => {
+				if (protocol.stage === ProtocolStage.VideoProcess) {
+					handleProcessVideo(protocol.id);
+				}
+			});
 		}
 	}, [data, page]);
 
@@ -68,7 +74,10 @@ const ProtocolList = () => {
 	const handleProcessVideo = async (id: number) => {
 		try {
 			await processVideo(id).unwrap();
-			const unsubscribe = listenToProtocolUpdates(id, updateProtocolInList);
+			const unsubscribe = echoService.listenToProtocolUpdates(
+				id,
+				updateProtocolInList
+			);
 
 			setTimeout(() => {
 				unsubscribe();
@@ -101,18 +110,32 @@ const ProtocolList = () => {
 		[isFetching, data]
 	);
 
-	const updateProtocolInList = (updatedProtocol: Protocol) => {
-		dispatch(
-			showNotification({
-				message: `Протокол №${updatedProtocol.protocol_number} готов, нажмите на это сообщение, чтобы открыть его.`,
-				protocolId: updatedProtocol.id,
-			})
-		);
-		dispatch({
-			type: "protocolsApi/invalidateTags",
-			payload: [{ type: "Protocol", id: "LIST" }],
-		});
-	};
+	const updateProtocolInList = useCallback(
+		(updatedProtocol: Protocol) => {
+			setAllProtocols((prevProtocols) =>
+				prevProtocols.map((protocol) =>
+					protocol.id === updatedProtocol.id ? updatedProtocol : protocol
+				)
+			);
+
+			dispatch(
+				showNotification({
+					message: `Протокол №${updatedProtocol.protocol_number} готов, нажмите на это сообщение, чтобы открыть его.`,
+					protocolId: updatedProtocol.id,
+				})
+			);
+
+			dispatch({
+				type: "protocolsApi/invalidateTags",
+				payload: [{ type: "Protocol", id: "LIST" }],
+			});
+
+			if (updatedProtocol.stage !== ProtocolStage.VideoProcess) {
+				echoService.stopListeningToProtocol(updatedProtocol.id);
+			}
+		},
+		[dispatch]
+	);
 
 	return (
 		<div className="h-[78vh] overflow-y-auto rounded-lg relative">

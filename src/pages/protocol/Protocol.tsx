@@ -382,6 +382,7 @@ const Protocol = () => {
 					event_start_time={protocol.data.event_start_time}
 					final_transcript={protocol.data.final_transcript}
 					onClose={() => setIsModalOpenText(false)}
+					onUpdate={() => setShouldFetchProtocol(true)}
 				/>
 			)}
 
