@@ -41,7 +41,7 @@ export interface CreateProtocol {
 }
 
 export interface ProtocolTaskData {
-	id: number;
+	id?: number;
 	responsible_id: number;
 	essence: string;
 	deadline: string;
