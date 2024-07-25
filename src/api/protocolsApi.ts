@@ -68,6 +68,7 @@ const protocolsApi = createApi({
 				method: "PUT",
 				body: data,
 			}),
+			invalidatesTags: (_, __, { id }) => [{ type: "Protocol", id }],
 		}),
 
 		deleteProtocol: builder.mutation<void, number>({
@@ -112,7 +113,7 @@ const protocolsApi = createApi({
 		}),
 
 		updateProtocolTask: builder.mutation<
-			ProtocolTaskData,
+			void,
 			{ taskId: number; status: string }
 		>({
 			query: ({ taskId, status }) => ({
@@ -120,12 +121,21 @@ const protocolsApi = createApi({
 				method: "PUT",
 				body: { status },
 			}),
+
+			invalidatesTags: (_, __, { taskId }) => [
+				{ type: "ProtocolTasks", id: taskId },
+			],
 		}),
+
 		deleteProtocolTask: builder.mutation<void, { taskId: number }>({
 			query: ({ taskId }) => ({
 				url: `/api/protocols/tasks/${taskId}`,
 				method: "DELETE",
 			}),
+
+			invalidatesTags: (_, __, { taskId }) => [
+				{ type: "ProtocolTasks", id: taskId },
+			],
 		}),
 
 		getProtocolMembers: builder.query<ProtocolMembersResponse, number>({

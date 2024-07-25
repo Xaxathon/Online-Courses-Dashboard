@@ -44,7 +44,6 @@ const Protocol = () => {
 	const [isSelectingFor, setIsSelectingFor] = useState<
 		"secretary" | "supervisor" | null
 	>(null);
-	const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
 	const [initialValues, setInitialValues] = useState({
 		theme: "",
@@ -53,7 +52,6 @@ const Protocol = () => {
 		secretaryName: "",
 		director_id: 0,
 		directorName: "",
-		status: "process",
 	});
 
 	const {
@@ -80,7 +78,6 @@ const Protocol = () => {
 				secretaryName: protocol.data.secretary.full_name,
 				director_id: protocol.data.director.id,
 				directorName: protocol.data.director.full_name,
-				status: protocol.data.status,
 			});
 			setShouldFetchProtocol(false);
 		}
@@ -126,21 +123,17 @@ const Protocol = () => {
 
 	const handleStatusToggle = async () => {
 		if (!protocol) return;
-		setIsUpdatingStatus(true);
 		try {
-			const newStatus =
-				initialValues.status === "success" ? "process" : "success";
 			await updateProtocol({
 				id: Number(id),
-				data: { status: newStatus },
+				data: {
+					status: protocol.data.status === "success" ? "process" : "success",
+				},
 			}).unwrap();
-
-			setInitialValues((prev) => ({ ...prev, status: newStatus }));
 			setShouldFetchProtocol(true);
 		} catch (error) {
 			console.error("Status Update Error:", error);
 		}
-		setIsUpdatingStatus(false);
 	};
 
 	const handleBlur = async (e: FocusEvent<HTMLInputElement>) => {
@@ -171,11 +164,6 @@ const Protocol = () => {
 	const handleCloseModalUser = () => {
 		setIsModalOpenUser(false);
 		setIsSelectingFor(null);
-	};
-
-	const handleCloseTextModal = () => {
-		setIsModalOpenText(false);
-		setShouldFetchProtocol(true);
 	};
 
 	if (isLoading) return <SkeletonProtocol />;
@@ -339,16 +327,13 @@ const Protocol = () => {
 			<div className="flex gap-4">
 				<button
 					className={`my-6 text-white font-bold text-xl px-3 py-2 rounded-lg ${
-						isUpdatingStatus
-							? "bg-gray-500 cursor-not-allowed"
-							: initialValues.status === "success"
+						protocol.data.status === "success"
 							? "bg-gardenGreen hover:bg-gardenGreenHover"
 							: "bg-mainPurple hover:bg-mainPurpleHover active:bg-mainPurpleActive"
 					}`}
 					onClick={handleStatusToggle}
-					disabled={isUpdatingStatus}
 				>
-					{initialValues.status === "success"
+					{protocol.data.status === "success"
 						? "Исполнено"
 						: "Исполнить протокол"}
 				</button>
@@ -390,7 +375,7 @@ const Protocol = () => {
 				<DeleteElementModal
 					title="Удаление протокола"
 					description={`Протокол №${protocol.data.protocol_number}`}
-					onClose={handleCloseTextModal}
+					onClose={() => setIsDeleteModalOpen(false)}
 					onDelete={handleDelete}
 					isLoading={isDeleteLoading}
 				/>

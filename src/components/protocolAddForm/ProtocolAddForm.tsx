@@ -130,7 +130,7 @@ const ProtocolAddForm = () => {
 
 			<form
 				onSubmit={formik.handleSubmit}
-				className="w-full grid grid-cols-2 gap-5"
+				className="w-full grid grid-cols-2  gap-5"
 			>
 				<div className=" w-full flex flex-col items-center xl:text-xl lg:text-lg font-bold text-mainPurple gap-8">
 					<div className="flex flex-col items-center w-full">

@@ -18,7 +18,6 @@ import { ProtocolTask } from "@/shared/interfaces/protocol";
 
 interface TaskItemProps {
 	task: ProtocolTask;
-	onDelete: (taskId: number) => void;
 }
 
 const getStatusColor = (status: string) => {
@@ -35,7 +34,7 @@ const getStatusColor = (status: string) => {
 };
 
 const ProtocolTaskItem = memo(
-	forwardRef<HTMLUListElement, TaskItemProps>(({ task, onDelete }, ref) => {
+	forwardRef<HTMLUListElement, TaskItemProps>(({ task }, ref) => {
 		const navigate = useNavigate();
 
 		const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -66,7 +65,6 @@ const ProtocolTaskItem = memo(
 		const handleDelete = async () => {
 			try {
 				await deleteProtocolTask({ taskId: task.id });
-				onDelete(task.id);
 			} catch (error) {
 				console.error("Error deleting task:", error);
 			}
@@ -76,7 +74,7 @@ const ProtocolTaskItem = memo(
 			<>
 				<ul
 					ref={ref}
-					className="relative grid grid-cols-5 xl:text-sm text-xs bg-gray-100 items-center justify-center rounded-lg text-center p-4 w-full mb-3 cursor-pointer hover:bg-gray-200 active:bg-gray-300 transition-colors duration-200"
+					className="relative grid grid-cols-5  text-xs xl:text-sm 2xl:text-base bg-gray-100 items-center justify-center rounded-lg text-center p-4 w-full mb-3 cursor-pointer hover:bg-gray-200 active:bg-gray-300 transition-colors duration-200"
 					onClick={() => navigate(`/main/protocols/${task.protocol.id}`)}
 				>
 					<li

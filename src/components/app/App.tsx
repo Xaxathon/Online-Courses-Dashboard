@@ -5,6 +5,7 @@ import {
 	Route,
 	Routes,
 	Navigate,
+	Outlet,
 } from "react-router-dom";
 
 import { ReactComponent as Spinner } from "@/assets/icons/spinner.svg";
@@ -18,7 +19,7 @@ import ResetPassword from "@components/resetPassword/ResetPassword";
 import PrivateRoute from "@components/privateRoute/PrivateRoute";
 import Dashboard from "@components/dashboard/Dashboard";
 
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/store/store";
 import { setToken, setRole } from "@/store/slices/authSlice";
 
@@ -26,6 +27,7 @@ import { UserRole } from "@/shared/interfaces/user";
 
 const App = () => {
 	const dispatch = useDispatch<AppDispatch>();
+	const token = useSelector((state: any) => state.auth.token);
 
 	useEffect(() => {
 		const token = localStorage.getItem("token");
@@ -48,14 +50,23 @@ const App = () => {
 				}
 			>
 				<Routes>
-					<Route path="/" element={<Navigate to="/login" />} />
-					<Route path="/login" element={<Login />} />
-					<Route path="/change-password" element={<ForgotPassword />} />
 					<Route
-						path="/change-password/:token"
-						element={<ResetPassword />}
-					/>{" "}
-					{/* TODO: Ждем почтовый клиент */}
+						path="/"
+						element={
+							token ? (
+								<Navigate to="/main" replace />
+							) : (
+								<Navigate to="/login" replace />
+							)
+						}
+					/>
+
+					<Route element={<AnonymousRoute />}>
+						<Route path="/login" element={<Login />} />
+						<Route path="/change-password" element={<ForgotPassword />} />
+						<Route path="/change-password/:token" element={<ResetPassword />} />
+					</Route>
+
 					<Route
 						path="/main/*"
 						element={
@@ -73,3 +84,9 @@ const App = () => {
 };
 
 export default App;
+
+const AnonymousRoute = () => {
+	const token = useSelector((state: any) => state.auth.token);
+
+	return token ? <Navigate to="/main" replace /> : <Outlet />;
+};

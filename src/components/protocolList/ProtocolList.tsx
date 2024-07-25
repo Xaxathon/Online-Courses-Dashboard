@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState, useRef } from "react";
+import { useEffect, useCallback, useState, useRef, useMemo } from "react";
 
 import ProtocolItem from "../protocolItem/ProtocolItem";
 import { showNotification } from "@/store/slices/notificationSlice";
@@ -138,7 +138,7 @@ const ProtocolList = () => {
 	);
 
 	return (
-		<div className="h-[78vh] overflow-y-auto rounded-lg relative">
+		<div className="h-full overflow-y-auto rounded-lg relative">
 			{allProtocols.map((protocol, index) => (
 				<ProtocolItem
 					ref={
@@ -149,30 +149,26 @@ const ProtocolList = () => {
 				/>
 			))}
 
-			{isLoading && (
-				<div className="h-[78vh] overflow-y-auto rounded-lg">
-					<SkeletonProtocolItem />
-					<SkeletonProtocolItem />
-					<SkeletonProtocolItem />
-					<SkeletonProtocolItem />
-					<SkeletonProtocolItem />
-					<SkeletonProtocolItem />
-				</div>
-			)}
-			{isFetching && (
-				<div className="flex justify-center mt-2">
-					<Spinner />
-				</div>
-			)}
-			{error && (
-				<span className="block text-center text-crimsonRed font-bold mt-5">
-					Ошибка загрузки протоколов
-				</span>
-			)}
-			{allProtocols.length === 0 && (
-				<span className="block text-center text-gardenGreen font-bold mt-5">
-					На данный момент нет протоколов
-				</span>
+			{isLoading && <SkeletonList />}
+			{!isLoading && (
+				<>
+					{isFetching && (
+						<div className="flex justify-center mt-2">
+							<Spinner />
+						</div>
+					)}
+					{error ? (
+						<span className="block text-center text-crimsonRed font-bold mt-5">
+							Ошибка загрузки протоколов
+						</span>
+					) : (
+						allProtocols.length === 0 && (
+							<span className="block text-center text-gardenGreen font-bold mt-5">
+								На данный момент нет протоколов
+							</span>
+						)
+					)}
+				</>
 			)}
 		</div>
 	);
@@ -180,10 +176,22 @@ const ProtocolList = () => {
 
 export default ProtocolList;
 
-const SkeletonProtocolItem = () => {
-	return (
-		<li className="flex bg-gray-100 px-5 py-6 rounded-lg gap-3  my-3">
-			<Skeleton width="full" height="10" className="mb-2 rounded-lg" />
-		</li>
-	);
+const SkeletonList = () => {
+	const skeletonItems = useMemo(() => {
+		return Array(10)
+			.fill(null)
+			.map((_, index) => (
+				<div
+					key={`skeleton-${index}`}
+					className="flex bg-gray-100 w-full p-4 mb-5 rounded-lg gap-2"
+				>
+					<Skeleton width="1/4" height="7" className="mb-2 rounded" />
+					<Skeleton width="1/4" height="7" className="mb-2 rounded" />
+					<Skeleton width="1/4" height="7" className="mb-2 rounded" />
+					<Skeleton width="1/4" height="7" className="mb-2 rounded" />
+				</div>
+			));
+	}, []);
+
+	return <>{skeletonItems}</>;
 };

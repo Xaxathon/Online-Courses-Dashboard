@@ -4,7 +4,7 @@ import Skeleton from "../skeleton/Skeleton";
 import { useFetchKeywordsQuery } from "@/api/keywordsApi";
 
 const KeywordsList = () => {
-	const { data, error, isLoading, refetch } = useFetchKeywordsQuery();
+	const { data, error, isLoading } = useFetchKeywordsQuery();
 
 	if (isLoading)
 		return (
@@ -21,12 +21,6 @@ const KeywordsList = () => {
 				<p className="text-center text-crimsonRed font-bold">
 					Ошибка при загрузке данных
 				</p>
-				<button
-					onClick={() => refetch()}
-					className=" bg-crimsonRed text-white px-10 text-base py-2 rounded-lg"
-				>
-					Обновить
-				</button>
 			</div>
 		);
 
@@ -34,7 +28,7 @@ const KeywordsList = () => {
 		<ul className="mt-10 max-w-6xl mx-auto">
 			{data && data.data.length > 0 ? (
 				data.data.map((keyword) => (
-					<KeywordsItem key={keyword.id} keyword={keyword} refetch={refetch} />
+					<KeywordsItem key={keyword.id} keyword={keyword} />
 				))
 			) : (
 				<div className="flex justify-center text-base font-bold text-gardenGreen">

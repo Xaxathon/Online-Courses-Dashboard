@@ -1,20 +1,13 @@
-import { Protocol } from "@/shared/interfaces/protocol";
 import Echo from "laravel-echo";
 import io from "socket.io-client";
 
-declare global {
-	interface Window {
-		io: typeof io;
-	}
-}
-
-window.io = io;
+(window as any).io = io;
 
 class EchoService {
-	private echo: Echo | null = null;
+	private echo: any | null = null;
 	private listeners: Map<
 		number,
-		{ unsubscribe: () => void; listener: (e: { protocol: Protocol }) => void }
+		{ unsubscribe: () => void; listener: (e: any) => void }
 	> = new Map();
 
 	initialize() {
@@ -29,17 +22,22 @@ class EchoService {
 					Authorization: `Bearer ${token}`,
 				},
 			},
+			transports: ["websocket", "polling"],
+			secure: true,
+			forceTLS: true,
+			encrypted: true,
+			enabledTransports: ["ws", "wss"],
 		});
 	}
 
 	listenToProtocolUpdates(
 		protocolId: number,
-		onUpdate: (protocol: Protocol) => void
+		onUpdate: (protocol: any) => void
 	) {
 		this.initialize();
 
 		const channel = this.echo?.private(`secretary_protocol.${protocolId}`);
-		const listener = (e: { protocol: Protocol }) => {
+		const listener = (e: { protocol: any }) => {
 			onUpdate(e.protocol);
 		};
 
@@ -75,7 +73,7 @@ export const echoService = new EchoService();
 
 export const listenToProtocolUpdates = (
 	protocolId: number,
-	onUpdate: (protocol: Protocol) => void
+	onUpdate: (protocol: any) => void
 ) => {
 	return echoService.listenToProtocolUpdates(protocolId, onUpdate);
 };

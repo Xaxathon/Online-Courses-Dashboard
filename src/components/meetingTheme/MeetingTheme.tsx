@@ -27,6 +27,7 @@ interface MeetingThemeProps {
 	onMeetingSelect: (meeting: Meeting | null) => void;
 	meetings: Meeting[];
 	refetchMeetings: () => void;
+	error: any;
 }
 
 const MeetingTheme = ({
@@ -35,6 +36,7 @@ const MeetingTheme = ({
 	onMeetingSelect,
 	meetings,
 	refetchMeetings,
+	error,
 }: MeetingThemeProps) => {
 	const [isModalOpenTime, setIsModalOpenTime] = useState(false);
 	const [isModalOpenUser, setIsModalOpenUser] = useState(false);
@@ -168,119 +170,128 @@ const MeetingTheme = ({
 
 	return (
 		<div className="min-h-dynamic border-effect border bg-white shadow-effect px-3 py-5 rounded-lg">
-			<div className="flex items-center justify-between relative">
-				<span className="font-bold text-2xl text-center text-gardenGreen w-full">
-					Тема совещания
+			{error ? (
+				<span className="block mx-auto text-center font-bold text-xl mt-10 text-crimsonRed">
+					Ошибка загрузки данных
 				</span>
-				{(selectedMeeting || newFrontendMeeting) && (
-					<Delete
-						className="w-6 h-6 fill-current text-gray-400 hover:text-crimsonRed cursor-pointer absolute right-0"
-						onClick={() => setIsDeleteModalOpen(true)}
-					/>
-				)}
-			</div>
-
-			<div className="flex items-center relative mt-3">
-				<ul className="w-full flex items-center gap-2 overflow-x-auto justify-start max-h-full">
-					{filteredMeetings.length === 0 ? (
-						<li
-							className="flex flex-grow items-center border px-2 flex-shrink-0 w-1/4 justify-center border-mainPurple rounded-lg py-2 cursor-pointer"
-							onClick={() => setIsModalOpenTime(true)}
-						>
-							Нажмите, чтобы создать тему совещания
-						</li>
-					) : (
-						filteredMeetings.map((meeting) => (
-							<li
-								key={`${meeting.id}-${meeting.event_start_time}`}
-								className={classNames(
-									"flex flex-grow items-center border px-2 flex-shrink-0 w-1/4 justify-center border-mainPurple rounded-lg py-2 cursor-pointer",
-									{
-										"bg-white hover:bg-gray-100":
-											selectedMeeting?.id !== meeting.id,
-										"bg-lightPurpleHover ": selectedMeeting?.id === meeting.id,
-									}
-								)}
-								onClick={() => handleMeetingSelect(meeting)}
-							>
-								{meeting.event_start_time
-									? meeting.event_start_time.slice(0, 5)
-									: "Invalid date"}
-							</li>
-						))
-					)}
-					<div
-						className={classNames(
-							"absolute right-0 flex items-center justify-center font-bold text-lg text-white py-2 px-3 rounded-md",
-							{
-								"bg-mainPurple hover:bg-mainPurpleHover active:bg-mainPurpleActive cursor-pointer":
-									!isAddButtonDisabled,
-								"bg-gray-400 cursor-not-allowed": isAddButtonDisabled,
-							}
-						)}
-						onClick={() => !isAddButtonDisabled && setIsModalOpenTime(true)}
-					>
-						+
-					</div>
-				</ul>
-			</div>
-
-			{filteredMeetings.length === 0 ? (
-				<div className="flex flex-col items-center justify-center bg-gray-100 rounded-lg p-5 mt-5">
-					<Skeleton width="full" height="20" className="rounded-lg mb-5" />
-					<Skeleton width="20" height="10" className="rounded-lg mb-10" />
-					<Skeleton width="full" height="5" className="rounded-lg mb-4" />
-					<Skeleton width="full" height="5" className="rounded-lg mb-4" />
-					<Skeleton width="full" height="5" className="rounded-lg mb-4" />
-					<Skeleton width="full" height="5" className="rounded-lg mb-4" />
-				</div>
 			) : (
 				<>
-					{startTime && endTime && (
-						<div className="flex justify-around mt-3 bg-time-gradient p-3 rounded-lg text-black w-full">
-							<div className="">Начало: {startTime}</div>
-							<div className="text-mainPurple font-bold text-xl ">→</div>
-							<div>Конец: {endTime}</div>
+					<div className="flex items-center justify-between relative">
+						<span className="font-bold text-2xl text-center text-gardenGreen w-full">
+							Тема совещания
+						</span>
+						{(selectedMeeting || newFrontendMeeting) && (
+							<Delete
+								className="w-6 h-6 fill-current text-gray-400 hover:text-crimsonRed cursor-pointer absolute right-0"
+								onClick={() => setIsDeleteModalOpen(true)}
+							/>
+						)}
+					</div>
+
+					<div className="flex items-center relative mt-3">
+						<ul className="w-full flex items-center gap-2 overflow-x-auto justify-start max-h-full">
+							{filteredMeetings.length === 0 ? (
+								<li
+									className="flex flex-grow items-center border px-2 flex-shrink-0 w-1/4 justify-center border-mainPurple rounded-lg py-2 cursor-pointer"
+									onClick={() => setIsModalOpenTime(true)}
+								>
+									Нажмите, чтобы создать тему совещания
+								</li>
+							) : (
+								filteredMeetings.map((meeting) => (
+									<li
+										key={`${meeting.id}-${meeting.event_start_time}`}
+										className={classNames(
+											"flex flex-grow items-center border px-2 flex-shrink-0 w-1/4 justify-center border-mainPurple rounded-lg py-2 cursor-pointer",
+											{
+												"bg-white hover:bg-gray-100":
+													selectedMeeting?.id !== meeting.id,
+												"bg-lightPurpleHover ":
+													selectedMeeting?.id === meeting.id,
+											}
+										)}
+										onClick={() => handleMeetingSelect(meeting)}
+									>
+										{meeting.event_start_time
+											? meeting.event_start_time.slice(0, 5)
+											: "Invalid date"}
+									</li>
+								))
+							)}
+							<div
+								className={classNames(
+									"absolute right-0 flex items-center justify-center font-bold text-lg text-white py-2 px-3 rounded-md",
+									{
+										"bg-mainPurple hover:bg-mainPurpleHover active:bg-mainPurpleActive cursor-pointer":
+											!isAddButtonDisabled,
+										"bg-gray-400 cursor-not-allowed": isAddButtonDisabled,
+									}
+								)}
+								onClick={() => !isAddButtonDisabled && setIsModalOpenTime(true)}
+							>
+								+
+							</div>
+						</ul>
+					</div>
+
+					{filteredMeetings.length === 0 ? (
+						<div className="flex flex-col items-center justify-center bg-gray-100 rounded-lg p-5 mt-5">
+							<Skeleton width="full" height="20" className="rounded-lg mb-5" />
+							<Skeleton width="20" height="10" className="rounded-lg mb-10" />
+							<Skeleton width="full" height="5" className="rounded-lg mb-4" />
+							<Skeleton width="full" height="5" className="rounded-lg mb-4" />
+							<Skeleton width="full" height="5" className="rounded-lg mb-4" />
+							<Skeleton width="full" height="5" className="rounded-lg mb-4" />
 						</div>
+					) : (
+						<>
+							{startTime && endTime && (
+								<div className="flex justify-around mt-3 bg-time-gradient p-3 rounded-lg text-black w-full">
+									<div className="">Начало: {startTime}</div>
+									<div className="text-mainPurple font-bold text-xl ">→</div>
+									<div>Конец: {endTime}</div>
+								</div>
+							)}
+							<MeetingForm
+								meeting={selectedMeeting}
+								errorAddMember={errorAddMember}
+								selectedDate={selectedDate}
+								startTime={startTime}
+								endTime={endTime}
+								onSave={handleSave}
+								onOpenUserModal={() => setIsModalOpenUser(true)}
+								onUpdateMeeting={handleUpdateMeeting}
+							/>
+						</>
 					)}
-					<MeetingForm
-						meeting={selectedMeeting}
-						errorAddMember={errorAddMember}
-						selectedDate={selectedDate}
-						startTime={startTime}
-						endTime={endTime}
-						onSave={handleSave}
-						onOpenUserModal={() => setIsModalOpenUser(true)}
-						onUpdateMeeting={handleUpdateMeeting}
-					/>
+					{isModalOpenTime && (
+						<MeetingTimeAddFormModal
+							onClose={() => setIsModalOpenTime(false)}
+							onTimeSubmit={handleTimeSubmit}
+						/>
+					)}
+					{isModalOpenUser && selectedMeeting && (
+						<ExternalUserAddModal
+							onClose={() => setIsModalOpenUser(false)}
+							onUserSelect={handleUserSelect}
+						/>
+					)}
+					{isDeleteModalOpen && (selectedMeeting || newFrontendMeeting) && (
+						<DeleteElementModal
+							title="Удаление совещания"
+							description={
+								selectedMeeting
+									? `${selectedMeeting.theme.slice(0, 10)} (ID: ${
+											selectedMeeting.id
+									  })`
+									: "Несохраненное совещание"
+							}
+							onClose={() => setIsDeleteModalOpen(false)}
+							onDelete={() => handleDelete(selectedMeeting?.id)}
+							isLoading={isDeleteLoading}
+						/>
+					)}
 				</>
-			)}
-			{isModalOpenTime && (
-				<MeetingTimeAddFormModal
-					onClose={() => setIsModalOpenTime(false)}
-					onTimeSubmit={handleTimeSubmit}
-				/>
-			)}
-			{isModalOpenUser && selectedMeeting && (
-				<ExternalUserAddModal
-					onClose={() => setIsModalOpenUser(false)}
-					onUserSelect={handleUserSelect}
-				/>
-			)}
-			{isDeleteModalOpen && (selectedMeeting || newFrontendMeeting) && (
-				<DeleteElementModal
-					title="Удаление совещания"
-					description={
-						selectedMeeting
-							? `${selectedMeeting.theme.slice(0, 10)} (ID: ${
-									selectedMeeting.id
-							  })`
-							: "Несохраненное совещание"
-					}
-					onClose={() => setIsDeleteModalOpen(false)}
-					onDelete={() => handleDelete(selectedMeeting?.id)}
-					isLoading={isDeleteLoading}
-				/>
 			)}
 		</div>
 	);

@@ -9,6 +9,7 @@ import {
 export const keywordsApi = createApi({
 	reducerPath: "keywordsApi",
 	baseQuery: baseQueryWithReauth,
+	tagTypes: ["Keyword"],
 	endpoints: (builder) => ({
 		createKeyword: builder.mutation<
 			KeywordResponse,
@@ -22,6 +23,7 @@ export const keywordsApi = createApi({
 					Accept: "application/json",
 				},
 			}),
+			invalidatesTags: ["Keyword"],
 		}),
 
 		fetchKeywords: builder.query<KeywordResponse, void>({
@@ -32,6 +34,7 @@ export const keywordsApi = createApi({
 					Accept: "application/json",
 				},
 			}),
+			providesTags: ["Keyword"],
 		}),
 
 		updateKeyword: builder.mutation<KeywordResponse, Keyword>({
@@ -43,6 +46,7 @@ export const keywordsApi = createApi({
 					Accept: "application/json",
 				},
 			}),
+			invalidatesTags: ["Keyword"],
 		}),
 
 		deleteKeyword: builder.mutation<KeywordResponse, { id: number }>({
@@ -53,6 +57,7 @@ export const keywordsApi = createApi({
 					Accept: "application/json",
 				},
 			}),
+			invalidatesTags: ["Keyword"],
 		}),
 	}),
 });

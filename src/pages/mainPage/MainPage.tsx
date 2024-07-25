@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, ChangeEvent, useMemo } from "react";
+import { useState, useCallback, ChangeEvent, useMemo } from "react";
 import { useSelector } from "react-redux";
 
 import { ReactComponent as Search } from "@assets/icons/search.svg";
@@ -49,20 +49,15 @@ const MainPage = () => {
 			}
 		);
 
-	const { data: meetingStats, refetch: refetchMeetingStats } =
-		useFetchMeetingStatsQuery(
-			{
-				start_date_at,
-				end_date_at,
-			},
-			{
-				skip: !userId,
-			}
-		);
-
-	useEffect(() => {
-		refetchMeetingStats();
-	}, [currentMonth, refetchMeetingStats]);
+	const { data: meetingStats } = useFetchMeetingStatsQuery(
+		{
+			start_date_at,
+			end_date_at,
+		},
+		{
+			skip: !userId,
+		}
+	);
 
 	const formattedKpiData = useMemo(() => {
 		if (!kpiStats) return [];
@@ -105,7 +100,7 @@ const MainPage = () => {
 		: [];
 
 	return (
-		<div className="grid grid-cols-[minmax(20rem,_30rem)_minmax(30rem,_70rem)] gap-6 px-4 mt-7">
+		<div className="grid grid-cols-[minmax(20rem,_30rem)_minmax(30rem,_90rem)] gap-6 px-4 mt-7">
 			<div className="flex w-full flex-col gap-2 ">
 				<div className="max-w-[30rem] rounded-xl flex justify-center items-center">
 					<CalendarWrapper
@@ -139,7 +134,7 @@ const MainPage = () => {
 					)}
 				</div>
 			</div>
-			<div className="">
+			<div className="flex flex-col h-[calc(100vh-1.75rem)]">
 				<div className="flex justify-center items-center w-full bg-gray-100 mt-2 rounded-lg px-3 py-1 mb-5">
 					<input
 						className="bg-transparent p-2 w-full focus:outline-none"

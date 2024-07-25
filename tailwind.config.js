@@ -29,7 +29,7 @@ export default {
 			},
 			gridTemplateColumns: {
 				"5-protocol-cols":
-					"minmax(18.75rem, 27.5rem) minmax(11.125rem, 19.5rem) minmax(8.75rem, 8.75rem) minmax(7.75rem, 10.9375rem) minmax(7.75rem, 11.125rem)",
+					"minmax(18rem, 0.32fr) minmax(11rem, 0.25fr) minmax(8rem, 0.11fr) minmax(7rem, 0.14fr) minmax(7rem, 0.14fr)",
 			},
 
 			borderColor: {

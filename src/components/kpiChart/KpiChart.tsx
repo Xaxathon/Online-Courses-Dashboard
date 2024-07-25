@@ -149,38 +149,40 @@ const KpiChart = ({
 				onChange={handleMonthChange}
 				styles={customStyles}
 			/>
-			<ResponsiveContainer width="100%" height="75%">
-				{isLoading ? (
-					<div className="flex justify-center items-center w-full h-full p-1">
-						<Skeleton width="full" height="full" className="rounded-xl" />
-					</div>
-				) : (
-					<BarChart data={completeData} barCategoryGap="10%" barGap={10}>
-						<CartesianGrid vertical={false} strokeDasharray="2 3" />
-						<XAxis dataKey="week" tick={{ fontSize: 15 }} interval={0} />
-						<YAxis axisLine={false} tickLine={false} />
-						<Tooltip />
-						<Bar
-							dataKey="in_process"
-							fill="#A964D3"
-							shape={<CustomBar radius={[6, 6, 0, 0]} width={20} />}
-							name="В процессе"
-						/>
-						<Bar
-							dataKey="success"
-							fill="#A1BBA4"
-							shape={<CustomBar radius={[6, 6, 0, 0]} width={20} />}
-							name="Готово"
-						/>
-						<Bar
-							dataKey="expired"
-							fill="#D46666"
-							shape={<CustomBar radius={[6, 6, 0, 0]} width={20} />}
-							name="Просрочено"
-						/>
-					</BarChart>
-				)}
-			</ResponsiveContainer>
+			<ChartWrapper>
+				<ResponsiveContainer width="100%" height="100%">
+					{isLoading ? (
+						<div className="flex justify-center items-center w-full h-full p-1">
+							<Skeleton width="full" height="full" className="rounded-xl" />
+						</div>
+					) : (
+						<BarChart data={completeData} barCategoryGap="10%" barGap={10}>
+							<CartesianGrid vertical={false} strokeDasharray="2 3" />
+							<XAxis dataKey="week" tick={{ fontSize: 15 }} interval={0} />
+							<YAxis axisLine={false} tickLine={false} />
+							<Tooltip />
+							<Bar
+								dataKey="in_process"
+								fill="#A964D3"
+								shape={<CustomBar radius={[6, 6, 0, 0]} width={20} />}
+								name="В процессе"
+							/>
+							<Bar
+								dataKey="success"
+								fill="#A1BBA4"
+								shape={<CustomBar radius={[6, 6, 0, 0]} width={20} />}
+								name="Готово"
+							/>
+							<Bar
+								dataKey="expired"
+								fill="#D46666"
+								shape={<CustomBar radius={[6, 6, 0, 0]} width={20} />}
+								name="Просрочено"
+							/>
+						</BarChart>
+					)}
+				</ResponsiveContainer>
+			</ChartWrapper>
 		</Container>
 	);
 };
@@ -210,6 +212,8 @@ const Container = styled.div`
 	border-radius: 0.6rem;
 	padding: 1.2rem;
 	box-shadow: 0 0 0.6rem rgba(0, 0, 0, 0.1);
+	display: flex;
+	flex-direction: column;
 
 	@media (max-width: 768px) {
 		max-width: 100%;
@@ -286,3 +290,8 @@ const SelectWrapper = styled(Select)`
 	border: none;
 	margin-bottom: 0.31rem;
 ` as typeof Select;
+
+const ChartWrapper = styled.div`
+	flex-grow: 1;
+	min-height: 0;
+`;

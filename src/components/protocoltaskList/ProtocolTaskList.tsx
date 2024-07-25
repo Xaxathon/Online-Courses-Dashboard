@@ -51,35 +51,36 @@ const ProtocolTaskList = ({ searchTerm }: { searchTerm: string }) => {
 		[isFetching, data?.data?.data.length]
 	);
 
-	const handleDeleteTask = useCallback((taskId: number) => {
-		setAllTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
-	}, []);
-
 	return (
-		<div className="h-[78vh] overflow-y-auto rounded-lg">
+		<div className="overflow-y-auto rounded-lg mb-3">
 			{allTasks.map((task, index) => (
 				<ProtocolTaskItem
 					ref={allTasks.length === index + 1 ? lastTaskElementRef : null}
 					key={task.id}
 					task={task}
-					onDelete={handleDeleteTask}
 				/>
 			))}
 			{isLoading && <SkeletonList />}
-			{allTasks.length === 0 && (
-				<span className="block text-center text-gardenGreen font-bold mt-5">
-					На данный момент нет задач
-				</span>
-			)}
-			{isFetching && (
-				<div className="flex justify-center mt-2">
-					<Spinner />
-				</div>
-			)}
-			{error && (
-				<span className="block text-center text-crimsonRed font-bold mt-5">
-					Ошибка загрузки задач
-				</span>
+
+			{!isLoading && (
+				<>
+					{isFetching && (
+						<div className="flex justify-center mt-2">
+							<Spinner />
+						</div>
+					)}
+					{error ? (
+						<span className="block text-center text-crimsonRed font-bold mt-5">
+							Ошибка загрузки задач
+						</span>
+					) : (
+						allTasks.length === 0 && (
+							<span className="block text-center text-gardenGreen font-bold mt-5">
+								На данный момент нет задач
+							</span>
+						)
+					)}
+				</>
 			)}
 		</div>
 	);
@@ -88,7 +89,7 @@ export default ProtocolTaskList;
 
 const SkeletonList = () => {
 	const skeletonItems = useMemo(() => {
-		return Array(8)
+		return Array(10)
 			.fill(null)
 			.map((_, index) => (
 				<div
@@ -103,7 +104,5 @@ const SkeletonList = () => {
 			));
 	}, []);
 
-	return (
-		<div className="h-[78vh] overflow-y-auto rounded-lg">{skeletonItems}</div>
-	);
+	return <>{skeletonItems}</>;
 };

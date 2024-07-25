@@ -12,7 +12,7 @@ import { logout } from "../store/slices/authSlice";
 export const authApi = createApi({
 	reducerPath: "authApi",
 	baseQuery: baseQueryWithReauth,
-	tagTypes: ["User"],
+	tagTypes: ["User", "PersonalUser"],
 	endpoints: (builder) => ({
 		login: builder.mutation<LoginResponse, LoginRequest>({
 			query: (credentials) => ({
@@ -63,6 +63,7 @@ export const authApi = createApi({
 				url: "/api/me",
 				method: "GET",
 			}),
+			providesTags: ["PersonalUser"],
 		}),
 		fetchUserById: builder.query<FetchUsersResponse, number>({
 			query: (id) => ({
@@ -89,7 +90,7 @@ export const authApi = createApi({
 					body: data,
 				};
 			},
-			invalidatesTags: ["User"],
+			invalidatesTags: () => ["User", "PersonalUser"],
 		}),
 		createUser: builder.mutation<{ user: UserResponse }, CreateUserRequest>({
 			query: (data) => ({

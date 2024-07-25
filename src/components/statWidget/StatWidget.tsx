@@ -30,7 +30,7 @@ const StatWidget = ({ title, inProcess, success }: StatWidgetProps) => {
 						<span className="ml-2 text-gardenGreen">{success}</span>
 					</div>
 				</div>
-				<div className="relative w-[50px] h-[50px]">
+				<div className="relative w-12 h-12">
 					<CircularProgressbarWithChildren
 						value={successPercentage}
 						styles={buildStyles({

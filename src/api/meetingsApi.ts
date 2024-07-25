@@ -20,9 +20,7 @@ const meetingsApi = createApi({
 				params: { start_date_at, end_date_at },
 			}),
 		}),
-		getMeeting: builder.query<MeetingResponse, number>({
-			query: (id) => `/api/meetings/${id}`,
-		}),
+
 		createMeeting: builder.mutation<
 			{ meeting: Meeting },
 			{ data: FormData | Partial<CreateMeeting> }
@@ -81,7 +79,6 @@ const meetingsApi = createApi({
 
 export const {
 	useGetMeetingsQuery,
-	useGetMeetingQuery,
 	useCreateMeetingMutation,
 	useUpdateMeetingMutation,
 	useDeleteMeetingMutation,

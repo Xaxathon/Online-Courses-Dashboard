@@ -61,7 +61,11 @@ const UserSetting = () => {
 							/>
 						</>
 					)}
-					{isError && <p>Error loading user data</p>}
+					{isError && (
+						<p className="text-center text-crimsonRed font-bold">
+							Ошибка при загрузке данных
+						</p>
+					)}
 					{userData && <UserSettingPersonalForm userData={userData.data} />}
 				</div>
 				{role === UserRole.Manager && (

@@ -1,54 +1,34 @@
 import { memo, useState } from "react";
-
 import classNames from "classnames";
-
 import { ReactComponent as Change } from "@assets/icons/change.svg";
 import { ReactComponent as Success } from "@assets/icons/change.svg";
 import { ReactComponent as Delete } from "@assets/icons/delete.svg";
 import { ReactComponent as Close } from "@assets/icons/сlose-icon.svg";
-
 import DeleteElementModal from "../deleteElementModal/DeleteElementModal";
-
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
-
 import {
 	useUpdateKeywordMutation,
 	useDeleteKeywordMutation,
 } from "@/api/keywordsApi";
-
 import { Keyword } from "@/shared/interfaces/keyword";
 
-interface KeywordsItemProps {
-	keyword: Keyword;
-	refetch: () => void;
-}
-
-const KeywordsItem = memo(({ keyword, refetch }: KeywordsItemProps) => {
+const KeywordsItem = memo(({ keyword }: { keyword: Keyword }) => {
 	const [isEditing, setIsEditing] = useState<boolean>(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
-	const [updateKeyword, { isLoading: isUpdating, error: updateError }] =
-		useUpdateKeywordMutation();
-	const [deleteKeyword, { error: deleteError, isLoading: isDeleteLoading }] =
+	const [updateKeyword, { isLoading: isUpdating }] = useUpdateKeywordMutation();
+	const [deleteKeyword, { isLoading: isDeleteLoading }] =
 		useDeleteKeywordMutation();
 
 	const handleSave = async (values: { title: string; phrase: string }) => {
-		try {
-			await updateKeyword({ ...keyword, ...values }).unwrap();
-			setIsEditing(false);
-		} catch (error) {
-			console.error("Ошибка при обновлении ключевого слова:", error);
-		}
+		await updateKeyword({ ...keyword, ...values });
+		setIsEditing(false);
 	};
 
 	const handleDelete = async () => {
 		if (keyword.id !== undefined) {
-			try {
-				await deleteKeyword({ id: keyword.id }).unwrap();
-				refetch();
-			} catch (error) {
-				console.error("Ошибка при удалении ключевого слова:", error);
-			}
+			await deleteKeyword({ id: keyword.id });
+			setIsDeleteModalOpen(false);
 		}
 	};
 
@@ -56,8 +36,9 @@ const KeywordsItem = memo(({ keyword, refetch }: KeywordsItemProps) => {
 		title: Yup.string().required("Поле обязательно для заполнения"),
 		phrase: Yup.string().required("Поле обязательно для заполнения"),
 	});
+
 	return (
-		<li className="relative mb-5 mr-5 pr-10 text-gardenGreen text-base font-normal rounded-xl bg-gray-100 py-7 px-8 hover:bg-gray-200  transition-colors duration-200">
+		<li className="relative mb-5 mr-5 pr-10 text-gardenGreen text-base font-normal rounded-xl bg-gray-100 py-7 px-8 hover:bg-gray-200 transition-colors duration-200">
 			<Formik
 				initialValues={{ title: keyword.title, phrase: keyword.phrase }}
 				validationSchema={validationSchema}
@@ -110,14 +91,6 @@ const KeywordsItem = memo(({ keyword, refetch }: KeywordsItemProps) => {
 								className="text-crimsonRed text-sm mt-1"
 							/>
 						</div>
-						{(updateError || deleteError) && (
-							<div className="col-span-2 text-crimsonRed text-sm mt-2">
-								{updateError
-									? "Ошибка при обновлении ключевого слова"
-									: "Ошибка при удалении ключевого слова"}
-								. Пожалуйста, попробуйте еще раз.
-							</div>
-						)}
 						<div className="flex flex-col items-start justify-center absolute top-1/2 transform -translate-y-1/2 -right-5 gap-4">
 							{isEditing ? (
 								<>

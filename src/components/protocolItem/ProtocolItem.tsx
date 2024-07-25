@@ -33,7 +33,7 @@ const ProtocolItem = forwardRef<HTMLLIElement, ProtocolItemProps>(
 				ref={ref}
 				onClick={handleClick}
 				className={classNames(
-					"grid grid-cols-5-protocol-cols justify-center items-center lg:text-sm text-xs text-center p-5 rounded-lg mb-3 transition-colors duration-200",
+					"grid grid-cols-5-protocol-cols 2xl:text-base justify-center items-center lg:text-sm text-xs text-center p-5 rounded-lg mb-3 transition-colors duration-200",
 					{
 						"bg-gray-100 hover:bg-gray-200 active:bg-gray-300 cursor-pointer ":
 							!isProcessing,

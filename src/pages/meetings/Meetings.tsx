@@ -54,15 +54,9 @@ const Meetings = () => {
 	if (isLoading) {
 		return <LoadingSkeleton />;
 	}
-	if (error) {
-		return (
-			<span className="block mx-auto text-center font-bold text-xl mt-10 text-crimsonRed">
-				Ошибка загрузки данных
-			</span>
-		);
-	}
+
 	return (
-		<div className="ml-3 grid grid-cols-[minmax(470px,_800px),_minmax(370px,_470px)] gap-3 justify-between items-start mt-5 mr-6 w-full">
+		<div className="ml-3 grid grid-cols-[minmax(29.4rem,_1fr),_minmax(23.1rem,_0.5fr)] gap-3 justify-between items-start mt-5 mr-6 w-full">
 			<MeetingCalendar
 				onDateChange={handleDateChange}
 				onMonthChange={handleMonthChange}
@@ -74,13 +68,14 @@ const Meetings = () => {
 				onMeetingSelect={setSelectedMeeting}
 				meetings={meetings}
 				refetchMeetings={refetchMeetings}
+				error={error}
 			/>
 		</div>
 	);
 };
 
 const LoadingSkeleton = () => (
-	<div className="ml-3 grid grid-cols-[800px_minmax(470px,_470px)] gap-3 justify-between items-start mt-5 mr-6 w-full h-screen pb-[5rem]">
+	<div className="ml-3 grid grid-cols-[minmax(29.4rem,_1fr),_minmax(23.1rem,_0.5fr)] gap-3 justify-between items-start mt-5 mr-6 w-full h-screen pb-[5rem]">
 		<div className="flex flex-col items-center justify-center bg-gray-100 rounded-lg p-5 mt-5 h-full">
 			<Skeleton width="full" height="full" className="rounded-lg mb-4" />
 		</div>
