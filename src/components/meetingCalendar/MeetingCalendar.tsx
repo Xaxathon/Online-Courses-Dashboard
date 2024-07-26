@@ -223,7 +223,7 @@ const StyledCalendar = styled(LibCalendar)`
 		}
 
 		&.react-calendar__tile--active {
-			background: #68a7f5;
+			background: #3eb1b8;
 			color: #fff;
 
 			&:enabled:hover,
