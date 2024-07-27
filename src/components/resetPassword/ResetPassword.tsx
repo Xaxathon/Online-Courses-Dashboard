@@ -2,6 +2,7 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import classNames from "classnames";
 
 import { useResetPasswordMutation } from "@/api/authApi";
 
@@ -109,7 +110,13 @@ const ResetPassword = () => {
 						<div className="w-full flex justify-center mt-6">
 							<button
 								type="submit"
-								className="rounded-md px-10 py-2 bg-mainPurple text-white text-base font-bold"
+								className={classNames(
+									"rounded-md px-10 py-2 text-white text-base font-bold",
+									{
+										"bg-gray-500 cursor-not-allowed": isLoading,
+										"bg-mainPurple": !isLoading,
+									}
+								)}
 								disabled={isLoading}
 							>
 								{isLoading ? "Загрузка..." : "Сбросить пароль"}

@@ -100,8 +100,8 @@ const MeetingCalendar = ({
 		return "";
 	};
 
-	const renderMonthLabel = (_: string | undefined, date: Date) => {
-		return dayjs(date).format("MMMM");
+	const renderMonthLabel = (date: Date) => {
+		return russianMonths[dayjs(date).month()];
 	};
 
 	return (
@@ -121,8 +121,7 @@ const MeetingCalendar = ({
 				}
 				prev2Label={null}
 				next2Label={null}
-				navigationLabel={({ date }) => renderMonthLabel("ru-RU", date)}
-				formatMonthYear={renderMonthLabel}
+				navigationLabel={({ date }) => renderMonthLabel(date)}
 				tileContent={tileContent}
 				tileClassName={tileClassName}
 				onActiveStartDateChange={handleActiveStartDateChange}
@@ -212,6 +211,7 @@ const StyledCalendar = styled(LibCalendar)`
 		position: relative;
 		padding: 0.3rem;
 		font-size: clamp(0.8rem, 1.2vw, 1.2rem);
+		border-radius: 0.5rem;
 		font-weight: bold;
 		color: #3eb1b8;
 		flex-direction: column;
@@ -235,6 +235,10 @@ const StyledCalendar = styled(LibCalendar)`
 		&.out-of-month {
 			opacity: 0.3;
 		}
+	}
+
+	.react-calendar__month-view__days__day--neighboringMonth {
+		opacity: 0.3;
 	}
 
 	@media (max-width: 768px) {
@@ -272,3 +276,19 @@ const Event = styled.div`
 	text-overflow: ellipsis;
 	max-width: 100%;
 `;
+
+// Не хотелось добавлять импорты для dayjs locale ru :(
+const russianMonths = [
+	"Январь",
+	"Февраль",
+	"Март",
+	"Апрель",
+	"Май",
+	"Июнь",
+	"Июль",
+	"Август",
+	"Сентябрь",
+	"Октябрь",
+	"Ноябрь",
+	"Декабрь",
+];

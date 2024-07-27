@@ -4,6 +4,7 @@ import { ReactComponent as Backward } from "@assets/icons/backward.svg";
 
 import { useFormik, FormikHelpers } from "formik";
 import * as Yup from "yup";
+import classNames from "classnames";
 
 import { useForgotPasswordMutation } from "@/api/authApi";
 
@@ -83,11 +84,21 @@ const ForgotPassword = () => {
 				<div className="w-full flex justify-center mt-10">
 					<button
 						type="submit"
-						className="rounded-md px-10 py-2 bg-mainPurple text-white text-base font-bold"
+						className={classNames(
+							"rounded-md px-10 py-2 text-white text-base font-bold",
+							{
+								"bg-gardenGreen cursor-not-allowed": isSuccess,
+								"bg-gray-500 cursor-not-allowed": isLoading,
+								"bg-mainPurple": !isSuccess && !isLoading,
+							}
+						)}
 						disabled={isLoading || isSuccess}
 					>
-						{isLoading ? "Отправка..." : "Отправить ссылку для сброса пароля"}
-						{isSuccess && "Отправлено"}
+						{isSuccess
+							? "Отправлено"
+							: isLoading
+							? "Отправка..."
+							: "Отправить ссылку для сброса пароля"}
 					</button>
 				</div>
 			</form>
