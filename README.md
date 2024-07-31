@@ -1,30 +1,94 @@
-# React + TypeScript + Vite
+# 🚀 Protomind
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-Currently, two official plugins are available:
+Этот проект представляет собой современное веб-приложение, построенное с использованием передовых технологий и библиотек.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Основные библиотеки
 
-## Expanding the ESLint configuration
+![RTK-Query](https://img.shields.io/badge/RTK_Query-593D88?style=for-the-badge&logo=react&logoColor=white)
+![React Router](https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white)
+![Formik](https://img.shields.io/badge/Formik-0CAFFF?style=for-the-badge&logo=formik&logoColor=white)
+![Yup](https://img.shields.io/badge/Yup-32CD32?style=for-the-badge&logo=yup&logoColor=white)
+![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chart.js&logoColor=white)
+![Recharts](https://img.shields.io/badge/Recharts-22B5BF?style=for-the-badge&logo=recharts&logoColor=white)
+![React DnD](https://img.shields.io/badge/React_DnD-1C78C0?style=for-the-badge&logo=react&logoColor=white)
+![Styled Components](https://img.shields.io/badge/Styled_Components-DB7093?style=for-the-badge&logo=styled-components&logoColor=white)
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## 🧰 Дополнительные инструменты
 
-- Configure the top-level `parserOptions` property like this:
+![Day.js](https://img.shields.io/badge/Day.js-FF5F4C?style=for-the-badge&logo=day.js&logoColor=white)
+![Socket.io](https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=socket.io&logoColor=white)
+![Classnames](https://img.shields.io/badge/Classnames-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![React Select](https://img.shields.io/badge/React_Select-FF6B6B?style=for-the-badge&logo=react&logoColor=white)
+![React Player](https://img.shields.io/badge/React_Player-F50057?style=for-the-badge&logo=react&logoColor=white)
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+## 🔥 Ключевые особенности
+
+- 🎨 **Современный пользовательский интерфейс**
+
+  - Адаптивный дизайн для устройств с разрешением от 1024px
+  - Интуитивно понятная навигация
+
+![Dashboard](https://i.imgur.com/f2tZTCB.png)
+
+- 🔄 **Эффективное управление данными**
+
+  - Использование RTK Query для кэширования и оптимизации запросов
+  - Быстрая загрузка и обновление данных
+
+- 👥 **Двойная панель управления**
+
+  - Дашборд для менеджера:
+    - Отслеживание статуса активности секретарей
+    - Создание личных секретарей
+    - Изменение настроек секретарей
+    - Возможность блокировки аккаунтов секретарей
+  - Дашборд для секретаря:
+    - **Продвинутая обработка видео**
+      - Пользовательский интерфейс для загрузки видеозаписей совещаний
+      - Обработка видео в реальном времени с использованием веб-сокетов
+      - Извлечение субтитров из видео для дальнейшего анализа
+      - Отображение прогресса обработки видео
+      - Уведомления о завершении обработки
+    - **Работа с протоколами**
+      - Просмотр и редактирование полученного протокола
+      - Функциональность ключевых слов для всех протоколов
+      - Возможность взять кусок субтитра по ключевым словам (по фразе)
+      - Возможность вручную внести корректировки и сохранить новый текст протокола
+      - Экспорт отредактированного протокола в форматы PDF и DOCX
+    - **Управление совещаниями**
+      - Создание новых совещаний
+      - Прикрепление ссылок на совещания
+      - Добавление и выбор участников
+      - Отправка приглашений на совещания по электронной почте
+
+- 🧩 **Модульная архитектура**
+  - Легкое масштабирование и добавление новых функций
+  - Чистый и поддерживаемый код
+
+## 🚀 Запуск проекта
+
+```bash
+# Клонирование репозитория
+git clone https://github.com/your-username/your-project-name.git
+
+# Переход в директорию проекта
+cd your-project-name
+
+# Установка зависимостей
+npm install
+
+# Запуск в режиме разработки
+npm run dev
+
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## 📞 Контакты
+
+Если у вас есть вопросы или предложения по проекту, не стесняйтесь связаться со мной:
+
+- 📧 Telegram: @askh95

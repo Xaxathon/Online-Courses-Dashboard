@@ -146,6 +146,7 @@ const CalendarContainer = styled.div`
 		rgba(231, 249, 255, 0.54) 100%
 	);
 	padding: 1rem;
+	overflow: scroll;
 
 	@media (max-width: 1024px) {
 		height: auto;
@@ -160,11 +161,13 @@ const StyledCalendar = styled(LibCalendar)`
 	border: none;
 	background-color: transparent;
 	font-family: "Poppins", sans-serif;
+	display: flex;
+	flex-direction: column;
 
 	& .react-calendar__navigation {
 		display: flex;
 		padding: 0 5%;
-		margin: 1rem 0;
+		margin-bottom: 1rem;
 		justify-content: space-between;
 		align-items: center;
 		font-size: clamp(1rem, 2vw, 1.3rem);
@@ -186,6 +189,18 @@ const StyledCalendar = styled(LibCalendar)`
 		}
 	}
 
+	& .react-calendar__viewContainer {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	}
+
+	& .react-calendar__month-view {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	}
+
 	& .react-calendar__month-view__weekdays {
 		text-align: center;
 		font-size: clamp(0.8rem, 1.5vw, 1.5rem);
@@ -203,8 +218,14 @@ const StyledCalendar = styled(LibCalendar)`
 		}
 	}
 
+	& .react-calendar__month-view__days {
+		flex: 1;
+		display: flex;
+		flex-wrap: wrap;
+	}
+
 	& .react-calendar__tile {
-		height: clamp(4rem, 10vw, 6.2rem);
+		height: 6.2rem;
 		display: flex;
 		align-items: flex-start;
 		justify-content: flex-start;
@@ -247,7 +268,7 @@ const StyledCalendar = styled(LibCalendar)`
 		}
 
 		& .react-calendar__tile {
-			height: clamp(2rem, 8vw, 5rem);
+			height: clamp(4rem, 10vw, 6.2rem);
 			padding: 0.2rem;
 		}
 	}
